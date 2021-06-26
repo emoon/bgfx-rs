@@ -1,0 +1,15 @@
+[package]
+name = "bgfx-rs"
+license = "BSD-2-Clause"
+authors = ["Daniel Collin <daniel@collin.com>"]
+version = "0.1.0"
+edition = "2018"
+readme = "README.md"
+
+[badges]
+maintenance = {status = "actively-developed"}
+
+[dependencies]
+bitflags = "1.2"
+# bgfx-sys = { git = "https://github.com/emoon/bgfx-sys" }
+bgfx-sys = { path = "../bgfx-sys" }

@@ -1,0 +1,2 @@
+   Compiling bgfx-rs v0.1.0 (/home/emoon/code/projects/bgfx-rs)
+    Finished dev [unoptimized + debuginfo] target(s) in 2.02s
