@@ -7,6 +7,10 @@ version = "0.1.0"
 edition = "2018"
 readme = "README.md"
 
+exclude = [
+  "resources/"
+]
+
 [badges]
 maintenance = {status = "actively-developed"}
 
