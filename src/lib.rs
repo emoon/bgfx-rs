@@ -6001,4 +6001,4 @@ pub fn dbg_text(x: u16, y: u16, attr: u8, text: &str) {
     }
 }
 
-//pub use bgfx_rs::* as bgfx::*;
+//pub use crate::* as bgfx::*;

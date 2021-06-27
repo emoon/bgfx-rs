@@ -1,8 +1,8 @@
+use bgfx::*;
 use bgfx_rs as bgfx;
 use glfw::{Action, Context, Key, Window};
 use raw_window_handle::HasRawWindowHandle;
 use raw_window_handle::RawWindowHandle;
-use bgfx::*;
 
 const WIDTH: usize = 1280;
 const HEIGHT: usize = 720;
@@ -50,7 +50,7 @@ fn main() {
 
     // TODO: run ctor inside new
     let mut init = Init::new();
-    bgfx_rs::init_ctor(&init);
+    bgfx::init_ctor(&init);
 
     init.type_r = RendererType::Count;
     init.resolution.width = WIDTH as u32;
@@ -63,8 +63,14 @@ fn main() {
     }
 
     bgfx::set_debug(DebugFlags::TEXT.bits());
-    bgfx::set_view_clear(0, ClearFlags::COLOR.bits() | ClearFlags::DEPTH.bits(),
-         SetViewClearArgs { rgba: 0x103030ff, .. Default::default() });
+    bgfx::set_view_clear(
+        0,
+        ClearFlags::COLOR.bits() | ClearFlags::DEPTH.bits(),
+        SetViewClearArgs {
+            rgba: 0x103030ff,
+            ..Default::default()
+        },
+    );
 
     let mut old_size = (0, 0);
 
@@ -79,10 +85,7 @@ fn main() {
         let size = window.get_framebuffer_size();
 
         if old_size != size {
-            bgfx::reset(
-                size.0 as _,
-                size.1 as _,
-                ResetArgs::default());
+            bgfx::reset(size.0 as _, size.1 as _, ResetArgs::default());
             old_size = size;
         }
 
@@ -98,7 +101,7 @@ fn main() {
             0,
             4,
             0x3f,
-            "Description: Initialization and debug text with bgfx-rs Rust API."
+            "Description: Initialization and debug text with bgfx-rs Rust API.",
         );
 
         bgfx::frame(false);
@@ -106,4 +109,3 @@ fn main() {
 
     bgfx::shutdown();
 }
-
