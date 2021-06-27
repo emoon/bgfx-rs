@@ -44,7 +44,6 @@ static CUBE_INDICES: [u16; 36] = [
     6, 3, 7,
 ];
 
-
 #[cfg(target_os = "linux")]
 fn update_platform_handle(pd: &mut PlatformData, window: &Window) {
     match window.raw_window_handle() {
@@ -74,7 +73,7 @@ fn load_shader_file(name: &str) -> std::io::Result<Vec<u8>> {
         RendererType::Direct3D11 => path.push("dx11"),
         RendererType::OpenGL => path.push("glsl"),
         RendererType::Metal => path.push("metal"),
-        RendererType::OpenGLES  => path.push("essl"),
+        RendererType::OpenGLES => path.push("essl"),
         e => panic!("Unsupported render type {:#?}", e),
     }
 
@@ -106,7 +105,7 @@ fn main() -> std::io::Result<()> {
         .create_window(
             WIDTH as _,
             HEIGHT as _,
-            "helloworld.rs bgfx-rs example - ESC to close",
+            "cubes.rs bgfx-rs example - ESC to close",
             glfw::WindowMode::Windowed,
         )
         .expect("Failed to create GLFW window.");
@@ -146,7 +145,15 @@ fn main() -> std::io::Result<()> {
     let layout = VertexLayoutBuilder::new();
     layout.begin(RendererType::Noop);
     layout.add(Attrib::Position, 3, AttribType::Float, AddArgs::default());
-    layout.add(Attrib::Color0, 4, AttribType::Uint8, AddArgs { normalized: true, as_int: false });
+    layout.add(
+        Attrib::Color0,
+        4,
+        AttribType::Uint8,
+        AddArgs {
+            normalized: true,
+            as_int: false,
+        },
+    );
     layout.end();
 
     let verts_mem = unsafe { Memory::reference(&CUBE_VERTICES) };
@@ -161,7 +168,8 @@ fn main() -> std::io::Result<()> {
         | StateWriteFlags::G
         | StateWriteFlags::B
         | StateWriteFlags::A
-        | StateWriteFlags::Z).bits()
+        | StateWriteFlags::Z)
+        .bits()
         | StateDepthTestFlags::LESS.bits()
         | StateCullFlags::CW.bits();
 
@@ -191,8 +199,7 @@ fn main() -> std::io::Result<()> {
 
         let aspect = size.0 as f32 / size.1 as f32;
 
-        let persp =
-            Mat4::perspective_lh(60.0 * (std::f32::consts::PI / 180.0), aspect, 0.1, 100.0);
+        let persp = Mat4::perspective_lh(60.0 * (std::f32::consts::PI / 180.0), aspect, 0.1, 100.0);
         let view = Mat4::look_at_lh(eye, at, up);
 
         bgfx::set_view_rect(0, 0, 0, size.0 as _, size.1 as _);
@@ -225,4 +232,3 @@ fn main() -> std::io::Result<()> {
 
     Ok(())
 }
-
