@@ -1913,33 +1913,72 @@ pub struct VertexLayoutBuilder {
 #[repr(C)]
 pub struct Encoder {}
 impl DynamicIndexBuffer {
-    /// Create empty dynamic index buffer.
+    /// * `num`:
+    /// Number of indices.
+    /// * `flags`:
+    /// Buffer creation flags.
+    ///   - [BufferFlags::NONE] - No flags.
+    ///   - [BufferFlags::COMPUTE_READ] - Buffer will be read from by compute shader.
+    ///   - [BufferFlags::COMPUTE_WRITE] - Buffer will be written into by compute shader. When buffer
+    ///       is created with [BufferFlags::COMPUTE_WRITE] flag it cannot be updated from CPU.
+    ///   - [BufferFlags::COMPUTE_READ_WRITE] - Buffer will be used for read/write by compute shader.
+    ///   - [BufferFlags::ALLOW_RESIZE] - Buffer will resize on buffer update if a different amount of
+    ///       data is passed. If this flag is not specified, and more data is passed on update, the buffer
+    ///       will be trimmed to fit the existing buffer size. This flag has effect only on dynamic
+    ///       buffers.
+    ///   - [BufferFlags::INDEX32] - Buffer is using 32-bit indices. This flag has effect only on
+    ///       index buffers.
     pub fn create_dynamic_index_buffer(num: u32, flags: u16) -> DynamicIndexBuffer {
         unsafe {
             let _ret = bgfx_sys::bgfx_create_dynamic_index_buffer(num, flags);
             DynamicIndexBuffer { handle: _ret }
         }
     }
-    /// Create dynamic index buffer and initialized it.
+    /// * `mem`:
+    /// Index buffer data.
+    /// * `flags`:
+    /// Buffer creation flags.
+    ///   - [BufferFlags::NONE] - No flags.
+    ///   - [BufferFlags::COMPUTE_READ] - Buffer will be read from by compute shader.
+    ///   - [BufferFlags::COMPUTE_WRITE] - Buffer will be written into by compute shader. When buffer
+    ///       is created with [BufferFlags::COMPUTE_WRITE] flag it cannot be updated from CPU.
+    ///   - [BufferFlags::COMPUTE_READ_WRITE] - Buffer will be used for read/write by compute shader.
+    ///   - [BufferFlags::ALLOW_RESIZE] - Buffer will resize on buffer update if a different amount of
+    ///       data is passed. If this flag is not specified, and more data is passed on update, the buffer
+    ///       will be trimmed to fit the existing buffer size. This flag has effect only on dynamic
+    ///       buffers.
+    ///   - [BufferFlags::INDEX32] - Buffer is using 32-bit indices. This flag has effect only on
+    ///       index buffers.
     pub fn create_dynamic_index_buffer_mem(mem: &Memory, flags: u16) -> DynamicIndexBuffer {
         unsafe {
             let _ret = bgfx_sys::bgfx_create_dynamic_index_buffer_mem(mem.handle, flags);
             DynamicIndexBuffer { handle: _ret }
         }
     }
-    /// Update dynamic index buffer.
+    /// * `handle`:
+    /// Dynamic index buffer handle.
+    /// * `start_index`:
+    /// Start index.
+    /// * `mem`:
+    /// Index buffer data.
     pub fn update_dynamic_index_buffer(&self, start_index: u32, mem: &Memory) {
         unsafe {
             bgfx_sys::bgfx_update_dynamic_index_buffer(self.handle, start_index, mem.handle);
         }
     }
-    /// Destroy dynamic index buffer.
+    /// * `handle`:
+    /// Dynamic index buffer handle.
     pub fn destroy_dynamic_index_buffer(&self) {
         unsafe {
             bgfx_sys::bgfx_destroy_dynamic_index_buffer(self.handle);
         }
     }
-    /// Set index buffer for draw primitive.
+    /// * `handle`:
+    /// Dynamic index buffer.
+    /// * `first_index`:
+    /// First index to render.
+    /// * `num_indices`:
+    /// Number of indices to render.
     pub fn set_dynamic_index_buffer(&self, first_index: u32, num_indices: u32) {
         unsafe {
             bgfx_sys::bgfx_set_dynamic_index_buffer(self.handle, first_index, num_indices);
@@ -1948,7 +1987,23 @@ impl DynamicIndexBuffer {
 }
 
 impl DynamicVertexBuffer {
-    /// Create empty dynamic vertex buffer.
+    /// * `num`:
+    /// Number of vertices.
+    /// * `layout`:
+    /// Vertex layout.
+    /// * `flags`:
+    /// Buffer creation flags.
+    ///   - [BufferFlags::NONE] - No flags.
+    ///   - [BufferFlags::COMPUTE_READ] - Buffer will be read from by compute shader.
+    ///   - [BufferFlags::COMPUTE_WRITE] - Buffer will be written into by compute shader. When buffer
+    ///       is created with [BufferFlags::COMPUTE_WRITE] flag it cannot be updated from CPU.
+    ///   - [BufferFlags::COMPUTE_READ_WRITE] - Buffer will be used for read/write by compute shader.
+    ///   - [BufferFlags::ALLOW_RESIZE] - Buffer will resize on buffer update if a different amount of
+    ///       data is passed. If this flag is not specified, and more data is passed on update, the buffer
+    ///       will be trimmed to fit the existing buffer size. This flag has effect only on dynamic
+    ///       buffers.
+    ///   - [BufferFlags::INDEX32] - Buffer is using 32-bit indices. This flag has effect only on
+    ///       index buffers.
     pub fn create_dynamic_vertex_buffer(
         num: u32,
         layout: &VertexLayoutBuilder,
@@ -1960,7 +2015,23 @@ impl DynamicVertexBuffer {
             DynamicVertexBuffer { handle: _ret }
         }
     }
-    /// Create dynamic vertex buffer and initialize it.
+    /// * `mem`:
+    /// Vertex buffer data.
+    /// * `layout`:
+    /// Vertex layout.
+    /// * `flags`:
+    /// Buffer creation flags.
+    ///   - [BufferFlags::NONE] - No flags.
+    ///   - [BufferFlags::COMPUTE_READ] - Buffer will be read from by compute shader.
+    ///   - [BufferFlags::COMPUTE_WRITE] - Buffer will be written into by compute shader. When buffer
+    ///       is created with [BufferFlags::COMPUTE_WRITE] flag it cannot be updated from CPU.
+    ///   - [BufferFlags::COMPUTE_READ_WRITE] - Buffer will be used for read/write by compute shader.
+    ///   - [BufferFlags::ALLOW_RESIZE] - Buffer will resize on buffer update if a different amount of
+    ///       data is passed. If this flag is not specified, and more data is passed on update, the buffer
+    ///       will be trimmed to fit the existing buffer size. This flag has effect only on dynamic
+    ///       buffers.
+    ///   - [BufferFlags::INDEX32] - Buffer is using 32-bit indices. This flag has effect only on
+    ///       index buffers.
     pub fn create_dynamic_vertex_buffer_mem(
         mem: &Memory,
         layout: &VertexLayoutBuilder,
@@ -1972,19 +2043,30 @@ impl DynamicVertexBuffer {
             DynamicVertexBuffer { handle: _ret }
         }
     }
-    /// Update dynamic vertex buffer.
+    /// * `handle`:
+    /// Dynamic vertex buffer handle.
+    /// * `start_vertex`:
+    /// Start vertex.
+    /// * `mem`:
+    /// Vertex buffer data.
     pub fn update_dynamic_vertex_buffer(&self, start_vertex: u32, mem: &Memory) {
         unsafe {
             bgfx_sys::bgfx_update_dynamic_vertex_buffer(self.handle, start_vertex, mem.handle);
         }
     }
-    /// Destroy dynamic vertex buffer.
+    /// * `handle`:
+    /// Dynamic vertex buffer handle.
     pub fn destroy_dynamic_vertex_buffer(&self) {
         unsafe {
             bgfx_sys::bgfx_destroy_dynamic_vertex_buffer(self.handle);
         }
     }
-    /// Set instance data buffer for draw primitive.
+    /// * `handle`:
+    /// Dynamic vertex buffer.
+    /// * `start_vertex`:
+    /// First instance data.
+    /// * `num`:
+    /// Number of data instances.
     pub fn set_instance_data_from_dynamic_vertex_buffer(&self, start_vertex: u32, num: u32) {
         unsafe {
             bgfx_sys::bgfx_set_instance_data_from_dynamic_vertex_buffer(
@@ -1997,7 +2079,19 @@ impl DynamicVertexBuffer {
 }
 
 impl FrameBuffer {
-    /// Create frame buffer (simple).
+    /// * `width`:
+    /// Texture width.
+    /// * `height`:
+    /// Texture height.
+    /// * `format`:
+    /// Texture format. See: [TextureFormat].
+    /// * `texture_flags`:
+    /// Texture creation (see [TextureFlags].), and sampler (see [SamplerFlags])
+    /// flags. Default texture sampling mode is linear, and wrap mode is repeat.
+    /// - [SamplerFlags::[U/V/W]_[MIRROR/CLAMP]] - Mirror or clamp to edge wrap
+    ///   mode.
+    /// - [SamplerFlags::[MIN/MAG/MIP]_[POINT/ANISOTROPIC]] - Point or anisotropic
+    ///   sampling.
     pub fn create_frame_buffer(
         width: u16,
         height: u16,
@@ -2010,8 +2104,18 @@ impl FrameBuffer {
             FrameBuffer { handle: _ret }
         }
     }
-    /// Create frame buffer with size based on backbuffer ratio. Frame buffer will maintain ratio
-    /// if back buffer resolution changes.
+    /// * `ratio`:
+    /// Frame buffer size in respect to back-buffer size. See:
+    /// [BackbufferRatio].
+    /// * `format`:
+    /// Texture format. See: [TextureFormat].
+    /// * `texture_flags`:
+    /// Texture creation (see [TextureFlags].), and sampler (see [SamplerFlags])
+    /// flags. Default texture sampling mode is linear, and wrap mode is repeat.
+    /// - [SamplerFlags::[U/V/W]_[MIRROR/CLAMP]] - Mirror or clamp to edge wrap
+    ///   mode.
+    /// - [SamplerFlags::[MIN/MAG/MIP]_[POINT/ANISOTROPIC]] - Point or anisotropic
+    ///   sampling.
     pub fn create_frame_buffer_scaled(
         ratio: BackbufferRatio,
         format: TextureFormat,
@@ -2023,7 +2127,13 @@ impl FrameBuffer {
             FrameBuffer { handle: _ret }
         }
     }
-    /// Create MRT frame buffer from texture handles (simple).
+    /// * `num`:
+    /// Number of texture handles.
+    /// * `handles`:
+    /// Texture attachments.
+    /// * `destroy_texture`:
+    /// If true, textures will be destroyed when
+    /// frame buffer is destroyed.
     pub fn create_frame_buffer_from_handles(
         num: u8,
         handles: &Texture,
@@ -2038,8 +2148,13 @@ impl FrameBuffer {
             FrameBuffer { handle: _ret }
         }
     }
-    /// Create MRT frame buffer from texture handles with specific layer and
-    /// mip level.
+    /// * `num`:
+    /// Number of attachments.
+    /// * `attachment`:
+    /// Attachment texture info. See: `bgfx::Attachment`.
+    /// * `destroy_texture`:
+    /// If true, textures will be destroyed when
+    /// frame buffer is destroyed.
     pub fn create_frame_buffer_from_attachment(
         num: u8,
         attachment: &Attachment,
@@ -2055,13 +2170,16 @@ impl FrameBuffer {
             FrameBuffer { handle: _ret }
         }
     }
-    /// Create frame buffer for multiple window rendering.
-    ///
-    /// @remarks
-    ///   Frame buffer cannot be used for sampling.
-    ///
-    /// @attention Availability depends on: [CapsFlags::SWAP_CHAIN].
-    ///
+    /// * `nwh`:
+    /// OS' target native window handle.
+    /// * `width`:
+    /// Window back buffer width.
+    /// * `height`:
+    /// Window back buffer height.
+    /// * `format`:
+    /// Window back buffer color format.
+    /// * `depth_format`:
+    /// Window back buffer depth format.
     pub fn create_frame_buffer_from_nwh(
         nwh: &c_void,
         width: u16,
@@ -2079,31 +2197,39 @@ impl FrameBuffer {
             FrameBuffer { handle: _ret }
         }
     }
-    /// Set frame buffer debug name.
+    /// * `handle`:
+    /// Frame buffer handle.
+    /// * `name`:
+    /// Frame buffer name.
+    /// * `len`:
+    /// Frame buffer name length (if length is INT32_MAX, it's expected
+    /// that _name is zero terminated string.
     pub fn set_name(&self, name: &str) {
         unsafe {
             bgfx_sys::bgfx_set_frame_buffer_name(self.handle, name.as_ptr() as _, name.len() as i32)
         }
     }
-    /// Obtain texture handle of frame buffer attachment.
+    /// * `handle`:
+    /// Frame buffer handle.
+    /// * `attachment`:
     pub fn get_texture(&self, attachment: u8) -> Texture {
         unsafe {
             let _ret = bgfx_sys::bgfx_get_texture(self.handle, attachment);
             Texture { handle: _ret }
         }
     }
-    /// Destroy frame buffer.
+    /// * `handle`:
+    /// Frame buffer handle.
     pub fn destroy_frame_buffer(&self) {
         unsafe {
             bgfx_sys::bgfx_destroy_frame_buffer(self.handle);
         }
     }
-    /// Request screen shot of window back buffer.
-    ///
-    /// @remarks
-    ///   `bgfx::CallbackI::screenShot` must be implemented.
-    /// @attention Frame buffer handle must be created with OS' target native window handle.
-    ///
+    /// * `handle`:
+    /// Frame buffer handle. If handle is ]BGFX_INVALID_HANDLE] request will be
+    /// made for main window back buffer.
+    /// * `file_path`:
+    /// Will be passed to `bgfx::CallbackI::screenShot` callback.
     pub fn request_screen_shot(&self, file_path: &i8) {
         unsafe {
             bgfx_sys::bgfx_request_screen_shot(self.handle, file_path);
@@ -2112,26 +2238,52 @@ impl FrameBuffer {
 }
 
 impl IndexBuffer {
-    /// Create static index buffer.
+    /// * `mem`:
+    /// Index buffer data.
+    /// * `flags`:
+    /// Buffer creation flags.
+    ///   - [BufferFlags::NONE] - No flags.
+    ///   - [BufferFlags::COMPUTE_READ] - Buffer will be read from by compute shader.
+    ///   - [BufferFlags::COMPUTE_WRITE] - Buffer will be written into by compute shader. When buffer
+    ///       is created with [BufferFlags::COMPUTE_WRITE] flag it cannot be updated from CPU.
+    ///   - [BufferFlags::COMPUTE_READ_WRITE] - Buffer will be used for read/write by compute shader.
+    ///   - [BufferFlags::ALLOW_RESIZE] - Buffer will resize on buffer update if a different amount of
+    ///       data is passed. If this flag is not specified, and more data is passed on update, the buffer
+    ///       will be trimmed to fit the existing buffer size. This flag has effect only on dynamic
+    ///       buffers.
+    ///   - [BufferFlags::INDEX32] - Buffer is using 32-bit indices. This flag has effect only on
+    ///       index buffers.
     pub fn create_index_buffer(mem: &Memory, flags: u16) -> IndexBuffer {
         unsafe {
             let _ret = bgfx_sys::bgfx_create_index_buffer(mem.handle, flags);
             IndexBuffer { handle: _ret }
         }
     }
-    /// Set static index buffer debug name.
+    /// * `handle`:
+    /// Static index buffer handle.
+    /// * `name`:
+    /// Static index buffer name.
+    /// * `len`:
+    /// Static index buffer name length (if length is INT32_MAX, it's expected
+    /// that _name is zero terminated string.
     pub fn set_name(&self, name: &str) {
         unsafe {
             bgfx_sys::bgfx_set_index_buffer_name(self.handle, name.as_ptr() as _, name.len() as i32)
         }
     }
-    /// Destroy static index buffer.
+    /// * `handle`:
+    /// Static index buffer handle.
     pub fn destroy_index_buffer(&self) {
         unsafe {
             bgfx_sys::bgfx_destroy_index_buffer(self.handle);
         }
     }
-    /// Set index buffer for draw primitive.
+    /// * `handle`:
+    /// Index buffer.
+    /// * `first_index`:
+    /// First index to render.
+    /// * `num_indices`:
+    /// Number of indices to render.
     pub fn set_index_buffer(&self, first_index: u32, num_indices: u32) {
         unsafe {
             bgfx_sys::bgfx_set_index_buffer(self.handle, first_index, num_indices);
@@ -2140,14 +2292,16 @@ impl IndexBuffer {
 }
 
 impl IndirectBuffer {
-    /// Create draw indirect buffer.
+    /// * `num`:
+    /// Number of indirect calls.
     pub fn create_indirect_buffer(num: u32) -> IndirectBuffer {
         unsafe {
             let _ret = bgfx_sys::bgfx_create_indirect_buffer(num);
             IndirectBuffer { handle: _ret }
         }
     }
-    /// Destroy draw indirect buffer.
+    /// * `handle`:
+    /// Indirect buffer handle.
     pub fn destroy_indirect_buffer(&self) {
         unsafe {
             bgfx_sys::bgfx_destroy_indirect_buffer(self.handle);
@@ -2156,27 +2310,34 @@ impl IndirectBuffer {
 }
 
 impl OcclusionQuery {
-    /// Create occlusion query.
     pub fn create_occlusion_query() -> OcclusionQuery {
         unsafe {
             let _ret = bgfx_sys::bgfx_create_occlusion_query();
             OcclusionQuery { handle: _ret }
         }
     }
-    /// Retrieve occlusion query result from previous frame.
+    /// * `handle`:
+    /// Handle to occlusion query object.
+    /// * `result`:
+    /// Number of pixels that passed test. This argument
+    /// can be `NULL` if result of occlusion query is not needed.
     pub fn get_result(&self, result: &mut i32) -> OcclusionQueryResult {
         unsafe {
             let _ret = bgfx_sys::bgfx_get_result(self.handle, result);
             std::mem::transmute(_ret)
         }
     }
-    /// Destroy occlusion query.
+    /// * `handle`:
+    /// Handle to occlusion query object.
     pub fn destroy_occlusion_query(&self) {
         unsafe {
             bgfx_sys::bgfx_destroy_occlusion_query(self.handle);
         }
     }
-    /// Set condition for rendering.
+    /// * `handle`:
+    /// Occlusion query handle.
+    /// * `visible`:
+    /// Render if occlusion query is visible.
     pub fn set_condition(&self, visible: bool) {
         unsafe {
             bgfx_sys::bgfx_set_condition(self.handle, visible);
@@ -2185,21 +2346,30 @@ impl OcclusionQuery {
 }
 
 impl Program {
-    /// Create program with vertex and fragment shaders.
+    /// * `vsh`:
+    /// Vertex shader.
+    /// * `fsh`:
+    /// Fragment shader.
+    /// * `destroy_shaders`:
+    /// If true, shaders will be destroyed when program is destroyed.
     pub fn create_program(vsh: Shader, fsh: Shader, destroy_shaders: bool) -> Program {
         unsafe {
             let _ret = bgfx_sys::bgfx_create_program(vsh.handle, fsh.handle, destroy_shaders);
             Program { handle: _ret }
         }
     }
-    /// Create program with compute shader.
+    /// * `csh`:
+    /// Compute shader.
+    /// * `destroy_shaders`:
+    /// If true, shaders will be destroyed when program is destroyed.
     pub fn create_compute_program(csh: Shader, destroy_shaders: bool) -> Program {
         unsafe {
             let _ret = bgfx_sys::bgfx_create_compute_program(csh.handle, destroy_shaders);
             Program { handle: _ret }
         }
     }
-    /// Destroy program.
+    /// * `handle`:
+    /// Program handle.
     pub fn destroy_program(&self) {
         unsafe {
             bgfx_sys::bgfx_destroy_program(self.handle);
@@ -2208,37 +2378,49 @@ impl Program {
 }
 
 impl Shader {
-    /// Create shader from memory buffer.
+    /// * `mem`:
+    /// Shader binary.
     pub fn create_shader(mem: &Memory) -> Shader {
         unsafe {
             let _ret = bgfx_sys::bgfx_create_shader(mem.handle);
             Shader { handle: _ret }
         }
     }
-    /// Set shader debug name.
+    /// * `handle`:
+    /// Shader handle.
+    /// * `name`:
+    /// Shader name.
+    /// * `len`:
+    /// Shader name length (if length is INT32_MAX, it's expected
+    /// that _name is zero terminated string).
     pub fn set_name(&self, name: &str) {
         unsafe {
             bgfx_sys::bgfx_set_shader_name(self.handle, name.as_ptr() as _, name.len() as i32)
         }
     }
-    /// Destroy shader.
-    ///
-    /// @remark Once a shader program is created with _handle,
-    ///   it is safe to destroy that shader.
-    ///
+    /// * `handle`:
+    /// Shader handle.
     pub fn destroy_shader(&self) {
         unsafe {
             bgfx_sys::bgfx_destroy_shader(self.handle);
         }
     }
-    /// Create program with vertex and fragment shaders.
+    /// * `vsh`:
+    /// Vertex shader.
+    /// * `fsh`:
+    /// Fragment shader.
+    /// * `destroy_shaders`:
+    /// If true, shaders will be destroyed when program is destroyed.
     pub fn create_program(&self, fsh: Shader, destroy_shaders: bool) -> Program {
         unsafe {
             let _ret = bgfx_sys::bgfx_create_program(self.handle, fsh.handle, destroy_shaders);
             Program { handle: _ret }
         }
     }
-    /// Create program with compute shader.
+    /// * `csh`:
+    /// Compute shader.
+    /// * `destroy_shaders`:
+    /// If true, shaders will be destroyed when program is destroyed.
     pub fn create_compute_program(&self, destroy_shaders: bool) -> Program {
         unsafe {
             let _ret = bgfx_sys::bgfx_create_compute_program(self.handle, destroy_shaders);
@@ -2248,7 +2430,19 @@ impl Shader {
 }
 
 impl Texture {
-    /// Create texture from memory buffer.
+    /// * `mem`:
+    /// DDS, KTX or PVR texture binary data.
+    /// * `flags`:
+    /// Texture creation (see [TextureFlags].), and sampler (see [SamplerFlags])
+    /// flags. Default texture sampling mode is linear, and wrap mode is repeat.
+    /// - [SamplerFlags::[U/V/W]_[MIRROR/CLAMP]] - Mirror or clamp to edge wrap
+    ///   mode.
+    /// - [SamplerFlags::[MIN/MAG/MIP]_[POINT/ANISOTROPIC]] - Point or anisotropic
+    ///   sampling.
+    /// * `skip`:
+    /// Skip top level mips when parsing texture.
+    /// * `info`:
+    /// When non-`NULL` is specified it returns parsed texture information.
     pub fn create_texture(mem: &Memory, flags: u64, skip: u8, info: &mut TextureInfo) -> Texture {
         unsafe {
             let _info = std::mem::transmute(info);
@@ -2256,7 +2450,28 @@ impl Texture {
             Texture { handle: _ret }
         }
     }
-    /// Create 2D texture.
+    /// * `width`:
+    /// Width.
+    /// * `height`:
+    /// Height.
+    /// * `has_mips`:
+    /// Indicates that texture contains full mip-map chain.
+    /// * `num_layers`:
+    /// Number of layers in texture array. Must be 1 if caps
+    /// [CapsFlags::TEXTURE_2D_ARRAY] flag is not set.
+    /// * `format`:
+    /// Texture format. See: [TextureFormat].
+    /// * `flags`:
+    /// Texture creation (see [TextureFlags].), and sampler (see [SamplerFlags])
+    /// flags. Default texture sampling mode is linear, and wrap mode is repeat.
+    /// - [SamplerFlags::[U/V/W]_[MIRROR/CLAMP]] - Mirror or clamp to edge wrap
+    ///   mode.
+    /// - [SamplerFlags::[MIN/MAG/MIP]_[POINT/ANISOTROPIC]] - Point or anisotropic
+    ///   sampling.
+    /// * `mem`:
+    /// Texture data. If `_mem` is non-NULL, created texture will be immutable. If
+    /// `_mem` is NULL content of the texture is uninitialized. When `_numLayers` is more than
+    /// 1, expected memory layout is texture and all mips together for each array element.
     pub fn create_texture_2d(
         width: u16,
         height: u16,
@@ -2279,8 +2494,22 @@ impl Texture {
             Texture { handle: _ret }
         }
     }
-    /// Create texture with size based on backbuffer ratio. Texture will maintain ratio
-    /// if back buffer resolution changes.
+    /// * `ratio`:
+    /// Texture size in respect to back-buffer size. See: [BackbufferRatio].
+    /// * `has_mips`:
+    /// Indicates that texture contains full mip-map chain.
+    /// * `num_layers`:
+    /// Number of layers in texture array. Must be 1 if caps
+    /// [CapsFlags::TEXTURE_2D_ARRAY] flag is not set.
+    /// * `format`:
+    /// Texture format. See: [TextureFormat].
+    /// * `flags`:
+    /// Texture creation (see [TextureFlags].), and sampler (see [SamplerFlags])
+    /// flags. Default texture sampling mode is linear, and wrap mode is repeat.
+    /// - [SamplerFlags::[U/V/W]_[MIRROR/CLAMP]] - Mirror or clamp to edge wrap
+    ///   mode.
+    /// - [SamplerFlags::[MIN/MAG/MIP]_[POINT/ANISOTROPIC]] - Point or anisotropic
+    ///   sampling.
     pub fn create_texture_2d_scaled(
         ratio: BackbufferRatio,
         has_mips: bool,
@@ -2299,7 +2528,27 @@ impl Texture {
             Texture { handle: _ret }
         }
     }
-    /// Create 3D texture.
+    /// * `width`:
+    /// Width.
+    /// * `height`:
+    /// Height.
+    /// * `depth`:
+    /// Depth.
+    /// * `has_mips`:
+    /// Indicates that texture contains full mip-map chain.
+    /// * `format`:
+    /// Texture format. See: [TextureFormat].
+    /// * `flags`:
+    /// Texture creation (see [TextureFlags].), and sampler (see [SamplerFlags])
+    /// flags. Default texture sampling mode is linear, and wrap mode is repeat.
+    /// - [SamplerFlags::[U/V/W]_[MIRROR/CLAMP]] - Mirror or clamp to edge wrap
+    ///   mode.
+    /// - [SamplerFlags::[MIN/MAG/MIP]_[POINT/ANISOTROPIC]] - Point or anisotropic
+    ///   sampling.
+    /// * `mem`:
+    /// Texture data. If `_mem` is non-NULL, created texture will be immutable. If
+    /// `_mem` is NULL content of the texture is uninitialized. When `_numLayers` is more than
+    /// 1, expected memory layout is texture and all mips together for each array element.
     pub fn create_texture_3d(
         width: u16,
         height: u16,
@@ -2326,7 +2575,26 @@ impl Texture {
             Texture { handle: _ret }
         }
     }
-    /// Create Cube texture.
+    /// * `size`:
+    /// Cube side size.
+    /// * `has_mips`:
+    /// Indicates that texture contains full mip-map chain.
+    /// * `num_layers`:
+    /// Number of layers in texture array. Must be 1 if caps
+    /// [CapsFlags::TEXTURE_2D_ARRAY] flag is not set.
+    /// * `format`:
+    /// Texture format. See: [TextureFormat].
+    /// * `flags`:
+    /// Texture creation (see [TextureFlags].), and sampler (see [SamplerFlags])
+    /// flags. Default texture sampling mode is linear, and wrap mode is repeat.
+    /// - [SamplerFlags::[U/V/W]_[MIRROR/CLAMP]] - Mirror or clamp to edge wrap
+    ///   mode.
+    /// - [SamplerFlags::[MIN/MAG/MIP]_[POINT/ANISOTROPIC]] - Point or anisotropic
+    ///   sampling.
+    /// * `mem`:
+    /// Texture data. If `_mem` is non-NULL, created texture will be immutable. If
+    /// `_mem` is NULL content of the texture is uninitialized. When `_numLayers` is more than
+    /// 1, expected memory layout is texture and all mips together for each array element.
     pub fn create_texture_cube(
         size: u16,
         has_mips: bool,
@@ -2351,10 +2619,25 @@ impl Texture {
             Texture { handle: _ret }
         }
     }
-    /// Update 2D texture.
-    ///
-    /// @attention It's valid to update only mutable texture. See `bgfx::createTexture2D` for more info.
-    ///
+    /// * `handle`:
+    /// Texture handle.
+    /// * `layer`:
+    /// Layer in texture array.
+    /// * `mip`:
+    /// Mip level.
+    /// * `x`:
+    /// X offset in texture.
+    /// * `y`:
+    /// Y offset in texture.
+    /// * `width`:
+    /// Width of texture block.
+    /// * `height`:
+    /// Height of texture block.
+    /// * `mem`:
+    /// Texture update data.
+    /// * `pitch`:
+    /// Pitch of input image (bytes). When _pitch is set to
+    /// UINT16_MAX, it will be calculated internally based on _width.
     pub fn update_texture_2d(
         &self,
         layer: u16,
@@ -2380,10 +2663,24 @@ impl Texture {
             );
         }
     }
-    /// Update 3D texture.
-    ///
-    /// @attention It's valid to update only mutable texture. See `bgfx::createTexture3D` for more info.
-    ///
+    /// * `handle`:
+    /// Texture handle.
+    /// * `mip`:
+    /// Mip level.
+    /// * `x`:
+    /// X offset in texture.
+    /// * `y`:
+    /// Y offset in texture.
+    /// * `z`:
+    /// Z offset in texture.
+    /// * `width`:
+    /// Width of texture block.
+    /// * `height`:
+    /// Height of texture block.
+    /// * `depth`:
+    /// Depth of texture block.
+    /// * `mem`:
+    /// Texture update data.
     pub fn update_texture_3d(
         &self,
         mip: u8,
@@ -2409,10 +2706,45 @@ impl Texture {
             );
         }
     }
-    /// Update Cube texture.
+    /// * `handle`:
+    /// Texture handle.
+    /// * `layer`:
+    /// Layer in texture array.
+    /// * `side`:
+    /// Cubemap side [CubeMapFlags::<POSITIVE or NEGATIVE>_<X, Y or Z>],
+    ///   where 0 is +X, 1 is -X, 2 is +Y, 3 is -Y, 4 is +Z, and 5 is -Z.
     ///
-    /// @attention It's valid to update only mutable texture. See `bgfx::createTextureCube` for more info.
-    ///
+    ///                  +----------+
+    ///                  |-z       2|
+    ///                  | ^  +y    |
+    ///                  | |        |    Unfolded cube:
+    ///                  | +---->+x |
+    ///       +----------+----------+----------+----------+
+    ///       |+y       1|+y       4|+y       0|+y       5|
+    ///       | ^  -x    | ^  +z    | ^  +x    | ^  -z    |
+    ///       | |        | |        | |        | |        |
+    ///       | +---->+z | +---->+x | +---->-z | +---->-x |
+    ///       +----------+----------+----------+----------+
+    ///                  |+z       3|
+    ///                  | ^  -y    |
+    ///                  | |        |
+    ///                  | +---->+x |
+    ///                  +----------+
+    /// * `mip`:
+    /// Mip level.
+    /// * `x`:
+    /// X offset in texture.
+    /// * `y`:
+    /// Y offset in texture.
+    /// * `width`:
+    /// Width of texture block.
+    /// * `height`:
+    /// Height of texture block.
+    /// * `mem`:
+    /// Texture update data.
+    /// * `pitch`:
+    /// Pitch of input image (bytes). When _pitch is set to
+    /// UINT16_MAX, it will be calculated internally based on _width.
     pub fn update_texture_cube(
         &self,
         layer: u16,
@@ -2440,19 +2772,28 @@ impl Texture {
             );
         }
     }
-    /// Set texture debug name.
+    /// * `handle`:
+    /// Texture handle.
+    /// * `name`:
+    /// Texture name.
+    /// * `len`:
+    /// Texture name length (if length is INT32_MAX, it's expected
+    /// that _name is zero terminated string.
     pub fn set_name(&self, name: &str) {
         unsafe {
             bgfx_sys::bgfx_set_texture_name(self.handle, name.as_ptr() as _, name.len() as i32)
         }
     }
-    /// Destroy texture.
+    /// * `handle`:
+    /// Texture handle.
     pub fn destroy_texture(&self) {
         unsafe {
             bgfx_sys::bgfx_destroy_texture(self.handle);
         }
     }
-    /// Obtain texture handle of frame buffer attachment.
+    /// * `handle`:
+    /// Frame buffer handle.
+    /// * `attachment`:
     pub fn get_texture(handle: FrameBuffer, attachment: u8) -> Texture {
         unsafe {
             let _ret = bgfx_sys::bgfx_get_texture(handle.handle, attachment);
@@ -2462,52 +2803,42 @@ impl Texture {
 }
 
 impl Uniform {
-    /// Create shader uniform parameter.
-    ///
-    /// @remarks
-    ///   1. Uniform names are unique. It's valid to call `bgfx::createUniform`
-    ///      multiple times with the same uniform name. The library will always
-    ///      return the same handle, but the handle reference count will be
-    ///      incremented. This means that the same number of `bgfx::destroyUniform`
-    ///      must be called to properly destroy the uniform.
-    ///
-    ///   2. Predefined uniforms (declared in `bgfx_shader.sh`):
-    ///      - `u_viewRect vec4(x, y, width, height)` - view rectangle for current
-    ///        view, in pixels.
-    ///      - `u_viewTexel vec4(1.0/width, 1.0/height, undef, undef)` - inverse
-    ///        width and height
-    ///      - `u_view mat4` - view matrix
-    ///      - `u_invView mat4` - inverted view matrix
-    ///      - `u_proj mat4` - projection matrix
-    ///      - `u_invProj mat4` - inverted projection matrix
-    ///      - `u_viewProj mat4` - concatenated view projection matrix
-    ///      - `u_invViewProj mat4` - concatenated inverted view projection matrix
-    ///      - `u_model mat4[BGFX_CONFIG_MAX_BONES]` - array of model matrices.
-    ///      - `u_modelView mat4` - concatenated model view matrix, only first
-    ///        model matrix from array is used.
-    ///      - `u_modelViewProj mat4` - concatenated model view projection matrix.
-    ///      - `u_alphaRef float` - alpha reference value for alpha test.
-    ///
+    /// * `name`:
+    /// Uniform name in shader.
+    /// * `type_r`:
+    /// Type of uniform (See: `bgfx::UniformType`).
+    /// * `num`:
+    /// Number of elements in array.
     pub fn create_uniform(name: &i8, type_r: UniformType, num: u16) -> Uniform {
         unsafe {
             let _ret = bgfx_sys::bgfx_create_uniform(name, type_r as _, num);
             Uniform { handle: _ret }
         }
     }
-    /// Retrieve uniform info.
+    /// * `handle`:
+    /// Handle to uniform object.
+    /// * `info`:
+    /// Uniform info.
     pub fn get_uniform_info(&self, info: &mut UniformInfo) {
         unsafe {
             let _info = std::mem::transmute(info);
             bgfx_sys::bgfx_get_uniform_info(self.handle, _info);
         }
     }
-    /// Destroy shader uniform parameter.
+    /// * `handle`:
+    /// Handle to uniform object.
     pub fn destroy_uniform(&self) {
         unsafe {
             bgfx_sys::bgfx_destroy_uniform(self.handle);
         }
     }
-    /// Set shader uniform parameter for draw primitive.
+    /// * `handle`:
+    /// Uniform.
+    /// * `value`:
+    /// Pointer to uniform data.
+    /// * `num`:
+    /// Number of elements. Passing `UINT16_MAX` will
+    /// use the _num passed on uniform creation.
     pub fn set_uniform(&self, value: &c_void, num: u16) {
         unsafe {
             bgfx_sys::bgfx_set_uniform(self.handle, value, num);
@@ -2516,7 +2847,21 @@ impl Uniform {
 }
 
 impl VertexBuffer {
-    /// Create static vertex buffer.
+    /// * `mem`:
+    /// Vertex buffer data.
+    /// * `layout`:
+    /// Vertex layout.
+    /// * `flags`:
+    /// Buffer creation flags.
+    ///  - [BufferFlags::NONE] - No flags.
+    ///  - [BufferFlags::COMPUTE_READ] - Buffer will be read from by compute shader.
+    ///  - [BufferFlags::COMPUTE_WRITE] - Buffer will be written into by compute shader. When buffer
+    ///      is created with [BufferFlags::COMPUTE_WRITE] flag it cannot be updated from CPU.
+    ///  - [BufferFlags::COMPUTE_READ_WRITE] - Buffer will be used for read/write by compute shader.
+    ///  - [BufferFlags::ALLOW_RESIZE] - Buffer will resize on buffer update if a different amount of
+    ///      data is passed. If this flag is not specified, and more data is passed on update, the buffer
+    ///      will be trimmed to fit the existing buffer size. This flag has effect only on dynamic buffers.
+    ///  - [BufferFlags::INDEX32] - Buffer is using 32-bit indices. This flag has effect only on index buffers.
     pub fn create_vertex_buffer(
         mem: &Memory,
         layout: &VertexLayoutBuilder,
@@ -2528,7 +2873,13 @@ impl VertexBuffer {
             VertexBuffer { handle: _ret }
         }
     }
-    /// Set static vertex buffer debug name.
+    /// * `handle`:
+    /// Static vertex buffer handle.
+    /// * `name`:
+    /// Static vertex buffer name.
+    /// * `len`:
+    /// Static vertex buffer name length (if length is INT32_MAX, it's expected
+    /// that _name is zero terminated string.
     pub fn set_name(&self, name: &str) {
         unsafe {
             bgfx_sys::bgfx_set_vertex_buffer_name(
@@ -2538,13 +2889,21 @@ impl VertexBuffer {
             )
         }
     }
-    /// Destroy static vertex buffer.
+    /// * `handle`:
+    /// Static vertex buffer handle.
     pub fn destroy_vertex_buffer(&self) {
         unsafe {
             bgfx_sys::bgfx_destroy_vertex_buffer(self.handle);
         }
     }
+    /// * `handle`:
+    /// Vertex buffer.
+    /// * `start_vertex`:
+    /// First instance data.
+    /// * `num`:
+    /// Number of data instances.
     /// Set instance data buffer for draw primitive.
+    /// Dynamic vertex buffer.
     pub fn set_instance_data_from_vertex_buffer(&self, start_vertex: u32, num: u32) {
         unsafe {
             bgfx_sys::bgfx_set_instance_data_from_vertex_buffer(self.handle, start_vertex, num);
@@ -2553,7 +2912,8 @@ impl VertexBuffer {
 }
 
 impl VertexLayout {
-    /// Create vertex layout.
+    /// * `layout`:
+    /// Vertex layout.
     pub fn create_vertex_layout(layout: &VertexLayoutBuilder) -> VertexLayout {
         unsafe {
             let _layout = std::mem::transmute(layout);
@@ -2561,7 +2921,8 @@ impl VertexLayout {
             VertexLayout { handle: _ret }
         }
     }
-    /// Destroy vertex layout.
+    /// * `layout_handle`:
+    /// Vertex layout handle.
     pub fn destroy_vertex_layout(&self) {
         unsafe {
             bgfx_sys::bgfx_destroy_vertex_layout(self.handle);
@@ -2688,7 +3049,18 @@ impl Attachment {
         t
     }
 
-    /// Init attachment.
+    /// * `handle`:
+    /// Render target texture handle.
+    /// * `access`:
+    /// Access. See [Access].
+    /// * `layer`:
+    /// Cubemap side or depth layer/slice to use.
+    /// * `num_layers`:
+    /// Number of texture layer/slice(s) in array to use.
+    /// * `mip`:
+    /// Mip level.
+    /// * `resolve`:
+    /// Resolve flags. See: [ResolveFlags]
     pub fn init(&self, handle: Texture, params: InitArgs) {
         unsafe {
             let _self = std::mem::transmute(self);
@@ -2744,7 +3116,8 @@ impl VertexLayoutBuilder {
         t
     }
 
-    /// Start VertexLayout.
+    /// * `renderer_type`:
+    /// Renderer backend type. See: `bgfx::RendererType`
     pub fn begin(&self, renderer_type: RendererType) -> &Self {
         unsafe {
             let _self = std::mem::transmute(self);
@@ -2752,10 +3125,21 @@ impl VertexLayoutBuilder {
             self
         }
     }
-    /// Add attribute to VertexLayout.
-    ///
-    /// @remarks Must be called between begin/end.
-    ///
+    /// * `attrib`:
+    /// Attribute semantics. See: `bgfx::Attrib`
+    /// * `num`:
+    /// Number of elements 1, 2, 3 or 4.
+    /// * `type_r`:
+    /// Element type.
+    /// * `normalized`:
+    /// When using fixed point AttribType (f.e. Uint8)
+    /// value will be normalized for vertex shader usage. When normalized
+    /// is set to true, AttribType::Uint8 value in range 0-255 will be
+    /// in range 0.0-1.0 in vertex shader.
+    /// * `as_int`:
+    /// Packaging rule for vertexPack, vertexUnpack, and
+    /// vertexConvert for AttribType::Uint8 and AttribType::Int16.
+    /// Unpacking code must be implemented inside vertex shader.
     pub fn add(&self, attrib: Attrib, num: u8, type_r: AttribType, params: AddArgs) -> &Self {
         unsafe {
             let _self = std::mem::transmute(self);
@@ -2770,7 +3154,8 @@ impl VertexLayoutBuilder {
             self
         }
     }
-    /// Returns `true` if VertexLayout contains attribute.
+    /// * `attrib`:
+    /// Attribute semantics. See: `bgfx::Attrib`
     pub fn has(&self, attrib: Attrib) -> bool {
         unsafe {
             let _self = std::mem::transmute(self);
@@ -2778,7 +3163,8 @@ impl VertexLayoutBuilder {
             _ret
         }
     }
-    /// Skip `_num` bytes in vertex stream.
+    /// * `num`:
+    /// Number of bytes to skip.
     pub fn skip(&self, num: u8) -> &Self {
         unsafe {
             let _self = std::mem::transmute(self);
@@ -2786,7 +3172,6 @@ impl VertexLayoutBuilder {
             self
         }
     }
-    /// End VertexLayout.
     pub fn end(&self) {
         unsafe {
             let _self = std::mem::transmute(self);
@@ -2802,52 +3187,62 @@ impl Encoder {
         t
     }
 
-    /// Sets a debug marker. This allows you to group graphics calls together for easy browsing in
-    /// graphics debugging tools.
+    /// * `marker`:
+    /// Marker string.
     pub fn set_marker(&self, marker: &i8) {
         unsafe {
             let _self = std::mem::transmute(self);
             bgfx_sys::bgfx_encoder_set_marker(_self, marker);
         }
     }
-    /// Set render states for draw primitive.
-    ///
-    /// @remarks
-    ///   1. To setup more complex states use:
-    ///      [StateFlags::ALPHA_REF(_ref)],
-    ///      [StateFlags::POINT_SIZE(_size)],
-    ///      [StateBlendFlags::FUNC(_src, _dst)],
-    ///      [StateBlendFlags::FUNC_SEPARATE(_srcRGB, _dstRGB, _srcA, _dstA)],
-    ///      [StateBlendFlags::EQUATION(_equation)],
-    ///      [StateBlendEquationFlags::SEPARATE(_equationRGB, _equationA)]
-    ///   2. [StateBlendEquationFlags::ADD] is set when no other blend
-    ///      equation is specified.
-    ///
+    /// * `state`:
+    /// State flags. Default state for primitive type is
+    ///   triangles. See: [StateFlags::DEFAULT].
+    ///   - [StateDepthTestFlags] - Depth test function.
+    ///   - [StateBlendFlags] - See remark 1 about BGFX_STATE_BLEND_FUNC.
+    ///   - [StateBlendEquationFlags] - See remark 2.
+    ///   - [StateCullFlags] - Backface culling mode.
+    ///   - [StateWriteFlags] - Enable R, G, B, A or Z write.
+    ///   - [StateFlags::MSAA] - Enable hardware multisample antialiasing.
+    ///   - [StatePtFlags::[TRISTRIP/LINES/POINTS]] - Primitive type.
+    /// * `rgba`:
+    /// Sets blend factor used by [StateBlendFlags::FACTOR] and
+    ///   [StateBlendFlags::INV_FACTOR] blend modes.
     pub fn set_state(&self, state: u64, rgba: u32) {
         unsafe {
             let _self = std::mem::transmute(self);
             bgfx_sys::bgfx_encoder_set_state(_self, state, rgba);
         }
     }
-    /// Set condition for rendering.
+    /// * `handle`:
+    /// Occlusion query handle.
+    /// * `visible`:
+    /// Render if occlusion query is visible.
     pub fn set_condition(&self, handle: OcclusionQuery, visible: bool) {
         unsafe {
             let _self = std::mem::transmute(self);
             bgfx_sys::bgfx_encoder_set_condition(_self, handle.handle, visible);
         }
     }
-    /// Set stencil test state.
+    /// * `fstencil`:
+    /// Front stencil state.
+    /// * `bstencil`:
+    /// Back stencil state. If back is set to [StencilFlags::NONE]
+    /// _fstencil is applied to both front and back facing primitives.
     pub fn set_stencil(&self, fstencil: u32, bstencil: u32) {
         unsafe {
             let _self = std::mem::transmute(self);
             bgfx_sys::bgfx_encoder_set_stencil(_self, fstencil, bstencil);
         }
     }
-    /// Set scissor for draw primitive.
-    ///
-    /// @remark
-    ///   To scissor for all primitives in view see `bgfx::setViewScissor`.
-    ///
+    /// * `x`:
+    /// Position x from the left corner of the window.
+    /// * `y`:
+    /// Position y from the top corner of the window.
+    /// * `width`:
+    /// Width of view scissor region.
+    /// * `height`:
+    /// Height of view scissor region.
     pub fn set_scissor(&self, x: u16, y: u16, width: u16, height: u16) -> u16 {
         unsafe {
             let _self = std::mem::transmute(self);
@@ -2855,19 +3250,18 @@ impl Encoder {
             _ret
         }
     }
-    /// Set scissor from cache for draw primitive.
-    ///
-    /// @remark
-    ///   To scissor for all primitives in view see `bgfx::setViewScissor`.
-    ///
+    /// * `cache`:
+    /// Index in scissor cache.
     pub fn set_scissor_cached(&self, cache: u16) {
         unsafe {
             let _self = std::mem::transmute(self);
             bgfx_sys::bgfx_encoder_set_scissor_cached(_self, cache);
         }
     }
-    /// Set model matrix for draw primitive. If it is not called,
-    /// the model will be rendered with an identity model matrix.
+    /// * `mtx`:
+    /// Pointer to first matrix in array.
+    /// * `num`:
+    /// Number of matrices in array.
     pub fn set_transform(&self, mtx: &c_void, num: u16) -> u32 {
         unsafe {
             let _self = std::mem::transmute(self);
@@ -2875,17 +3269,20 @@ impl Encoder {
             _ret
         }
     }
-    ///  Set model matrix from matrix cache for draw primitive.
+    /// * `cache`:
+    /// Index in matrix cache.
+    /// * `num`:
+    /// Number of matrices from cache.
     pub fn set_transform_cached(&self, cache: u32, num: u16) {
         unsafe {
             let _self = std::mem::transmute(self);
             bgfx_sys::bgfx_encoder_set_transform_cached(_self, cache, num);
         }
     }
-    /// Reserve matrices in internal matrix cache.
-    ///
-    /// @attention Pointer returned can be modifed until `bgfx::frame` is called.
-    ///
+    /// * `transform`:
+    /// Pointer to `Transform` structure.
+    /// * `num`:
+    /// Number of matrices.
     pub fn alloc_transform(&self, transform: &mut Transform, num: u16) -> u32 {
         unsafe {
             let _self = std::mem::transmute(self);
@@ -2894,21 +3291,37 @@ impl Encoder {
             _ret
         }
     }
-    /// Set shader uniform parameter for draw primitive.
+    /// * `handle`:
+    /// Uniform.
+    /// * `value`:
+    /// Pointer to uniform data.
+    /// * `num`:
+    /// Number of elements. Passing `UINT16_MAX` will
+    /// use the _num passed on uniform creation.
     pub fn set_uniform(&self, handle: Uniform, value: &c_void, num: u16) {
         unsafe {
             let _self = std::mem::transmute(self);
             bgfx_sys::bgfx_encoder_set_uniform(_self, handle.handle, value, num);
         }
     }
-    /// Set index buffer for draw primitive.
+    /// * `handle`:
+    /// Index buffer.
+    /// * `first_index`:
+    /// First index to render.
+    /// * `num_indices`:
+    /// Number of indices to render.
     pub fn set_index_buffer(&self, handle: IndexBuffer, first_index: u32, num_indices: u32) {
         unsafe {
             let _self = std::mem::transmute(self);
             bgfx_sys::bgfx_encoder_set_index_buffer(_self, handle.handle, first_index, num_indices);
         }
     }
-    /// Set index buffer for draw primitive.
+    /// * `handle`:
+    /// Dynamic index buffer.
+    /// * `first_index`:
+    /// First index to render.
+    /// * `num_indices`:
+    /// Number of indices to render.
     pub fn set_dynamic_index_buffer(
         &self,
         handle: DynamicIndexBuffer,
@@ -2925,7 +3338,12 @@ impl Encoder {
             );
         }
     }
-    /// Set index buffer for draw primitive.
+    /// * `tib`:
+    /// Transient index buffer.
+    /// * `first_index`:
+    /// First index to render.
+    /// * `num_indices`:
+    /// Number of indices to render.
     pub fn set_transient_index_buffer(
         &self,
         tib: &TransientIndexBuffer,
@@ -2943,7 +3361,14 @@ impl Encoder {
             );
         }
     }
-    /// Set vertex buffer for draw primitive.
+    /// * `stream`:
+    /// Vertex stream.
+    /// * `handle`:
+    /// Vertex buffer.
+    /// * `start_vertex`:
+    /// First vertex to render.
+    /// * `num_vertices`:
+    /// Number of vertices to render.
     pub fn set_vertex_buffer(
         &self,
         stream: u8,
@@ -2962,7 +3387,18 @@ impl Encoder {
             );
         }
     }
-    /// Set vertex buffer for draw primitive.
+    /// * `stream`:
+    /// Vertex stream.
+    /// * `handle`:
+    /// Vertex buffer.
+    /// * `start_vertex`:
+    /// First vertex to render.
+    /// * `num_vertices`:
+    /// Number of vertices to render.
+    /// * `layout_handle`:
+    /// Vertex layout for aliasing vertex buffer. If invalid
+    /// handle is used, vertex layout used for creation
+    /// of vertex buffer will be used.
     pub fn set_vertex_buffer_with_layout(
         &self,
         stream: u8,
@@ -2983,7 +3419,21 @@ impl Encoder {
             );
         }
     }
-    /// Set vertex buffer for draw primitive.
+    /// * `stream`:
+    /// Vertex stream.
+    /// * `handle`:
+    /// Dynamic vertex buffer.
+    /// * `start_vertex`:
+    /// First vertex to render.
+    /// * `num_vertices`:
+    /// Number of vertices to render.
+    /// Vertex stream.
+    /// Dynamic vertex buffer.
+    /// First vertex to render.
+    /// Number of vertices to render.
+    /// Vertex layout for aliasing vertex buffer. If invalid
+    /// handle is used, vertex layout used for creation
+    /// of vertex buffer will be used.
     pub fn set_dynamic_vertex_buffer(
         &self,
         stream: u8,
@@ -3002,6 +3452,18 @@ impl Encoder {
             );
         }
     }
+    /// * `stream`:
+    /// Vertex stream.
+    /// * `handle`:
+    /// Dynamic vertex buffer.
+    /// * `start_vertex`:
+    /// First vertex to render.
+    /// * `num_vertices`:
+    /// Number of vertices to render.
+    /// * `layout_handle`:
+    /// Vertex layout for aliasing vertex buffer. If invalid
+    /// handle is used, vertex layout used for creation
+    /// of vertex buffer will be used.
     pub fn set_dynamic_vertex_buffer_with_layout(
         &self,
         stream: u8,
@@ -3022,7 +3484,14 @@ impl Encoder {
             );
         }
     }
-    /// Set vertex buffer for draw primitive.
+    /// * `stream`:
+    /// Vertex stream.
+    /// * `tvb`:
+    /// Transient vertex buffer.
+    /// * `start_vertex`:
+    /// First vertex to render.
+    /// * `num_vertices`:
+    /// Number of vertices to render.
     pub fn set_transient_vertex_buffer(
         &self,
         stream: u8,
@@ -3042,7 +3511,18 @@ impl Encoder {
             );
         }
     }
-    /// Set vertex buffer for draw primitive.
+    /// * `stream`:
+    /// Vertex stream.
+    /// * `tvb`:
+    /// Transient vertex buffer.
+    /// * `start_vertex`:
+    /// First vertex to render.
+    /// * `num_vertices`:
+    /// Number of vertices to render.
+    /// * `layout_handle`:
+    /// Vertex layout for aliasing vertex buffer. If invalid
+    /// handle is used, vertex layout used for creation
+    /// of vertex buffer will be used.
     pub fn set_transient_vertex_buffer_with_layout(
         &self,
         stream: u8,
@@ -3064,18 +3544,20 @@ impl Encoder {
             );
         }
     }
-    /// Set number of vertices for auto generated vertices use in conjuction
-    /// with gl_VertexID.
-    ///
-    /// @attention Availability depends on: [CapsFlags::VERTEX_ID].
-    ///
+    /// * `num_vertices`:
+    /// Number of vertices.
     pub fn set_vertex_count(&self, num_vertices: u32) {
         unsafe {
             let _self = std::mem::transmute(self);
             bgfx_sys::bgfx_encoder_set_vertex_count(_self, num_vertices);
         }
     }
-    /// Set instance data buffer for draw primitive.
+    /// * `idb`:
+    /// Transient instance data buffer.
+    /// * `start`:
+    /// First instance data.
+    /// * `num`:
+    /// Number of data instances.
     pub fn set_instance_data_buffer(&self, idb: &InstanceDataBuffer, start: u32, num: u32) {
         unsafe {
             let _self = std::mem::transmute(self);
@@ -3083,7 +3565,14 @@ impl Encoder {
             bgfx_sys::bgfx_encoder_set_instance_data_buffer(_self, _idb, start, num);
         }
     }
+    /// * `handle`:
+    /// Vertex buffer.
+    /// * `start_vertex`:
+    /// First instance data.
+    /// * `num`:
+    /// Number of data instances.
     /// Set instance data buffer for draw primitive.
+    /// Dynamic vertex buffer.
     pub fn set_instance_data_from_vertex_buffer(
         &self,
         handle: VertexBuffer,
@@ -3100,7 +3589,12 @@ impl Encoder {
             );
         }
     }
-    /// Set instance data buffer for draw primitive.
+    /// * `handle`:
+    /// Dynamic vertex buffer.
+    /// * `start_vertex`:
+    /// First instance data.
+    /// * `num`:
+    /// Number of data instances.
     pub fn set_instance_data_from_dynamic_vertex_buffer(
         &self,
         handle: DynamicVertexBuffer,
@@ -3117,46 +3611,64 @@ impl Encoder {
             );
         }
     }
-    /// Set number of instances for auto generated instances use in conjuction
-    /// with gl_InstanceID.
-    ///
-    /// @attention Availability depends on: [CapsFlags::VERTEX_ID].
-    ///
+    /// * `num_instances`:
     pub fn set_instance_count(&self, num_instances: u32) {
         unsafe {
             let _self = std::mem::transmute(self);
             bgfx_sys::bgfx_encoder_set_instance_count(_self, num_instances);
         }
     }
-    /// Set texture stage for draw primitive.
+    /// * `stage`:
+    /// Texture unit.
+    /// * `sampler`:
+    /// Program sampler.
+    /// * `handle`:
+    /// Texture handle.
+    /// * `flags`:
+    /// Texture sampling mode. Default value UINT32_MAX uses
+    ///   texture sampling settings from the texture.
+    ///   - [SamplerFlags::[U/V/W]_[MIRROR/CLAMP]] - Mirror or clamp to edge wrap
+    ///     mode.
+    ///   - [SamplerFlags::[MIN/MAG/MIP]_[POINT/ANISOTROPIC]] - Point or anisotropic
+    ///     sampling.
     pub fn set_texture(&self, stage: u8, sampler: Uniform, handle: Texture, flags: u32) {
         unsafe {
             let _self = std::mem::transmute(self);
             bgfx_sys::bgfx_encoder_set_texture(_self, stage, sampler.handle, handle.handle, flags);
         }
     }
-    /// Submit an empty primitive for rendering. Uniforms and draw state
-    /// will be applied but no geometry will be submitted. Useful in cases
-    /// when no other draw/compute primitive is submitted to view, but it's
-    /// desired to execute clear view.
-    ///
-    /// @remark
-    ///   These empty draw calls will sort before ordinary draw calls.
-    ///
+    /// * `id`:
+    /// View id.
     pub fn touch(&self, id: ViewId) {
         unsafe {
             let _self = std::mem::transmute(self);
             bgfx_sys::bgfx_encoder_touch(_self, id);
         }
     }
-    /// Submit primitive for rendering.
+    /// * `id`:
+    /// View id.
+    /// * `program`:
+    /// Program.
+    /// * `depth`:
+    /// Depth for sorting.
+    /// * `flags`:
+    /// Discard or preserve states. See [DiscardFlags].
     pub fn submit(&self, id: ViewId, program: Program, params: SubmitArgs) {
         unsafe {
             let _self = std::mem::transmute(self);
             bgfx_sys::bgfx_encoder_submit(_self, id, program.handle, params.depth, params.flags);
         }
     }
-    /// Submit primitive with occlusion query for rendering.
+    /// * `id`:
+    /// View id.
+    /// * `program`:
+    /// Program.
+    /// * `occlusion_query`:
+    /// Occlusion query.
+    /// * `depth`:
+    /// Depth for sorting.
+    /// * `flags`:
+    /// Discard or preserve states. See [DiscardFlags].
     pub fn submit_occlusion_query(
         &self,
         id: ViewId,
@@ -3176,8 +3688,20 @@ impl Encoder {
             );
         }
     }
-    /// Submit primitive for rendering with index and instance data info from
-    /// indirect buffer.
+    /// * `id`:
+    /// View id.
+    /// * `program`:
+    /// Program.
+    /// * `indirect_handle`:
+    /// Indirect buffer.
+    /// * `start`:
+    /// First element in indirect buffer.
+    /// * `num`:
+    /// Number of dispatches.
+    /// * `depth`:
+    /// Depth for sorting.
+    /// * `flags`:
+    /// Discard or preserve states. See [DiscardFlags].
     pub fn submit_indirect(
         &self,
         id: ViewId,
@@ -3199,7 +3723,12 @@ impl Encoder {
             );
         }
     }
-    /// Set compute index buffer.
+    /// * `stage`:
+    /// Compute stage.
+    /// * `handle`:
+    /// Index buffer handle.
+    /// * `access`:
+    /// Buffer access. See [Access].
     pub fn set_compute_index_buffer(&self, stage: u8, handle: IndexBuffer, access: Access) {
         unsafe {
             let _self = std::mem::transmute(self);
@@ -3211,7 +3740,12 @@ impl Encoder {
             );
         }
     }
-    /// Set compute vertex buffer.
+    /// * `stage`:
+    /// Compute stage.
+    /// * `handle`:
+    /// Vertex buffer handle.
+    /// * `access`:
+    /// Buffer access. See [Access].
     pub fn set_compute_vertex_buffer(&self, stage: u8, handle: VertexBuffer, access: Access) {
         unsafe {
             let _self = std::mem::transmute(self);
@@ -3223,7 +3757,12 @@ impl Encoder {
             );
         }
     }
-    /// Set compute dynamic index buffer.
+    /// * `stage`:
+    /// Compute stage.
+    /// * `handle`:
+    /// Dynamic index buffer handle.
+    /// * `access`:
+    /// Buffer access. See [Access].
     pub fn set_compute_dynamic_index_buffer(
         &self,
         stage: u8,
@@ -3240,7 +3779,12 @@ impl Encoder {
             );
         }
     }
-    /// Set compute dynamic vertex buffer.
+    /// * `stage`:
+    /// Compute stage.
+    /// * `handle`:
+    /// Dynamic vertex buffer handle.
+    /// * `access`:
+    /// Buffer access. See [Access].
     pub fn set_compute_dynamic_vertex_buffer(
         &self,
         stage: u8,
@@ -3257,7 +3801,12 @@ impl Encoder {
             );
         }
     }
-    /// Set compute indirect buffer.
+    /// * `stage`:
+    /// Compute stage.
+    /// * `handle`:
+    /// Indirect buffer handle.
+    /// * `access`:
+    /// Buffer access. See [Access].
     pub fn set_compute_indirect_buffer(&self, stage: u8, handle: IndirectBuffer, access: Access) {
         unsafe {
             let _self = std::mem::transmute(self);
@@ -3269,7 +3818,16 @@ impl Encoder {
             );
         }
     }
-    /// Set compute image from texture.
+    /// * `stage`:
+    /// Compute stage.
+    /// * `handle`:
+    /// Texture handle.
+    /// * `mip`:
+    /// Mip level.
+    /// * `access`:
+    /// Image access. See [Access].
+    /// * `format`:
+    /// Texture format. See: [TextureFormat].
     pub fn set_image(
         &self,
         stage: u8,
@@ -3290,7 +3848,18 @@ impl Encoder {
             );
         }
     }
-    /// Dispatch compute.
+    /// * `id`:
+    /// View id.
+    /// * `program`:
+    /// Compute program.
+    /// * `num_x`:
+    /// Number of groups X.
+    /// * `num_y`:
+    /// Number of groups Y.
+    /// * `num_z`:
+    /// Number of groups Z.
+    /// * `flags`:
+    /// Discard or preserve states. See [DiscardFlags].
     pub fn dispatch(&self, id: ViewId, program: Program, params: DispatchArgs) {
         unsafe {
             let _self = std::mem::transmute(self);
@@ -3305,7 +3874,18 @@ impl Encoder {
             );
         }
     }
-    /// Dispatch compute indirect.
+    /// * `id`:
+    /// View id.
+    /// * `program`:
+    /// Compute program.
+    /// * `indirect_handle`:
+    /// Indirect buffer.
+    /// * `start`:
+    /// First element in indirect buffer.
+    /// * `num`:
+    /// Number of dispatches.
+    /// * `flags`:
+    /// Discard or preserve states. See [DiscardFlags].
     pub fn dispatch_indirect(
         &self,
         id: ViewId,
@@ -3326,18 +3906,47 @@ impl Encoder {
             );
         }
     }
-    /// Discard previously set state for draw or compute call.
+    /// * `flags`:
+    /// Discard or preserve states. See [DiscardFlags].
     pub fn discard(&self, flags: u8) {
         unsafe {
             let _self = std::mem::transmute(self);
             bgfx_sys::bgfx_encoder_discard(_self, flags);
         }
     }
-    /// Blit 2D texture region between two 2D textures.
-    ///
-    /// @attention Destination texture must be created with [TextureFlags::BLIT_DST] flag.
-    /// @attention Availability depends on: [CapsFlags::TEXTURE_BLIT].
-    ///
+    /// * `id`:
+    /// View id.
+    /// * `dst`:
+    /// Destination texture handle.
+    /// * `dst_mip`:
+    /// Destination texture mip level.
+    /// * `dst_x`:
+    /// Destination texture X position.
+    /// * `dst_y`:
+    /// Destination texture Y position.
+    /// * `dst_z`:
+    /// If texture is 2D this argument should be 0. If destination texture is cube
+    /// this argument represents destination texture cube face. For 3D texture this argument
+    /// represents destination texture Z position.
+    /// * `src`:
+    /// Source texture handle.
+    /// * `src_mip`:
+    /// Source texture mip level.
+    /// * `src_x`:
+    /// Source texture X position.
+    /// * `src_y`:
+    /// Source texture Y position.
+    /// * `src_z`:
+    /// If texture is 2D this argument should be 0. If source texture is cube
+    /// this argument represents source texture cube face. For 3D texture this argument
+    /// represents source texture Z position.
+    /// * `width`:
+    /// Width of region.
+    /// * `height`:
+    /// Height of region.
+    /// * `depth`:
+    /// If texture is 3D this argument represents depth of region, otherwise it's
+    /// unused.
     pub fn blit(
         &self,
         id: ViewId,
@@ -3372,13 +3981,15 @@ impl Encoder {
     }
 }
 
+/// * `init`:
 pub fn init_ctor(init: &Init) {
     unsafe {
         let _init = std::mem::transmute(init);
         bgfx_sys::bgfx_init_ctor(_init);
     }
 }
-/// Initialize bgfx library.
+/// * `init`:
+/// Initialization parameters. See: `bgfx::Init` for more info.
 pub fn init(init: &Init) -> bool {
     unsafe {
         let _init = std::mem::transmute(init);
@@ -3386,101 +3997,139 @@ pub fn init(init: &Init) -> bool {
         _ret
     }
 }
-/// Shutdown bgfx library.
 pub fn shutdown() {
     unsafe {
         bgfx_sys::bgfx_shutdown();
     }
 }
-/// Reset graphic settings and back-buffer size.
-///
-/// @attention This call doesn't actually change window size, it just
-///   resizes back-buffer. Windowing code has to change window size.
-///
+/// * `width`:
+/// Back-buffer width.
+/// * `height`:
+/// Back-buffer height.
+/// * `flags`:
+/// See: [ResetFlags] for more info.
+///   - [ResetFlags::NONE] - No reset flags.
+///   - [ResetFlags::FULLSCREEN] - Not supported yet.
+///   - [ResetMsaaFlags::X[2/4/8/16]] - Enable 2, 4, 8 or 16 x MSAA.
+///   - [ResetFlags::VSYNC] - Enable V-Sync.
+///   - [ResetFlags::MAXANISOTROPY] - Turn on/off max anisotropy.
+///   - [ResetFlags::CAPTURE] - Begin screen capture.
+///   - [ResetFlags::FLUSH_AFTER_RENDER] - Flush rendering after submitting to GPU.
+///   - [ResetFlags::FLIP_AFTER_RENDER] - This flag  specifies where flip
+///     occurs. Default behaviour is that flip occurs before rendering new
+///     frame. This flag only has effect when `BGFX_CONFIG_MULTITHREADED=0`.
+///   - [ResetFlags::SRGB_BACKBUFFER] - Enable sRGB backbuffer.
+/// * `format`:
+/// Texture format. See: [TextureFormat].
 pub fn reset(width: u32, height: u32, params: ResetArgs) {
     unsafe {
         bgfx_sys::bgfx_reset(width, height, params.flags, params.format as _);
     }
 }
-/// Advance to next frame. When using multithreaded renderer, this call
-/// just swaps internal buffers, kicks render thread, and returns. In
-/// singlethreaded renderer this call does frame rendering.
+/// * `capture`:
+/// Capture frame with graphics debugger.
 pub fn frame(capture: bool) -> u32 {
     unsafe {
         let _ret = bgfx_sys::bgfx_frame(capture);
         _ret
     }
 }
-/// Returns current renderer backend API type.
-///
-/// @remarks
-///   Library must be initialized.
-///
 pub fn get_renderer_type() -> RendererType {
     unsafe {
         let _ret = bgfx_sys::bgfx_get_renderer_type();
         std::mem::transmute(_ret)
     }
 }
-/// Returns renderer capabilities.
-///
-/// @remarks
-///   Library must be initialized.
-///
 pub fn get_caps() -> &'static Caps {
     unsafe {
         let _ret = bgfx_sys::bgfx_get_caps();
         std::mem::transmute(_ret)
     }
 }
-/// Returns performance counters.
-///
-/// @attention Pointer returned is valid until `bgfx::frame` is called.
-///
 pub fn get_stats() -> &'static Stats {
     unsafe {
         let _ret = bgfx_sys::bgfx_get_stats();
         std::mem::transmute(_ret)
     }
 }
-/// Set debug flags.
+/// * `debug`:
+/// Available flags:
+///   - [DebugFlags::IFH] - Infinitely fast hardware. When this flag is set
+///     all rendering calls will be skipped. This is useful when profiling
+///     to quickly assess potential bottlenecks between CPU and GPU.
+///   - [DebugFlags::PROFILER] - Enable profiler.
+///   - [DebugFlags::STATS] - Display internal statistics.
+///   - [DebugFlags::TEXT] - Display debug text.
+///   - [DebugFlags::WIREFRAME] - Wireframe rendering. All rendering
+///     primitives will be rendered as lines.
 pub fn set_debug(debug: u32) {
     unsafe {
         bgfx_sys::bgfx_set_debug(debug);
     }
 }
-/// Clear internal debug text buffer.
+/// * `attr`:
+/// Background color.
+/// * `small`:
+/// Default 8x16 or 8x8 font.
 pub fn dbg_text_clear(params: DbgTextClearArgs) {
     unsafe {
         bgfx_sys::bgfx_dbg_text_clear(params.attr, params.small);
     }
 }
-/// Draw image into internal debug text buffer.
+/// * `x`:
+/// Position x from the left corner of the window.
+/// * `y`:
+/// Position y from the top corner of the window.
+/// * `width`:
+/// Image width.
+/// * `height`:
+/// Image height.
+/// * `data`:
+/// Raw image data (character/attribute raw encoding).
+/// * `pitch`:
+/// Image pitch in bytes.
 pub fn dbg_text_image(x: u16, y: u16, width: u16, height: u16, data: &c_void, pitch: u16) {
     unsafe {
         bgfx_sys::bgfx_dbg_text_image(x, y, width, height, data, pitch);
     }
 }
-/// Create static index buffer.
+/// * `mem`:
+/// Index buffer data.
+/// * `flags`:
+/// Buffer creation flags.
+///   - [BufferFlags::NONE] - No flags.
+///   - [BufferFlags::COMPUTE_READ] - Buffer will be read from by compute shader.
+///   - [BufferFlags::COMPUTE_WRITE] - Buffer will be written into by compute shader. When buffer
+///       is created with [BufferFlags::COMPUTE_WRITE] flag it cannot be updated from CPU.
+///   - [BufferFlags::COMPUTE_READ_WRITE] - Buffer will be used for read/write by compute shader.
+///   - [BufferFlags::ALLOW_RESIZE] - Buffer will resize on buffer update if a different amount of
+///       data is passed. If this flag is not specified, and more data is passed on update, the buffer
+///       will be trimmed to fit the existing buffer size. This flag has effect only on dynamic
+///       buffers.
+///   - [BufferFlags::INDEX32] - Buffer is using 32-bit indices. This flag has effect only on
+///       index buffers.
 pub fn create_index_buffer(mem: &Memory, flags: u16) -> IndexBuffer {
     unsafe {
         let _ret = bgfx_sys::bgfx_create_index_buffer(mem.handle, flags);
         IndexBuffer { handle: _ret }
     }
 }
-/// Set static index buffer debug name.
-pub fn set_index_buffer_name(handle: IndexBuffer, name: &i8, len: i32) {
-    unsafe {
-        bgfx_sys::bgfx_set_index_buffer_name(handle.handle, name, len);
-    }
-}
-/// Destroy static index buffer.
+/// * `handle`:
+/// Static index buffer handle.
+/// * `name`:
+/// Static index buffer name.
+/// * `len`:
+/// Static index buffer name length (if length is INT32_MAX, it's expected
+/// that _name is zero terminated string.
+/// * `handle`:
+/// Static index buffer handle.
 pub fn destroy_index_buffer(handle: IndexBuffer) {
     unsafe {
         bgfx_sys::bgfx_destroy_index_buffer(handle.handle);
     }
 }
-/// Create vertex layout.
+/// * `layout`:
+/// Vertex layout.
 pub fn create_vertex_layout(layout: &VertexLayoutBuilder) -> VertexLayout {
     unsafe {
         let _layout = std::mem::transmute(layout);
@@ -3488,13 +4137,28 @@ pub fn create_vertex_layout(layout: &VertexLayoutBuilder) -> VertexLayout {
         VertexLayout { handle: _ret }
     }
 }
-/// Destroy vertex layout.
+/// * `layout_handle`:
+/// Vertex layout handle.
 pub fn destroy_vertex_layout(layout_handle: VertexLayout) {
     unsafe {
         bgfx_sys::bgfx_destroy_vertex_layout(layout_handle.handle);
     }
 }
-/// Create static vertex buffer.
+/// * `mem`:
+/// Vertex buffer data.
+/// * `layout`:
+/// Vertex layout.
+/// * `flags`:
+/// Buffer creation flags.
+///  - [BufferFlags::NONE] - No flags.
+///  - [BufferFlags::COMPUTE_READ] - Buffer will be read from by compute shader.
+///  - [BufferFlags::COMPUTE_WRITE] - Buffer will be written into by compute shader. When buffer
+///      is created with [BufferFlags::COMPUTE_WRITE] flag it cannot be updated from CPU.
+///  - [BufferFlags::COMPUTE_READ_WRITE] - Buffer will be used for read/write by compute shader.
+///  - [BufferFlags::ALLOW_RESIZE] - Buffer will resize on buffer update if a different amount of
+///      data is passed. If this flag is not specified, and more data is passed on update, the buffer
+///      will be trimmed to fit the existing buffer size. This flag has effect only on dynamic buffers.
+///  - [BufferFlags::INDEX32] - Buffer is using 32-bit indices. This flag has effect only on index buffers.
 pub fn create_vertex_buffer(
     mem: &Memory,
     layout: &VertexLayoutBuilder,
@@ -3506,45 +4170,97 @@ pub fn create_vertex_buffer(
         VertexBuffer { handle: _ret }
     }
 }
-/// Set static vertex buffer debug name.
-pub fn set_vertex_buffer_name(handle: VertexBuffer, name: &i8, len: i32) {
-    unsafe {
-        bgfx_sys::bgfx_set_vertex_buffer_name(handle.handle, name, len);
-    }
-}
-/// Destroy static vertex buffer.
+/// * `handle`:
+/// Static vertex buffer handle.
+/// * `name`:
+/// Static vertex buffer name.
+/// * `len`:
+/// Static vertex buffer name length (if length is INT32_MAX, it's expected
+/// that _name is zero terminated string.
+/// * `handle`:
+/// Static vertex buffer handle.
 pub fn destroy_vertex_buffer(handle: VertexBuffer) {
     unsafe {
         bgfx_sys::bgfx_destroy_vertex_buffer(handle.handle);
     }
 }
-/// Create empty dynamic index buffer.
+/// * `num`:
+/// Number of indices.
+/// * `flags`:
+/// Buffer creation flags.
+///   - [BufferFlags::NONE] - No flags.
+///   - [BufferFlags::COMPUTE_READ] - Buffer will be read from by compute shader.
+///   - [BufferFlags::COMPUTE_WRITE] - Buffer will be written into by compute shader. When buffer
+///       is created with [BufferFlags::COMPUTE_WRITE] flag it cannot be updated from CPU.
+///   - [BufferFlags::COMPUTE_READ_WRITE] - Buffer will be used for read/write by compute shader.
+///   - [BufferFlags::ALLOW_RESIZE] - Buffer will resize on buffer update if a different amount of
+///       data is passed. If this flag is not specified, and more data is passed on update, the buffer
+///       will be trimmed to fit the existing buffer size. This flag has effect only on dynamic
+///       buffers.
+///   - [BufferFlags::INDEX32] - Buffer is using 32-bit indices. This flag has effect only on
+///       index buffers.
 pub fn create_dynamic_index_buffer(num: u32, flags: u16) -> DynamicIndexBuffer {
     unsafe {
         let _ret = bgfx_sys::bgfx_create_dynamic_index_buffer(num, flags);
         DynamicIndexBuffer { handle: _ret }
     }
 }
-/// Create dynamic index buffer and initialized it.
+/// * `mem`:
+/// Index buffer data.
+/// * `flags`:
+/// Buffer creation flags.
+///   - [BufferFlags::NONE] - No flags.
+///   - [BufferFlags::COMPUTE_READ] - Buffer will be read from by compute shader.
+///   - [BufferFlags::COMPUTE_WRITE] - Buffer will be written into by compute shader. When buffer
+///       is created with [BufferFlags::COMPUTE_WRITE] flag it cannot be updated from CPU.
+///   - [BufferFlags::COMPUTE_READ_WRITE] - Buffer will be used for read/write by compute shader.
+///   - [BufferFlags::ALLOW_RESIZE] - Buffer will resize on buffer update if a different amount of
+///       data is passed. If this flag is not specified, and more data is passed on update, the buffer
+///       will be trimmed to fit the existing buffer size. This flag has effect only on dynamic
+///       buffers.
+///   - [BufferFlags::INDEX32] - Buffer is using 32-bit indices. This flag has effect only on
+///       index buffers.
 pub fn create_dynamic_index_buffer_mem(mem: &Memory, flags: u16) -> DynamicIndexBuffer {
     unsafe {
         let _ret = bgfx_sys::bgfx_create_dynamic_index_buffer_mem(mem.handle, flags);
         DynamicIndexBuffer { handle: _ret }
     }
 }
-/// Update dynamic index buffer.
+/// * `handle`:
+/// Dynamic index buffer handle.
+/// * `start_index`:
+/// Start index.
+/// * `mem`:
+/// Index buffer data.
 pub fn update_dynamic_index_buffer(handle: DynamicIndexBuffer, start_index: u32, mem: &Memory) {
     unsafe {
         bgfx_sys::bgfx_update_dynamic_index_buffer(handle.handle, start_index, mem.handle);
     }
 }
-/// Destroy dynamic index buffer.
+/// * `handle`:
+/// Dynamic index buffer handle.
 pub fn destroy_dynamic_index_buffer(handle: DynamicIndexBuffer) {
     unsafe {
         bgfx_sys::bgfx_destroy_dynamic_index_buffer(handle.handle);
     }
 }
-/// Create empty dynamic vertex buffer.
+/// * `num`:
+/// Number of vertices.
+/// * `layout`:
+/// Vertex layout.
+/// * `flags`:
+/// Buffer creation flags.
+///   - [BufferFlags::NONE] - No flags.
+///   - [BufferFlags::COMPUTE_READ] - Buffer will be read from by compute shader.
+///   - [BufferFlags::COMPUTE_WRITE] - Buffer will be written into by compute shader. When buffer
+///       is created with [BufferFlags::COMPUTE_WRITE] flag it cannot be updated from CPU.
+///   - [BufferFlags::COMPUTE_READ_WRITE] - Buffer will be used for read/write by compute shader.
+///   - [BufferFlags::ALLOW_RESIZE] - Buffer will resize on buffer update if a different amount of
+///       data is passed. If this flag is not specified, and more data is passed on update, the buffer
+///       will be trimmed to fit the existing buffer size. This flag has effect only on dynamic
+///       buffers.
+///   - [BufferFlags::INDEX32] - Buffer is using 32-bit indices. This flag has effect only on
+///       index buffers.
 pub fn create_dynamic_vertex_buffer(
     num: u32,
     layout: &VertexLayoutBuilder,
@@ -3556,7 +4272,23 @@ pub fn create_dynamic_vertex_buffer(
         DynamicVertexBuffer { handle: _ret }
     }
 }
-/// Create dynamic vertex buffer and initialize it.
+/// * `mem`:
+/// Vertex buffer data.
+/// * `layout`:
+/// Vertex layout.
+/// * `flags`:
+/// Buffer creation flags.
+///   - [BufferFlags::NONE] - No flags.
+///   - [BufferFlags::COMPUTE_READ] - Buffer will be read from by compute shader.
+///   - [BufferFlags::COMPUTE_WRITE] - Buffer will be written into by compute shader. When buffer
+///       is created with [BufferFlags::COMPUTE_WRITE] flag it cannot be updated from CPU.
+///   - [BufferFlags::COMPUTE_READ_WRITE] - Buffer will be used for read/write by compute shader.
+///   - [BufferFlags::ALLOW_RESIZE] - Buffer will resize on buffer update if a different amount of
+///       data is passed. If this flag is not specified, and more data is passed on update, the buffer
+///       will be trimmed to fit the existing buffer size. This flag has effect only on dynamic
+///       buffers.
+///   - [BufferFlags::INDEX32] - Buffer is using 32-bit indices. This flag has effect only on
+///       index buffers.
 pub fn create_dynamic_vertex_buffer_mem(
     mem: &Memory,
     layout: &VertexLayoutBuilder,
@@ -3568,26 +4300,38 @@ pub fn create_dynamic_vertex_buffer_mem(
         DynamicVertexBuffer { handle: _ret }
     }
 }
-/// Update dynamic vertex buffer.
+/// * `handle`:
+/// Dynamic vertex buffer handle.
+/// * `start_vertex`:
+/// Start vertex.
+/// * `mem`:
+/// Vertex buffer data.
 pub fn update_dynamic_vertex_buffer(handle: DynamicVertexBuffer, start_vertex: u32, mem: &Memory) {
     unsafe {
         bgfx_sys::bgfx_update_dynamic_vertex_buffer(handle.handle, start_vertex, mem.handle);
     }
 }
-/// Destroy dynamic vertex buffer.
+/// * `handle`:
+/// Dynamic vertex buffer handle.
 pub fn destroy_dynamic_vertex_buffer(handle: DynamicVertexBuffer) {
     unsafe {
         bgfx_sys::bgfx_destroy_dynamic_vertex_buffer(handle.handle);
     }
 }
-/// Returns number of requested or maximum available indices.
+/// * `num`:
+/// Number of required indices.
+/// * `index_32`:
+/// Set to `true` if input indices will be 32-bit.
 pub fn get_avail_transient_index_buffer(num: u32, index_32: bool) -> u32 {
     unsafe {
         let _ret = bgfx_sys::bgfx_get_avail_transient_index_buffer(num, index_32);
         _ret
     }
 }
-/// Returns number of requested or maximum available vertices.
+/// * `num`:
+/// Number of required vertices.
+/// * `layout`:
+/// Vertex layout.
 pub fn get_avail_transient_vertex_buffer(num: u32, layout: &VertexLayoutBuilder) -> u32 {
     unsafe {
         let _layout = std::mem::transmute(layout);
@@ -3595,22 +4339,38 @@ pub fn get_avail_transient_vertex_buffer(num: u32, layout: &VertexLayoutBuilder)
         _ret
     }
 }
-/// Returns number of requested or maximum available instance buffer slots.
+/// * `num`:
+/// Number of required instances.
+/// * `stride`:
+/// Stride per instance.
 pub fn get_avail_instance_data_buffer(num: u32, stride: u16) -> u32 {
     unsafe {
         let _ret = bgfx_sys::bgfx_get_avail_instance_data_buffer(num, stride);
         _ret
     }
 }
-/// Allocate transient index buffer.
-///
+/// * `tib`:
+/// TransientIndexBuffer structure is filled and is valid
+/// for the duration of frame, and it can be reused for multiple draw
+/// calls.
+/// * `num`:
+/// Number of indices to allocate.
+/// * `index_32`:
+/// Set to `true` if input indices will be 32-bit.
 pub fn alloc_transient_index_buffer(tib: &mut TransientIndexBuffer, num: u32, index_32: bool) {
     unsafe {
         let _tib = std::mem::transmute(tib);
         bgfx_sys::bgfx_alloc_transient_index_buffer(_tib, num, index_32);
     }
 }
-/// Allocate transient vertex buffer.
+/// * `tvb`:
+/// TransientVertexBuffer structure is filled and is valid
+/// for the duration of frame, and it can be reused for multiple draw
+/// calls.
+/// * `num`:
+/// Number of vertices to allocate.
+/// * `layout`:
+/// Vertex layout.
 pub fn alloc_transient_vertex_buffer(
     tvb: &mut TransientVertexBuffer,
     num: u32,
@@ -3622,10 +4382,22 @@ pub fn alloc_transient_vertex_buffer(
         bgfx_sys::bgfx_alloc_transient_vertex_buffer(_tvb, num, _layout);
     }
 }
-/// Check for required space and allocate transient vertex and index
-/// buffers. If both space requirements are satisfied function returns
-/// true.
-///
+/// * `tvb`:
+/// TransientVertexBuffer structure is filled and is valid
+/// for the duration of frame, and it can be reused for multiple draw
+/// calls.
+/// * `layout`:
+/// Vertex layout.
+/// * `num_vertices`:
+/// Number of vertices to allocate.
+/// * `tib`:
+/// TransientIndexBuffer structure is filled and is valid
+/// for the duration of frame, and it can be reused for multiple draw
+/// calls.
+/// * `num_indices`:
+/// Number of indices to allocate.
+/// * `index_32`:
+/// Set to `true` if input indices will be 32-bit.
 pub fn alloc_transient_buffers(
     tvb: &mut TransientVertexBuffer,
     layout: &VertexLayoutBuilder,
@@ -3649,70 +4421,96 @@ pub fn alloc_transient_buffers(
         _ret
     }
 }
-/// Allocate instance data buffer.
+/// * `idb`:
+/// InstanceDataBuffer structure is filled and is valid
+/// for duration of frame, and it can be reused for multiple draw
+/// calls.
+/// * `num`:
+/// Number of instances.
+/// * `stride`:
+/// Instance stride. Must be multiple of 16.
 pub fn alloc_instance_data_buffer(idb: &mut InstanceDataBuffer, num: u32, stride: u16) {
     unsafe {
         let _idb = std::mem::transmute(idb);
         bgfx_sys::bgfx_alloc_instance_data_buffer(_idb, num, stride);
     }
 }
-/// Create draw indirect buffer.
+/// * `num`:
+/// Number of indirect calls.
 pub fn create_indirect_buffer(num: u32) -> IndirectBuffer {
     unsafe {
         let _ret = bgfx_sys::bgfx_create_indirect_buffer(num);
         IndirectBuffer { handle: _ret }
     }
 }
-/// Destroy draw indirect buffer.
+/// * `handle`:
+/// Indirect buffer handle.
 pub fn destroy_indirect_buffer(handle: IndirectBuffer) {
     unsafe {
         bgfx_sys::bgfx_destroy_indirect_buffer(handle.handle);
     }
 }
-/// Create shader from memory buffer.
+/// * `mem`:
+/// Shader binary.
 pub fn create_shader(mem: &Memory) -> Shader {
     unsafe {
         let _ret = bgfx_sys::bgfx_create_shader(mem.handle);
         Shader { handle: _ret }
     }
 }
-/// Set shader debug name.
-pub fn set_shader_name(handle: Shader, name: &i8, len: i32) {
-    unsafe {
-        bgfx_sys::bgfx_set_shader_name(handle.handle, name, len);
-    }
-}
-/// Destroy shader.
-///
-/// @remark Once a shader program is created with _handle,
-///   it is safe to destroy that shader.
-///
+/// * `handle`:
+/// Shader handle.
+/// * `name`:
+/// Shader name.
+/// * `len`:
+/// Shader name length (if length is INT32_MAX, it's expected
+/// that _name is zero terminated string).
+/// * `handle`:
+/// Shader handle.
 pub fn destroy_shader(handle: Shader) {
     unsafe {
         bgfx_sys::bgfx_destroy_shader(handle.handle);
     }
 }
-/// Create program with vertex and fragment shaders.
+/// * `vsh`:
+/// Vertex shader.
+/// * `fsh`:
+/// Fragment shader.
+/// * `destroy_shaders`:
+/// If true, shaders will be destroyed when program is destroyed.
 pub fn create_program(vsh: Shader, fsh: Shader, destroy_shaders: bool) -> Program {
     unsafe {
         let _ret = bgfx_sys::bgfx_create_program(vsh.handle, fsh.handle, destroy_shaders);
         Program { handle: _ret }
     }
 }
-/// Create program with compute shader.
+/// * `csh`:
+/// Compute shader.
+/// * `destroy_shaders`:
+/// If true, shaders will be destroyed when program is destroyed.
 pub fn create_compute_program(csh: Shader, destroy_shaders: bool) -> Program {
     unsafe {
         let _ret = bgfx_sys::bgfx_create_compute_program(csh.handle, destroy_shaders);
         Program { handle: _ret }
     }
 }
-/// Destroy program.
+/// * `handle`:
+/// Program handle.
 pub fn destroy_program(handle: Program) {
     unsafe {
         bgfx_sys::bgfx_destroy_program(handle.handle);
     }
 }
-/// Validate texture parameters.
+/// * `depth`:
+/// Depth dimension of volume texture.
+/// * `cube_map`:
+/// Indicates that texture contains cubemap.
+/// * `num_layers`:
+/// Number of layers in texture array.
+/// * `format`:
+/// Texture format. See: [TextureFormat].
+/// * `flags`:
+/// Texture flags. See [TextureFlags].
 pub fn is_texture_valid(
     depth: u16,
     cube_map: bool,
@@ -3725,7 +4523,10 @@ pub fn is_texture_valid(
         _ret
     }
 }
-/// Validate frame buffer parameters.
+/// * `num`:
+/// Number of attachments.
+/// * `attachment`:
+/// Attachment texture info. See: `bgfx::Attachment`.
 pub fn is_frame_buffer_valid(num: u8, attachment: &Attachment) -> bool {
     unsafe {
         let _attachment = std::mem::transmute(attachment);
@@ -3733,7 +4534,22 @@ pub fn is_frame_buffer_valid(num: u8, attachment: &Attachment) -> bool {
         _ret
     }
 }
-/// Calculate amount of memory required for texture.
+/// * `info`:
+/// Resulting texture info structure. See: `TextureInfo`.
+/// * `width`:
+/// Width.
+/// * `height`:
+/// Height.
+/// * `depth`:
+/// Depth dimension of volume texture.
+/// * `cube_map`:
+/// Indicates that texture contains cubemap.
+/// * `has_mips`:
+/// Indicates that texture contains full mip-map chain.
+/// * `num_layers`:
+/// Number of layers in texture array.
+/// * `format`:
+/// Texture format. See: [TextureFormat].
 pub fn calc_texture_size(
     info: &mut TextureInfo,
     width: u16,
@@ -3758,7 +4574,19 @@ pub fn calc_texture_size(
         );
     }
 }
-/// Create texture from memory buffer.
+/// * `mem`:
+/// DDS, KTX or PVR texture binary data.
+/// * `flags`:
+/// Texture creation (see [TextureFlags].), and sampler (see [SamplerFlags])
+/// flags. Default texture sampling mode is linear, and wrap mode is repeat.
+/// - [SamplerFlags::[U/V/W]_[MIRROR/CLAMP]] - Mirror or clamp to edge wrap
+///   mode.
+/// - [SamplerFlags::[MIN/MAG/MIP]_[POINT/ANISOTROPIC]] - Point or anisotropic
+///   sampling.
+/// * `skip`:
+/// Skip top level mips when parsing texture.
+/// * `info`:
+/// When non-`NULL` is specified it returns parsed texture information.
 pub fn create_texture(mem: &Memory, flags: u64, skip: u8, info: &mut TextureInfo) -> Texture {
     unsafe {
         let _info = std::mem::transmute(info);
@@ -3766,7 +4594,28 @@ pub fn create_texture(mem: &Memory, flags: u64, skip: u8, info: &mut TextureInfo
         Texture { handle: _ret }
     }
 }
-/// Create 2D texture.
+/// * `width`:
+/// Width.
+/// * `height`:
+/// Height.
+/// * `has_mips`:
+/// Indicates that texture contains full mip-map chain.
+/// * `num_layers`:
+/// Number of layers in texture array. Must be 1 if caps
+/// [CapsFlags::TEXTURE_2D_ARRAY] flag is not set.
+/// * `format`:
+/// Texture format. See: [TextureFormat].
+/// * `flags`:
+/// Texture creation (see [TextureFlags].), and sampler (see [SamplerFlags])
+/// flags. Default texture sampling mode is linear, and wrap mode is repeat.
+/// - [SamplerFlags::[U/V/W]_[MIRROR/CLAMP]] - Mirror or clamp to edge wrap
+///   mode.
+/// - [SamplerFlags::[MIN/MAG/MIP]_[POINT/ANISOTROPIC]] - Point or anisotropic
+///   sampling.
+/// * `mem`:
+/// Texture data. If `_mem` is non-NULL, created texture will be immutable. If
+/// `_mem` is NULL content of the texture is uninitialized. When `_numLayers` is more than
+/// 1, expected memory layout is texture and all mips together for each array element.
 pub fn create_texture_2d(
     width: u16,
     height: u16,
@@ -3789,8 +4638,22 @@ pub fn create_texture_2d(
         Texture { handle: _ret }
     }
 }
-/// Create texture with size based on backbuffer ratio. Texture will maintain ratio
-/// if back buffer resolution changes.
+/// * `ratio`:
+/// Texture size in respect to back-buffer size. See: [BackbufferRatio].
+/// * `has_mips`:
+/// Indicates that texture contains full mip-map chain.
+/// * `num_layers`:
+/// Number of layers in texture array. Must be 1 if caps
+/// [CapsFlags::TEXTURE_2D_ARRAY] flag is not set.
+/// * `format`:
+/// Texture format. See: [TextureFormat].
+/// * `flags`:
+/// Texture creation (see [TextureFlags].), and sampler (see [SamplerFlags])
+/// flags. Default texture sampling mode is linear, and wrap mode is repeat.
+/// - [SamplerFlags::[U/V/W]_[MIRROR/CLAMP]] - Mirror or clamp to edge wrap
+///   mode.
+/// - [SamplerFlags::[MIN/MAG/MIP]_[POINT/ANISOTROPIC]] - Point or anisotropic
+///   sampling.
 pub fn create_texture_2d_scaled(
     ratio: BackbufferRatio,
     has_mips: bool,
@@ -3809,7 +4672,27 @@ pub fn create_texture_2d_scaled(
         Texture { handle: _ret }
     }
 }
-/// Create 3D texture.
+/// * `width`:
+/// Width.
+/// * `height`:
+/// Height.
+/// * `depth`:
+/// Depth.
+/// * `has_mips`:
+/// Indicates that texture contains full mip-map chain.
+/// * `format`:
+/// Texture format. See: [TextureFormat].
+/// * `flags`:
+/// Texture creation (see [TextureFlags].), and sampler (see [SamplerFlags])
+/// flags. Default texture sampling mode is linear, and wrap mode is repeat.
+/// - [SamplerFlags::[U/V/W]_[MIRROR/CLAMP]] - Mirror or clamp to edge wrap
+///   mode.
+/// - [SamplerFlags::[MIN/MAG/MIP]_[POINT/ANISOTROPIC]] - Point or anisotropic
+///   sampling.
+/// * `mem`:
+/// Texture data. If `_mem` is non-NULL, created texture will be immutable. If
+/// `_mem` is NULL content of the texture is uninitialized. When `_numLayers` is more than
+/// 1, expected memory layout is texture and all mips together for each array element.
 pub fn create_texture_3d(
     width: u16,
     height: u16,
@@ -3836,7 +4719,26 @@ pub fn create_texture_3d(
         Texture { handle: _ret }
     }
 }
-/// Create Cube texture.
+/// * `size`:
+/// Cube side size.
+/// * `has_mips`:
+/// Indicates that texture contains full mip-map chain.
+/// * `num_layers`:
+/// Number of layers in texture array. Must be 1 if caps
+/// [CapsFlags::TEXTURE_2D_ARRAY] flag is not set.
+/// * `format`:
+/// Texture format. See: [TextureFormat].
+/// * `flags`:
+/// Texture creation (see [TextureFlags].), and sampler (see [SamplerFlags])
+/// flags. Default texture sampling mode is linear, and wrap mode is repeat.
+/// - [SamplerFlags::[U/V/W]_[MIRROR/CLAMP]] - Mirror or clamp to edge wrap
+///   mode.
+/// - [SamplerFlags::[MIN/MAG/MIP]_[POINT/ANISOTROPIC]] - Point or anisotropic
+///   sampling.
+/// * `mem`:
+/// Texture data. If `_mem` is non-NULL, created texture will be immutable. If
+/// `_mem` is NULL content of the texture is uninitialized. When `_numLayers` is more than
+/// 1, expected memory layout is texture and all mips together for each array element.
 pub fn create_texture_cube(
     size: u16,
     has_mips: bool,
@@ -3861,10 +4763,25 @@ pub fn create_texture_cube(
         Texture { handle: _ret }
     }
 }
-/// Update 2D texture.
-///
-/// @attention It's valid to update only mutable texture. See `bgfx::createTexture2D` for more info.
-///
+/// * `handle`:
+/// Texture handle.
+/// * `layer`:
+/// Layer in texture array.
+/// * `mip`:
+/// Mip level.
+/// * `x`:
+/// X offset in texture.
+/// * `y`:
+/// Y offset in texture.
+/// * `width`:
+/// Width of texture block.
+/// * `height`:
+/// Height of texture block.
+/// * `mem`:
+/// Texture update data.
+/// * `pitch`:
+/// Pitch of input image (bytes). When _pitch is set to
+/// UINT16_MAX, it will be calculated internally based on _width.
 pub fn update_texture_2d(
     handle: Texture,
     layer: u16,
@@ -3890,10 +4807,24 @@ pub fn update_texture_2d(
         );
     }
 }
-/// Update 3D texture.
-///
-/// @attention It's valid to update only mutable texture. See `bgfx::createTexture3D` for more info.
-///
+/// * `handle`:
+/// Texture handle.
+/// * `mip`:
+/// Mip level.
+/// * `x`:
+/// X offset in texture.
+/// * `y`:
+/// Y offset in texture.
+/// * `z`:
+/// Z offset in texture.
+/// * `width`:
+/// Width of texture block.
+/// * `height`:
+/// Height of texture block.
+/// * `depth`:
+/// Depth of texture block.
+/// * `mem`:
+/// Texture update data.
 pub fn update_texture_3d(
     handle: Texture,
     mip: u8,
@@ -3919,10 +4850,45 @@ pub fn update_texture_3d(
         );
     }
 }
-/// Update Cube texture.
+/// * `handle`:
+/// Texture handle.
+/// * `layer`:
+/// Layer in texture array.
+/// * `side`:
+/// Cubemap side [CubeMapFlags::<POSITIVE or NEGATIVE>_<X, Y or Z>],
+///   where 0 is +X, 1 is -X, 2 is +Y, 3 is -Y, 4 is +Z, and 5 is -Z.
 ///
-/// @attention It's valid to update only mutable texture. See `bgfx::createTextureCube` for more info.
-///
+///                  +----------+
+///                  |-z       2|
+///                  | ^  +y    |
+///                  | |        |    Unfolded cube:
+///                  | +---->+x |
+///       +----------+----------+----------+----------+
+///       |+y       1|+y       4|+y       0|+y       5|
+///       | ^  -x    | ^  +z    | ^  +x    | ^  -z    |
+///       | |        | |        | |        | |        |
+///       | +---->+z | +---->+x | +---->-z | +---->-x |
+///       +----------+----------+----------+----------+
+///                  |+z       3|
+///                  | ^  -y    |
+///                  | |        |
+///                  | +---->+x |
+///                  +----------+
+/// * `mip`:
+/// Mip level.
+/// * `x`:
+/// X offset in texture.
+/// * `y`:
+/// Y offset in texture.
+/// * `width`:
+/// Width of texture block.
+/// * `height`:
+/// Height of texture block.
+/// * `mem`:
+/// Texture update data.
+/// * `pitch`:
+/// Pitch of input image (bytes). When _pitch is set to
+/// UINT16_MAX, it will be calculated internally based on _width.
 pub fn update_texture_cube(
     handle: Texture,
     layer: u16,
@@ -3950,19 +4916,33 @@ pub fn update_texture_cube(
         );
     }
 }
-/// Set texture debug name.
-pub fn set_texture_name(handle: Texture, name: &i8, len: i32) {
-    unsafe {
-        bgfx_sys::bgfx_set_texture_name(handle.handle, name, len);
-    }
-}
-/// Destroy texture.
+/// * `handle`:
+/// Texture handle.
+/// * `name`:
+/// Texture name.
+/// * `len`:
+/// Texture name length (if length is INT32_MAX, it's expected
+/// that _name is zero terminated string.
+/// * `handle`:
+/// Texture handle.
 pub fn destroy_texture(handle: Texture) {
     unsafe {
         bgfx_sys::bgfx_destroy_texture(handle.handle);
     }
 }
-/// Create frame buffer (simple).
+/// * `width`:
+/// Texture width.
+/// * `height`:
+/// Texture height.
+/// * `format`:
+/// Texture format. See: [TextureFormat].
+/// * `texture_flags`:
+/// Texture creation (see [TextureFlags].), and sampler (see [SamplerFlags])
+/// flags. Default texture sampling mode is linear, and wrap mode is repeat.
+/// - [SamplerFlags::[U/V/W]_[MIRROR/CLAMP]] - Mirror or clamp to edge wrap
+///   mode.
+/// - [SamplerFlags::[MIN/MAG/MIP]_[POINT/ANISOTROPIC]] - Point or anisotropic
+///   sampling.
 pub fn create_frame_buffer(
     width: u16,
     height: u16,
@@ -3974,8 +4954,18 @@ pub fn create_frame_buffer(
         FrameBuffer { handle: _ret }
     }
 }
-/// Create frame buffer with size based on backbuffer ratio. Frame buffer will maintain ratio
-/// if back buffer resolution changes.
+/// * `ratio`:
+/// Frame buffer size in respect to back-buffer size. See:
+/// [BackbufferRatio].
+/// * `format`:
+/// Texture format. See: [TextureFormat].
+/// * `texture_flags`:
+/// Texture creation (see [TextureFlags].), and sampler (see [SamplerFlags])
+/// flags. Default texture sampling mode is linear, and wrap mode is repeat.
+/// - [SamplerFlags::[U/V/W]_[MIRROR/CLAMP]] - Mirror or clamp to edge wrap
+///   mode.
+/// - [SamplerFlags::[MIN/MAG/MIP]_[POINT/ANISOTROPIC]] - Point or anisotropic
+///   sampling.
 pub fn create_frame_buffer_scaled(
     ratio: BackbufferRatio,
     format: TextureFormat,
@@ -3987,7 +4977,13 @@ pub fn create_frame_buffer_scaled(
         FrameBuffer { handle: _ret }
     }
 }
-/// Create MRT frame buffer from texture handles (simple).
+/// * `num`:
+/// Number of texture handles.
+/// * `handles`:
+/// Texture attachments.
+/// * `destroy_texture`:
+/// If true, textures will be destroyed when
+/// frame buffer is destroyed.
 pub fn create_frame_buffer_from_handles(
     num: u8,
     handles: &Texture,
@@ -3999,8 +4995,13 @@ pub fn create_frame_buffer_from_handles(
         FrameBuffer { handle: _ret }
     }
 }
-/// Create MRT frame buffer from texture handles with specific layer and
-/// mip level.
+/// * `num`:
+/// Number of attachments.
+/// * `attachment`:
+/// Attachment texture info. See: `bgfx::Attachment`.
+/// * `destroy_texture`:
+/// If true, textures will be destroyed when
+/// frame buffer is destroyed.
 pub fn create_frame_buffer_from_attachment(
     num: u8,
     attachment: &Attachment,
@@ -4013,13 +5014,16 @@ pub fn create_frame_buffer_from_attachment(
         FrameBuffer { handle: _ret }
     }
 }
-/// Create frame buffer for multiple window rendering.
-///
-/// @remarks
-///   Frame buffer cannot be used for sampling.
-///
-/// @attention Availability depends on: [CapsFlags::SWAP_CHAIN].
-///
+/// * `nwh`:
+/// OS' target native window handle.
+/// * `width`:
+/// Window back buffer width.
+/// * `height`:
+/// Window back buffer height.
+/// * `format`:
+/// Window back buffer color format.
+/// * `depth_format`:
+/// Window back buffer depth format.
 pub fn create_frame_buffer_from_nwh(
     nwh: &c_void,
     width: u16,
@@ -4037,135 +5041,171 @@ pub fn create_frame_buffer_from_nwh(
         FrameBuffer { handle: _ret }
     }
 }
-/// Set frame buffer debug name.
-pub fn set_frame_buffer_name(handle: FrameBuffer, name: &i8, len: i32) {
-    unsafe {
-        bgfx_sys::bgfx_set_frame_buffer_name(handle.handle, name, len);
-    }
-}
-/// Obtain texture handle of frame buffer attachment.
+/// * `handle`:
+/// Frame buffer handle.
+/// * `name`:
+/// Frame buffer name.
+/// * `len`:
+/// Frame buffer name length (if length is INT32_MAX, it's expected
+/// that _name is zero terminated string.
+/// * `handle`:
+/// Frame buffer handle.
+/// * `attachment`:
 pub fn get_texture(handle: FrameBuffer, attachment: u8) -> Texture {
     unsafe {
         let _ret = bgfx_sys::bgfx_get_texture(handle.handle, attachment);
         Texture { handle: _ret }
     }
 }
-/// Destroy frame buffer.
+/// * `handle`:
+/// Frame buffer handle.
 pub fn destroy_frame_buffer(handle: FrameBuffer) {
     unsafe {
         bgfx_sys::bgfx_destroy_frame_buffer(handle.handle);
     }
 }
-/// Create shader uniform parameter.
-///
-/// @remarks
-///   1. Uniform names are unique. It's valid to call `bgfx::createUniform`
-///      multiple times with the same uniform name. The library will always
-///      return the same handle, but the handle reference count will be
-///      incremented. This means that the same number of `bgfx::destroyUniform`
-///      must be called to properly destroy the uniform.
-///
-///   2. Predefined uniforms (declared in `bgfx_shader.sh`):
-///      - `u_viewRect vec4(x, y, width, height)` - view rectangle for current
-///        view, in pixels.
-///      - `u_viewTexel vec4(1.0/width, 1.0/height, undef, undef)` - inverse
-///        width and height
-///      - `u_view mat4` - view matrix
-///      - `u_invView mat4` - inverted view matrix
-///      - `u_proj mat4` - projection matrix
-///      - `u_invProj mat4` - inverted projection matrix
-///      - `u_viewProj mat4` - concatenated view projection matrix
-///      - `u_invViewProj mat4` - concatenated inverted view projection matrix
-///      - `u_model mat4[BGFX_CONFIG_MAX_BONES]` - array of model matrices.
-///      - `u_modelView mat4` - concatenated model view matrix, only first
-///        model matrix from array is used.
-///      - `u_modelViewProj mat4` - concatenated model view projection matrix.
-///      - `u_alphaRef float` - alpha reference value for alpha test.
-///
+/// * `name`:
+/// Uniform name in shader.
+/// * `type_r`:
+/// Type of uniform (See: `bgfx::UniformType`).
+/// * `num`:
+/// Number of elements in array.
 pub fn create_uniform(name: &i8, type_r: UniformType, num: u16) -> Uniform {
     unsafe {
         let _ret = bgfx_sys::bgfx_create_uniform(name, type_r as _, num);
         Uniform { handle: _ret }
     }
 }
-/// Retrieve uniform info.
+/// * `handle`:
+/// Handle to uniform object.
+/// * `info`:
+/// Uniform info.
 pub fn get_uniform_info(handle: Uniform, info: &mut UniformInfo) {
     unsafe {
         let _info = std::mem::transmute(info);
         bgfx_sys::bgfx_get_uniform_info(handle.handle, _info);
     }
 }
-/// Destroy shader uniform parameter.
+/// * `handle`:
+/// Handle to uniform object.
 pub fn destroy_uniform(handle: Uniform) {
     unsafe {
         bgfx_sys::bgfx_destroy_uniform(handle.handle);
     }
 }
-/// Create occlusion query.
 pub fn create_occlusion_query() -> OcclusionQuery {
     unsafe {
         let _ret = bgfx_sys::bgfx_create_occlusion_query();
         OcclusionQuery { handle: _ret }
     }
 }
-/// Retrieve occlusion query result from previous frame.
+/// * `handle`:
+/// Handle to occlusion query object.
+/// * `result`:
+/// Number of pixels that passed test. This argument
+/// can be `NULL` if result of occlusion query is not needed.
 pub fn get_result(handle: OcclusionQuery, result: &mut i32) -> OcclusionQueryResult {
     unsafe {
         let _ret = bgfx_sys::bgfx_get_result(handle.handle, result);
         std::mem::transmute(_ret)
     }
 }
-/// Destroy occlusion query.
+/// * `handle`:
+/// Handle to occlusion query object.
 pub fn destroy_occlusion_query(handle: OcclusionQuery) {
     unsafe {
         bgfx_sys::bgfx_destroy_occlusion_query(handle.handle);
     }
 }
-/// Set view name.
-///
-/// @remarks
-///   This is debug only feature.
-///
-///   In graphics debugger view name will appear as:
-///
-///       "nnnc <view name>"
-///        ^  ^ ^
-///        |  +--- compute (C)
-///        +------ view id
-///
-pub fn set_view_name(id: ViewId, name: &i8) {
-    unsafe {
-        bgfx_sys::bgfx_set_view_name(id, name);
-    }
-}
-/// Set view rectangle. Draw primitive outside view will be clipped.
+/// * `id`:
+/// View id.
+/// * `name`:
+/// View name.
+/// * `id`:
+/// View id.
+/// * `x`:
+/// Position x from the left corner of the window.
+/// * `y`:
+/// Position y from the top corner of the window.
+/// * `width`:
+/// Width of view port region.
+/// * `height`:
+/// Height of view port region.
 pub fn set_view_rect(id: ViewId, x: u16, y: u16, width: u16, height: u16) {
     unsafe {
         bgfx_sys::bgfx_set_view_rect(id, x, y, width, height);
     }
 }
-/// Set view rectangle. Draw primitive outside view will be clipped.
+/// * `id`:
+/// View id.
+/// * `x`:
+/// Position x from the left corner of the window.
+/// * `y`:
+/// Position y from the top corner of the window.
+/// * `ratio`:
+/// Width and height will be set in respect to back-buffer size.
+/// See: [BackbufferRatio].
 pub fn set_view_rect_ratio(id: ViewId, x: u16, y: u16, ratio: BackbufferRatio) {
     unsafe {
         bgfx_sys::bgfx_set_view_rect_ratio(id, x, y, ratio as _);
     }
 }
-/// Set view scissor. Draw primitive outside view will be clipped. When
-/// _x, _y, _width and _height are set to 0, scissor will be disabled.
+/// * `id`:
+/// View id.
+/// * `x`:
+/// Position x from the left corner of the window.
+/// * `y`:
+/// Position y from the top corner of the window.
+/// * `width`:
+/// Width of view scissor region.
+/// * `height`:
+/// Height of view scissor region.
 pub fn set_view_scissor(id: ViewId, params: SetViewScissorArgs) {
     unsafe {
         bgfx_sys::bgfx_set_view_scissor(id, params.x, params.y, params.width, params.height);
     }
 }
-/// Set view clear flags.
+/// * `id`:
+/// View id.
+/// * `flags`:
+/// Clear flags. Use [ClearFlags::NONE] to remove any clear
+/// operation. See: [ClearFlags].
+/// * `rgba`:
+/// Color clear value.
+/// * `depth`:
+/// Depth clear value.
+/// * `stencil`:
+/// Stencil clear value.
 pub fn set_view_clear(id: ViewId, flags: u16, params: SetViewClearArgs) {
     unsafe {
         bgfx_sys::bgfx_set_view_clear(id, flags, params.rgba, params.depth, params.stencil);
     }
 }
-/// Set view clear flags with different clear color for each
-/// frame buffer texture. Must use `bgfx::setPaletteColor` to setup clear color
-/// palette.
+/// * `id`:
+/// View id.
+/// * `flags`:
+/// Clear flags. Use [ClearFlags::NONE] to remove any clear
+/// operation. See: [ClearFlags].
+/// * `depth`:
+/// Depth clear value.
+/// * `stencil`:
+/// Stencil clear value.
+/// * `c_0`:
+/// Palette index for frame buffer attachment 0.
+/// * `c_1`:
+/// Palette index for frame buffer attachment 1.
+/// * `c_2`:
+/// Palette index for frame buffer attachment 2.
+/// * `c_3`:
+/// Palette index for frame buffer attachment 3.
+/// * `c_4`:
+/// Palette index for frame buffer attachment 4.
+/// * `c_5`:
+/// Palette index for frame buffer attachment 5.
+/// * `c_6`:
+/// Palette index for frame buffer attachment 6.
+/// * `c_7`:
+/// Palette index for frame buffer attachment 7.
 pub fn set_view_clear_mrt(
     id: ViewId,
     flags: u16,
@@ -4180,180 +5220,179 @@ pub fn set_view_clear_mrt(
         );
     }
 }
-/// Set view sorting mode.
-///
-/// @remarks
-///   View mode must be set prior calling `bgfx::submit` for the view.
-///
+/// * `id`:
+/// View id.
+/// * `mode`:
+/// View sort mode. See [ViewMode].
 pub fn set_view_mode(id: ViewId, mode: ViewMode) {
     unsafe {
         bgfx_sys::bgfx_set_view_mode(id, mode as _);
     }
 }
-/// Set view frame buffer.
-///
-/// @remarks
-///   Not persistent after `bgfx::reset` call.
-///
+/// * `id`:
+/// View id.
+/// * `handle`:
+/// Frame buffer handle. Passing ]BGFX_INVALID_HANDLE] as
+/// frame buffer handle will draw primitives from this view into
+/// default back buffer.
 pub fn set_view_frame_buffer(id: ViewId, handle: FrameBuffer) {
     unsafe {
         bgfx_sys::bgfx_set_view_frame_buffer(id, handle.handle);
     }
 }
-/// Set view view and projection matrices, all draw primitives in this
-/// view will use these matrices.
+/// * `id`:
+/// View id.
+/// * `view`:
+/// View matrix.
+/// * `proj`:
+/// Projection matrix.
 pub fn set_view_transform(id: ViewId, view: &c_void, proj: &c_void) {
     unsafe {
         bgfx_sys::bgfx_set_view_transform(id, view, proj);
     }
 }
-/// Reset all view settings to default.
+/// * `id`:
 pub fn reset_view(id: ViewId) {
     unsafe {
         bgfx_sys::bgfx_reset_view(id);
     }
 }
-/// Begin submitting draw calls from thread.
+/// * `for_thread`:
+/// Explicitly request an encoder for a worker thread.
 pub fn encoder_begin(for_thread: bool) -> &'static Encoder {
     unsafe {
         let _ret = bgfx_sys::bgfx_encoder_begin(for_thread);
         std::mem::transmute(_ret)
     }
 }
-/// End submitting draw calls from thread.
+/// * `encoder`:
+/// Encoder.
 pub fn encoder_end(encoder: &Encoder) {
     unsafe {
         let _encoder = std::mem::transmute(encoder);
         bgfx_sys::bgfx_encoder_end(_encoder);
     }
 }
-/// Request screen shot of window back buffer.
-///
-/// @remarks
-///   `bgfx::CallbackI::screenShot` must be implemented.
-/// @attention Frame buffer handle must be created with OS' target native window handle.
-///
+/// * `handle`:
+/// Frame buffer handle. If handle is ]BGFX_INVALID_HANDLE] request will be
+/// made for main window back buffer.
+/// * `file_path`:
+/// Will be passed to `bgfx::CallbackI::screenShot` callback.
 pub fn request_screen_shot(handle: FrameBuffer, file_path: &i8) {
     unsafe {
         bgfx_sys::bgfx_request_screen_shot(handle.handle, file_path);
     }
 }
-/// Render frame.
-///
-/// @attention `bgfx::renderFrame` is blocking call. It waits for
-///   `bgfx::frame` to be called from API thread to process frame.
-///   If timeout value is passed call will timeout and return even
-///   if `bgfx::frame` is not called.
-///
-/// @warning This call should be only used on platforms that don't
-///   allow creating separate rendering thread. If it is called before
-///   to bgfx::init, render thread won't be created by bgfx::init call.
-///
+/// * `msecs`:
+/// Timeout in milliseconds.
 pub fn render_frame(msecs: i32) -> RenderFrame {
     unsafe {
         let _ret = bgfx_sys::bgfx_render_frame(msecs);
         std::mem::transmute(_ret)
     }
 }
-/// Set platform data.
-///
-/// @warning Must be called before `bgfx::init`.
-///
+/// * `data`:
+/// Platform data.
 pub fn set_platform_data(data: &PlatformData) {
     unsafe {
         let _data = std::mem::transmute(data);
         bgfx_sys::bgfx_set_platform_data(_data);
     }
 }
-/// Get internal data for interop.
-///
-/// @attention It's expected you understand some bgfx internals before you
-///   use this call.
-///
-/// @warning Must be called only on render thread.
-///
 pub fn get_internal_data() -> &'static InternalData {
     unsafe {
         let _ret = bgfx_sys::bgfx_get_internal_data();
         std::mem::transmute(_ret)
     }
 }
-/// Sets a debug marker. This allows you to group graphics calls together for easy browsing in
-/// graphics debugging tools.
+/// * `marker`:
+/// Marker string.
 pub fn set_marker(marker: &i8) {
     unsafe {
         bgfx_sys::bgfx_set_marker(marker);
     }
 }
-/// Set render states for draw primitive.
-///
-/// @remarks
-///   1. To setup more complex states use:
-///      [StateFlags::ALPHA_REF(_ref)],
-///      [StateFlags::POINT_SIZE(_size)],
-///      [StateBlendFlags::FUNC(_src, _dst)],
-///      [StateBlendFlags::FUNC_SEPARATE(_srcRGB, _dstRGB, _srcA, _dstA)],
-///      [StateBlendFlags::EQUATION(_equation)],
-///      [StateBlendEquationFlags::SEPARATE(_equationRGB, _equationA)]
-///   2. [StateBlendEquationFlags::ADD] is set when no other blend
-///      equation is specified.
-///
+/// * `state`:
+/// State flags. Default state for primitive type is
+///   triangles. See: [StateFlags::DEFAULT].
+///   - [StateDepthTestFlags] - Depth test function.
+///   - [StateBlendFlags] - See remark 1 about BGFX_STATE_BLEND_FUNC.
+///   - [StateBlendEquationFlags] - See remark 2.
+///   - [StateCullFlags] - Backface culling mode.
+///   - [StateWriteFlags] - Enable R, G, B, A or Z write.
+///   - [StateFlags::MSAA] - Enable hardware multisample antialiasing.
+///   - [StatePtFlags::[TRISTRIP/LINES/POINTS]] - Primitive type.
+/// * `rgba`:
+/// Sets blend factor used by [StateBlendFlags::FACTOR] and
+///   [StateBlendFlags::INV_FACTOR] blend modes.
 pub fn set_state(state: u64, rgba: u32) {
     unsafe {
         bgfx_sys::bgfx_set_state(state, rgba);
     }
 }
-/// Set condition for rendering.
+/// * `handle`:
+/// Occlusion query handle.
+/// * `visible`:
+/// Render if occlusion query is visible.
 pub fn set_condition(handle: OcclusionQuery, visible: bool) {
     unsafe {
         bgfx_sys::bgfx_set_condition(handle.handle, visible);
     }
 }
-/// Set stencil test state.
+/// * `fstencil`:
+/// Front stencil state.
+/// * `bstencil`:
+/// Back stencil state. If back is set to [StencilFlags::NONE]
+/// _fstencil is applied to both front and back facing primitives.
 pub fn set_stencil(fstencil: u32, bstencil: u32) {
     unsafe {
         bgfx_sys::bgfx_set_stencil(fstencil, bstencil);
     }
 }
-/// Set scissor for draw primitive.
-///
-/// @remark
-///   To scissor for all primitives in view see `bgfx::setViewScissor`.
-///
+/// * `x`:
+/// Position x from the left corner of the window.
+/// * `y`:
+/// Position y from the top corner of the window.
+/// * `width`:
+/// Width of view scissor region.
+/// * `height`:
+/// Height of view scissor region.
 pub fn set_scissor(x: u16, y: u16, width: u16, height: u16) -> u16 {
     unsafe {
         let _ret = bgfx_sys::bgfx_set_scissor(x, y, width, height);
         _ret
     }
 }
-/// Set scissor from cache for draw primitive.
-///
-/// @remark
-///   To scissor for all primitives in view see `bgfx::setViewScissor`.
-///
+/// * `cache`:
+/// Index in scissor cache.
 pub fn set_scissor_cached(cache: u16) {
     unsafe {
         bgfx_sys::bgfx_set_scissor_cached(cache);
     }
 }
-/// Set model matrix for draw primitive. If it is not called,
-/// the model will be rendered with an identity model matrix.
+/// * `mtx`:
+/// Pointer to first matrix in array.
+/// * `num`:
+/// Number of matrices in array.
 pub fn set_transform(mtx: &c_void, num: u16) -> u32 {
     unsafe {
         let _ret = bgfx_sys::bgfx_set_transform(mtx, num);
         _ret
     }
 }
-///  Set model matrix from matrix cache for draw primitive.
+/// * `cache`:
+/// Index in matrix cache.
+/// * `num`:
+/// Number of matrices from cache.
 pub fn set_transform_cached(cache: u32, num: u16) {
     unsafe {
         bgfx_sys::bgfx_set_transform_cached(cache, num);
     }
 }
-/// Reserve matrices in internal matrix cache.
-///
-/// @attention Pointer returned can be modifed until `bgfx::frame` is called.
-///
+/// * `transform`:
+/// Pointer to `Transform` structure.
+/// * `num`:
+/// Number of matrices.
 pub fn alloc_transform(transform: &mut Transform, num: u16) -> u32 {
     unsafe {
         let _transform = std::mem::transmute(transform);
@@ -4361,38 +5400,77 @@ pub fn alloc_transform(transform: &mut Transform, num: u16) -> u32 {
         _ret
     }
 }
-/// Set shader uniform parameter for draw primitive.
+/// * `handle`:
+/// Uniform.
+/// * `value`:
+/// Pointer to uniform data.
+/// * `num`:
+/// Number of elements. Passing `UINT16_MAX` will
+/// use the _num passed on uniform creation.
 pub fn set_uniform(handle: Uniform, value: &c_void, num: u16) {
     unsafe {
         bgfx_sys::bgfx_set_uniform(handle.handle, value, num);
     }
 }
-/// Set index buffer for draw primitive.
+/// * `handle`:
+/// Index buffer.
+/// * `first_index`:
+/// First index to render.
+/// * `num_indices`:
+/// Number of indices to render.
 pub fn set_index_buffer(handle: IndexBuffer, first_index: u32, num_indices: u32) {
     unsafe {
         bgfx_sys::bgfx_set_index_buffer(handle.handle, first_index, num_indices);
     }
 }
-/// Set index buffer for draw primitive.
+/// * `handle`:
+/// Dynamic index buffer.
+/// * `first_index`:
+/// First index to render.
+/// * `num_indices`:
+/// Number of indices to render.
 pub fn set_dynamic_index_buffer(handle: DynamicIndexBuffer, first_index: u32, num_indices: u32) {
     unsafe {
         bgfx_sys::bgfx_set_dynamic_index_buffer(handle.handle, first_index, num_indices);
     }
 }
-/// Set index buffer for draw primitive.
+/// * `tib`:
+/// Transient index buffer.
+/// * `first_index`:
+/// First index to render.
+/// * `num_indices`:
+/// Number of indices to render.
 pub fn set_transient_index_buffer(tib: &TransientIndexBuffer, first_index: u32, num_indices: u32) {
     unsafe {
         let _tib = std::mem::transmute(tib);
         bgfx_sys::bgfx_set_transient_index_buffer(_tib, first_index, num_indices);
     }
 }
-/// Set vertex buffer for draw primitive.
+/// * `stream`:
+/// Vertex stream.
+/// * `handle`:
+/// Vertex buffer.
+/// * `start_vertex`:
+/// First vertex to render.
+/// * `num_vertices`:
+/// Number of vertices to render.
 pub fn set_vertex_buffer(stream: u8, handle: VertexBuffer, start_vertex: u32, num_vertices: u32) {
     unsafe {
         bgfx_sys::bgfx_set_vertex_buffer(stream, handle.handle, start_vertex, num_vertices);
     }
 }
-/// Set vertex buffer for draw primitive.
+/// * `stream`:
+/// Vertex stream.
+/// * `handle`:
+/// Vertex buffer.
+/// * `start_vertex`:
+/// First vertex to render.
+/// * `num_vertices`:
+/// Number of vertices to render.
+/// * `layout_handle`:
+/// Vertex layout for aliasing vertex buffer. If invalid
+/// handle is used, vertex layout used for creation
+/// of vertex buffer will be used.
 pub fn set_vertex_buffer_with_layout(
     stream: u8,
     handle: VertexBuffer,
@@ -4410,7 +5488,14 @@ pub fn set_vertex_buffer_with_layout(
         );
     }
 }
-/// Set vertex buffer for draw primitive.
+/// * `stream`:
+/// Vertex stream.
+/// * `handle`:
+/// Dynamic vertex buffer.
+/// * `start_vertex`:
+/// First vertex to render.
+/// * `num_vertices`:
+/// Number of vertices to render.
 pub fn set_dynamic_vertex_buffer(
     stream: u8,
     handle: DynamicVertexBuffer,
@@ -4421,7 +5506,18 @@ pub fn set_dynamic_vertex_buffer(
         bgfx_sys::bgfx_set_dynamic_vertex_buffer(stream, handle.handle, start_vertex, num_vertices);
     }
 }
-/// Set vertex buffer for draw primitive.
+/// * `stream`:
+/// Vertex stream.
+/// * `handle`:
+/// Dynamic vertex buffer.
+/// * `start_vertex`:
+/// First vertex to render.
+/// * `num_vertices`:
+/// Number of vertices to render.
+/// * `layout_handle`:
+/// Vertex layout for aliasing vertex buffer. If invalid
+/// handle is used, vertex layout used for creation
+/// of vertex buffer will be used.
 pub fn set_dynamic_vertex_buffer_with_layout(
     stream: u8,
     handle: DynamicVertexBuffer,
@@ -4439,7 +5535,14 @@ pub fn set_dynamic_vertex_buffer_with_layout(
         );
     }
 }
-/// Set vertex buffer for draw primitive.
+/// * `stream`:
+/// Vertex stream.
+/// * `tvb`:
+/// Transient vertex buffer.
+/// * `start_vertex`:
+/// First vertex to render.
+/// * `num_vertices`:
+/// Number of vertices to render.
 pub fn set_transient_vertex_buffer(
     stream: u8,
     tvb: &TransientVertexBuffer,
@@ -4451,7 +5554,18 @@ pub fn set_transient_vertex_buffer(
         bgfx_sys::bgfx_set_transient_vertex_buffer(stream, _tvb, start_vertex, num_vertices);
     }
 }
-/// Set vertex buffer for draw primitive.
+/// * `stream`:
+/// Vertex stream.
+/// * `tvb`:
+/// Transient vertex buffer.
+/// * `start_vertex`:
+/// First vertex to render.
+/// * `num_vertices`:
+/// Number of vertices to render.
+/// * `layout_handle`:
+/// Vertex layout for aliasing vertex buffer. If invalid
+/// handle is used, vertex layout used for creation
+/// of vertex buffer will be used.
 pub fn set_transient_vertex_buffer_with_layout(
     stream: u8,
     tvb: &TransientVertexBuffer,
@@ -4470,30 +5584,44 @@ pub fn set_transient_vertex_buffer_with_layout(
         );
     }
 }
-/// Set number of vertices for auto generated vertices use in conjuction
-/// with gl_VertexID.
-///
-/// @attention Availability depends on: [CapsFlags::VERTEX_ID].
-///
+/// * `num_vertices`:
+/// Number of vertices.
 pub fn set_vertex_count(num_vertices: u32) {
     unsafe {
         bgfx_sys::bgfx_set_vertex_count(num_vertices);
     }
 }
-/// Set instance data buffer for draw primitive.
+/// * `idb`:
+/// Transient instance data buffer.
+/// * `start`:
+/// First instance data.
+/// * `num`:
+/// Number of data instances.
 pub fn set_instance_data_buffer(idb: &InstanceDataBuffer, start: u32, num: u32) {
     unsafe {
         let _idb = std::mem::transmute(idb);
         bgfx_sys::bgfx_set_instance_data_buffer(_idb, start, num);
     }
 }
+/// * `handle`:
+/// Vertex buffer.
+/// * `start_vertex`:
+/// First instance data.
+/// * `num`:
+/// Number of data instances.
 /// Set instance data buffer for draw primitive.
+/// Dynamic vertex buffer.
 pub fn set_instance_data_from_vertex_buffer(handle: VertexBuffer, start_vertex: u32, num: u32) {
     unsafe {
         bgfx_sys::bgfx_set_instance_data_from_vertex_buffer(handle.handle, start_vertex, num);
     }
 }
-/// Set instance data buffer for draw primitive.
+/// * `handle`:
+/// Dynamic vertex buffer.
+/// * `start_vertex`:
+/// First instance data.
+/// * `num`:
+/// Number of data instances.
 pub fn set_instance_data_from_dynamic_vertex_buffer(
     handle: DynamicVertexBuffer,
     start_vertex: u32,
@@ -4507,40 +5635,60 @@ pub fn set_instance_data_from_dynamic_vertex_buffer(
         );
     }
 }
-/// Set number of instances for auto generated instances use in conjuction
-/// with gl_InstanceID.
-///
-/// @attention Availability depends on: [CapsFlags::VERTEX_ID].
-///
+/// * `num_instances`:
 pub fn set_instance_count(num_instances: u32) {
     unsafe {
         bgfx_sys::bgfx_set_instance_count(num_instances);
     }
 }
-/// Set texture stage for draw primitive.
+/// * `stage`:
+/// Texture unit.
+/// * `sampler`:
+/// Program sampler.
+/// * `handle`:
+/// Texture handle.
+/// * `flags`:
+/// Texture sampling mode. Default value UINT32_MAX uses
+///   texture sampling settings from the texture.
+///   - [SamplerFlags::[U/V/W]_[MIRROR/CLAMP]] - Mirror or clamp to edge wrap
+///     mode.
+///   - [SamplerFlags::[MIN/MAG/MIP]_[POINT/ANISOTROPIC]] - Point or anisotropic
+///     sampling.
 pub fn set_texture(stage: u8, sampler: Uniform, handle: Texture, flags: u32) {
     unsafe {
         bgfx_sys::bgfx_set_texture(stage, sampler.handle, handle.handle, flags);
     }
 }
-/// Submit an empty primitive for rendering. Uniforms and draw state
-/// will be applied but no geometry will be submitted.
-///
-/// @remark
-///   These empty draw calls will sort before ordinary draw calls.
-///
+/// * `id`:
+/// View id.
 pub fn touch(id: ViewId) {
     unsafe {
         bgfx_sys::bgfx_touch(id);
     }
 }
-/// Submit primitive for rendering.
+/// * `id`:
+/// View id.
+/// * `program`:
+/// Program.
+/// * `depth`:
+/// Depth for sorting.
+/// * `flags`:
+/// Which states to discard for next draw. See [DiscardFlags].
 pub fn submit(id: ViewId, program: Program, params: SubmitArgs) {
     unsafe {
         bgfx_sys::bgfx_submit(id, program.handle, params.depth, params.flags);
     }
 }
-/// Submit primitive with occlusion query for rendering.
+/// * `id`:
+/// View id.
+/// * `program`:
+/// Program.
+/// * `occlusion_query`:
+/// Occlusion query.
+/// * `depth`:
+/// Depth for sorting.
+/// * `flags`:
+/// Which states to discard for next draw. See [DiscardFlags].
 pub fn submit_occlusion_query(
     id: ViewId,
     program: Program,
@@ -4557,8 +5705,20 @@ pub fn submit_occlusion_query(
         );
     }
 }
-/// Submit primitive for rendering with index and instance data info from
-/// indirect buffer.
+/// * `id`:
+/// View id.
+/// * `program`:
+/// Program.
+/// * `indirect_handle`:
+/// Indirect buffer.
+/// * `start`:
+/// First element in indirect buffer.
+/// * `num`:
+/// Number of dispatches.
+/// * `depth`:
+/// Depth for sorting.
+/// * `flags`:
+/// Which states to discard for next draw. See [DiscardFlags].
 pub fn submit_indirect(
     id: ViewId,
     program: Program,
@@ -4577,43 +5737,88 @@ pub fn submit_indirect(
         );
     }
 }
-/// Set compute index buffer.
+/// * `stage`:
+/// Compute stage.
+/// * `handle`:
+/// Index buffer handle.
+/// * `access`:
+/// Buffer access. See [Access].
 pub fn set_compute_index_buffer(stage: u8, handle: IndexBuffer, access: Access) {
     unsafe {
         bgfx_sys::bgfx_set_compute_index_buffer(stage, handle.handle, access as _);
     }
 }
-/// Set compute vertex buffer.
+/// * `stage`:
+/// Compute stage.
+/// * `handle`:
+/// Vertex buffer handle.
+/// * `access`:
+/// Buffer access. See [Access].
 pub fn set_compute_vertex_buffer(stage: u8, handle: VertexBuffer, access: Access) {
     unsafe {
         bgfx_sys::bgfx_set_compute_vertex_buffer(stage, handle.handle, access as _);
     }
 }
-/// Set compute dynamic index buffer.
+/// * `stage`:
+/// Compute stage.
+/// * `handle`:
+/// Dynamic index buffer handle.
+/// * `access`:
+/// Buffer access. See [Access].
 pub fn set_compute_dynamic_index_buffer(stage: u8, handle: DynamicIndexBuffer, access: Access) {
     unsafe {
         bgfx_sys::bgfx_set_compute_dynamic_index_buffer(stage, handle.handle, access as _);
     }
 }
-/// Set compute dynamic vertex buffer.
+/// * `stage`:
+/// Compute stage.
+/// * `handle`:
+/// Dynamic vertex buffer handle.
+/// * `access`:
+/// Buffer access. See [Access].
 pub fn set_compute_dynamic_vertex_buffer(stage: u8, handle: DynamicVertexBuffer, access: Access) {
     unsafe {
         bgfx_sys::bgfx_set_compute_dynamic_vertex_buffer(stage, handle.handle, access as _);
     }
 }
-/// Set compute indirect buffer.
+/// * `stage`:
+/// Compute stage.
+/// * `handle`:
+/// Indirect buffer handle.
+/// * `access`:
+/// Buffer access. See [Access].
 pub fn set_compute_indirect_buffer(stage: u8, handle: IndirectBuffer, access: Access) {
     unsafe {
         bgfx_sys::bgfx_set_compute_indirect_buffer(stage, handle.handle, access as _);
     }
 }
-/// Set compute image from texture.
+/// * `stage`:
+/// Compute stage.
+/// * `handle`:
+/// Texture handle.
+/// * `mip`:
+/// Mip level.
+/// * `access`:
+/// Image access. See [Access].
+/// * `format`:
+/// Texture format. See: [TextureFormat].
 pub fn set_image(stage: u8, handle: Texture, mip: u8, access: Access, format: TextureFormat) {
     unsafe {
         bgfx_sys::bgfx_set_image(stage, handle.handle, mip, access as _, format as _);
     }
 }
-/// Dispatch compute.
+/// * `id`:
+/// View id.
+/// * `program`:
+/// Compute program.
+/// * `num_x`:
+/// Number of groups X.
+/// * `num_y`:
+/// Number of groups Y.
+/// * `num_z`:
+/// Number of groups Z.
+/// * `flags`:
+/// Discard or preserve states. See [DiscardFlags].
 pub fn dispatch(id: ViewId, program: Program, params: DispatchArgs) {
     unsafe {
         bgfx_sys::bgfx_dispatch(
@@ -4626,7 +5831,18 @@ pub fn dispatch(id: ViewId, program: Program, params: DispatchArgs) {
         );
     }
 }
-/// Dispatch compute indirect.
+/// * `id`:
+/// View id.
+/// * `program`:
+/// Compute program.
+/// * `indirect_handle`:
+/// Indirect buffer.
+/// * `start`:
+/// First element in indirect buffer.
+/// * `num`:
+/// Number of dispatches.
+/// * `flags`:
+/// Discard or preserve states. See [DiscardFlags].
 pub fn dispatch_indirect(
     id: ViewId,
     program: Program,
@@ -4644,17 +5860,46 @@ pub fn dispatch_indirect(
         );
     }
 }
-/// Discard previously set state for draw or compute call.
+/// * `flags`:
+/// Draw/compute states to discard.
 pub fn discard(flags: u8) {
     unsafe {
         bgfx_sys::bgfx_discard(flags);
     }
 }
-/// Blit 2D texture region between two 2D textures.
-///
-/// @attention Destination texture must be created with [TextureFlags::BLIT_DST] flag.
-/// @attention Availability depends on: [CapsFlags::TEXTURE_BLIT].
-///
+/// * `id`:
+/// View id.
+/// * `dst`:
+/// Destination texture handle.
+/// * `dst_mip`:
+/// Destination texture mip level.
+/// * `dst_x`:
+/// Destination texture X position.
+/// * `dst_y`:
+/// Destination texture Y position.
+/// * `dst_z`:
+/// If texture is 2D this argument should be 0. If destination texture is cube
+/// this argument represents destination texture cube face. For 3D texture this argument
+/// represents destination texture Z position.
+/// * `src`:
+/// Source texture handle.
+/// * `src_mip`:
+/// Source texture mip level.
+/// * `src_x`:
+/// Source texture X position.
+/// * `src_y`:
+/// Source texture Y position.
+/// * `src_z`:
+/// If texture is 2D this argument should be 0. If source texture is cube
+/// this argument represents source texture cube face. For 3D texture this argument
+/// represents source texture Z position.
+/// * `width`:
+/// Width of region.
+/// * `height`:
+/// Height of region.
+/// * `depth`:
+/// If texture is 3D this argument represents depth of region, otherwise it's
+/// unused.
 pub fn blit(
     id: ViewId,
     dst: Texture,
