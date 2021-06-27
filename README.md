@@ -20,7 +20,7 @@ Usage
 bgfx-rs = "0.1"
 ```
 
-The library doesn't include any window handling and that has to be provided by the user. See [examples](https://github.com/emoon/bgfx-rs/examples) an how to use [GLFW](https://crates.io/crates/glfw)
+The library doesn't include any window handling and that has to be provided by the user. See [examples](https://github.com/emoon/bgfx-rs/tree/main/examples) an how to use [GLFW](https://crates.io/crates/glfw)
 
 ## License
 
