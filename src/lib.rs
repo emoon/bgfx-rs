@@ -5985,3 +5985,20 @@ impl Memory {
         Memory { handle }
     }
 }
+
+/// * `x`:
+/// Position x from the left corner of the window.
+/// * `y`:
+/// Position y from the top corner of the window.
+/// * `attr`:
+/// Color palette. Where top 4-bits represent index of background, and bottom
+/// 4-bits represent foreground color from standard VGA text palette (ANSI escape codes).
+/// * `text`: Text to be displayed
+pub fn dbg_text(x: u16, y: u16, attr: u8, text: &str) {
+    unsafe {
+        let c_text = std::ffi::CString::new(text).unwrap();
+        bgfx_sys::bgfx_dbg_text_printf(x, y, attr, c_text.as_ptr());
+    }
+}
+
+//pub use bgfx_rs::* as bgfx::*;
