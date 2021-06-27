@@ -35,7 +35,7 @@ fn main() {
         .create_window(
             WIDTH as _,
             HEIGHT as _,
-            "helloworld.rs bgfx-sys example - ESC to close",
+            "helloworld.rs bgfx-rs example - ESC to close",
             glfw::WindowMode::Windowed,
         )
         .expect("Failed to create GLFW window.");

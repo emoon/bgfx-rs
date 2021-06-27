@@ -3258,27 +3258,6 @@ impl Encoder {
             bgfx_sys::bgfx_encoder_set_scissor_cached(_self, cache);
         }
     }
-    /// * `mtx`:
-    /// Pointer to first matrix in array.
-    /// * `num`:
-    /// Number of matrices in array.
-    pub fn set_transform(&self, mtx: &c_void, num: u16) -> u32 {
-        unsafe {
-            let _self = std::mem::transmute(self);
-            let _ret = bgfx_sys::bgfx_encoder_set_transform(_self, mtx, num);
-            _ret
-        }
-    }
-    /// * `cache`:
-    /// Index in matrix cache.
-    /// * `num`:
-    /// Number of matrices from cache.
-    pub fn set_transform_cached(&self, cache: u32, num: u16) {
-        unsafe {
-            let _self = std::mem::transmute(self);
-            bgfx_sys::bgfx_encoder_set_transform_cached(_self, cache, num);
-        }
-    }
     /// * `transform`:
     /// Pointer to `Transform` structure.
     /// * `num`:
@@ -5241,17 +5220,6 @@ pub fn set_view_frame_buffer(id: ViewId, handle: FrameBuffer) {
     }
 }
 /// * `id`:
-/// View id.
-/// * `view`:
-/// View matrix.
-/// * `proj`:
-/// Projection matrix.
-pub fn set_view_transform(id: ViewId, view: &c_void, proj: &c_void) {
-    unsafe {
-        bgfx_sys::bgfx_set_view_transform(id, view, proj);
-    }
-}
-/// * `id`:
 pub fn reset_view(id: ViewId) {
     unsafe {
         bgfx_sys::bgfx_reset_view(id);
@@ -5368,25 +5336,6 @@ pub fn set_scissor(x: u16, y: u16, width: u16, height: u16) -> u16 {
 pub fn set_scissor_cached(cache: u16) {
     unsafe {
         bgfx_sys::bgfx_set_scissor_cached(cache);
-    }
-}
-/// * `mtx`:
-/// Pointer to first matrix in array.
-/// * `num`:
-/// Number of matrices in array.
-pub fn set_transform(mtx: &c_void, num: u16) -> u32 {
-    unsafe {
-        let _ret = bgfx_sys::bgfx_set_transform(mtx, num);
-        _ret
-    }
-}
-/// * `cache`:
-/// Index in matrix cache.
-/// * `num`:
-/// Number of matrices from cache.
-pub fn set_transform_cached(cache: u32, num: u16) {
-    unsafe {
-        bgfx_sys::bgfx_set_transform_cached(cache, num);
     }
 }
 /// * `transform`:
@@ -5998,6 +5947,31 @@ pub fn dbg_text(x: u16, y: u16, attr: u8, text: &str) {
     unsafe {
         let c_text = std::ffi::CString::new(text).unwrap();
         bgfx_sys::bgfx_dbg_text_printf(x, y, attr, c_text.as_ptr());
+    }
+}
+
+/// * `id`:
+/// View id.
+/// * `view`:
+/// View matrix.
+/// * `proj`:
+/// Projection matrix.
+pub fn set_view_transform(id: ViewId, view: &[f32; 16], proj: &[f32; 16]) {
+    unsafe {
+        let _view = std::mem::transmute(view);
+        let _proj = std::mem::transmute(proj);
+        bgfx_sys::bgfx_set_view_transform(id, _view, _proj);
+    }
+}
+
+/// * `mtx`:
+/// Pointer to first matrix in array.
+/// * `num`:
+/// Number of matrices in array.
+pub fn set_transform(mtx: &[f32; 16], num: u16) -> u32 {
+    unsafe {
+        let _mtx = std::mem::transmute(mtx);
+        bgfx_sys::bgfx_set_transform(_mtx, num)
     }
 }
 
