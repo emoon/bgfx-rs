@@ -1914,15 +1914,17 @@ pub struct VertexLayoutBuilder {
 pub struct Encoder {}
 impl DynamicIndexBuffer {
     /// Create empty dynamic index buffer.
-    pub fn create_dynamic_index_buffer(num: u32, flags: u16) {
+    pub fn create_dynamic_index_buffer(num: u32, flags: u16) -> DynamicIndexBuffer {
         unsafe {
-            bgfx_sys::bgfx_create_dynamic_index_buffer(num, flags);
+            let _ret = bgfx_sys::bgfx_create_dynamic_index_buffer(num, flags);
+            DynamicIndexBuffer { handle: _ret }
         }
     }
     /// Create dynamic index buffer and initialized it.
-    pub fn create_dynamic_index_buffer_mem(mem: &Memory, flags: u16) {
+    pub fn create_dynamic_index_buffer_mem(mem: &Memory, flags: u16) -> DynamicIndexBuffer {
         unsafe {
-            bgfx_sys::bgfx_create_dynamic_index_buffer_mem(mem.handle, flags);
+            let _ret = bgfx_sys::bgfx_create_dynamic_index_buffer_mem(mem.handle, flags);
+            DynamicIndexBuffer { handle: _ret }
         }
     }
     /// Update dynamic index buffer.
@@ -1947,10 +1949,15 @@ impl DynamicIndexBuffer {
 
 impl DynamicVertexBuffer {
     /// Create empty dynamic vertex buffer.
-    pub fn create_dynamic_vertex_buffer(num: u32, layout: &VertexLayoutBuilder, flags: u16) {
+    pub fn create_dynamic_vertex_buffer(
+        num: u32,
+        layout: &VertexLayoutBuilder,
+        flags: u16,
+    ) -> DynamicVertexBuffer {
         unsafe {
             let _layout = std::mem::transmute(layout);
-            bgfx_sys::bgfx_create_dynamic_vertex_buffer(num, _layout, flags);
+            let _ret = bgfx_sys::bgfx_create_dynamic_vertex_buffer(num, _layout, flags);
+            DynamicVertexBuffer { handle: _ret }
         }
     }
     /// Create dynamic vertex buffer and initialize it.
@@ -1958,10 +1965,11 @@ impl DynamicVertexBuffer {
         mem: &Memory,
         layout: &VertexLayoutBuilder,
         flags: u16,
-    ) {
+    ) -> DynamicVertexBuffer {
         unsafe {
             let _layout = std::mem::transmute(layout);
-            bgfx_sys::bgfx_create_dynamic_vertex_buffer_mem(mem.handle, _layout, flags);
+            let _ret = bgfx_sys::bgfx_create_dynamic_vertex_buffer_mem(mem.handle, _layout, flags);
+            DynamicVertexBuffer { handle: _ret }
         }
     }
     /// Update dynamic vertex buffer.
@@ -1990,9 +1998,16 @@ impl DynamicVertexBuffer {
 
 impl FrameBuffer {
     /// Create frame buffer (simple).
-    pub fn create_frame_buffer(width: u16, height: u16, format: TextureFormat, texture_flags: u64) {
+    pub fn create_frame_buffer(
+        width: u16,
+        height: u16,
+        format: TextureFormat,
+        texture_flags: u64,
+    ) -> FrameBuffer {
         unsafe {
-            bgfx_sys::bgfx_create_frame_buffer(width, height, format as _, texture_flags);
+            let _ret =
+                bgfx_sys::bgfx_create_frame_buffer(width, height, format as _, texture_flags);
+            FrameBuffer { handle: _ret }
         }
     }
     /// Create frame buffer with size based on backbuffer ratio. Frame buffer will maintain ratio
@@ -2001,15 +2016,26 @@ impl FrameBuffer {
         ratio: BackbufferRatio,
         format: TextureFormat,
         texture_flags: u64,
-    ) {
+    ) -> FrameBuffer {
         unsafe {
-            bgfx_sys::bgfx_create_frame_buffer_scaled(ratio as _, format as _, texture_flags);
+            let _ret =
+                bgfx_sys::bgfx_create_frame_buffer_scaled(ratio as _, format as _, texture_flags);
+            FrameBuffer { handle: _ret }
         }
     }
     /// Create MRT frame buffer from texture handles (simple).
-    pub fn create_frame_buffer_from_handles(num: u8, handles: &Texture, destroy_texture: bool) {
+    pub fn create_frame_buffer_from_handles(
+        num: u8,
+        handles: &Texture,
+        destroy_texture: bool,
+    ) -> FrameBuffer {
         unsafe {
-            bgfx_sys::bgfx_create_frame_buffer_from_handles(num, &handles.handle, destroy_texture);
+            let _ret = bgfx_sys::bgfx_create_frame_buffer_from_handles(
+                num,
+                &handles.handle,
+                destroy_texture,
+            );
+            FrameBuffer { handle: _ret }
         }
     }
     /// Create MRT frame buffer from texture handles with specific layer and
@@ -2018,10 +2044,15 @@ impl FrameBuffer {
         num: u8,
         attachment: &Attachment,
         destroy_texture: bool,
-    ) {
+    ) -> FrameBuffer {
         unsafe {
             let _attachment = std::mem::transmute(attachment);
-            bgfx_sys::bgfx_create_frame_buffer_from_attachment(num, _attachment, destroy_texture);
+            let _ret = bgfx_sys::bgfx_create_frame_buffer_from_attachment(
+                num,
+                _attachment,
+                destroy_texture,
+            );
+            FrameBuffer { handle: _ret }
         }
     }
     /// Create frame buffer for multiple window rendering.
@@ -2036,15 +2067,16 @@ impl FrameBuffer {
         width: u16,
         height: u16,
         params: CreateFrameBufferFromNwhArgs,
-    ) {
+    ) -> FrameBuffer {
         unsafe {
-            bgfx_sys::bgfx_create_frame_buffer_from_nwh(
+            let _ret = bgfx_sys::bgfx_create_frame_buffer_from_nwh(
                 nwh,
                 width,
                 height,
                 params.format as _,
                 params.depth_format as _,
             );
+            FrameBuffer { handle: _ret }
         }
     }
     /// Set frame buffer debug name.
@@ -2054,9 +2086,10 @@ impl FrameBuffer {
         }
     }
     /// Obtain texture handle of frame buffer attachment.
-    pub fn get_texture(&self, attachment: u8) {
+    pub fn get_texture(&self, attachment: u8) -> Texture {
         unsafe {
-            bgfx_sys::bgfx_get_texture(self.handle, attachment);
+            let _ret = bgfx_sys::bgfx_get_texture(self.handle, attachment);
+            Texture { handle: _ret }
         }
     }
     /// Destroy frame buffer.
@@ -2080,9 +2113,10 @@ impl FrameBuffer {
 
 impl IndexBuffer {
     /// Create static index buffer.
-    pub fn create_index_buffer(mem: &Memory, flags: u16) {
+    pub fn create_index_buffer(mem: &Memory, flags: u16) -> IndexBuffer {
         unsafe {
-            bgfx_sys::bgfx_create_index_buffer(mem.handle, flags);
+            let _ret = bgfx_sys::bgfx_create_index_buffer(mem.handle, flags);
+            IndexBuffer { handle: _ret }
         }
     }
     /// Set static index buffer debug name.
@@ -2107,9 +2141,10 @@ impl IndexBuffer {
 
 impl IndirectBuffer {
     /// Create draw indirect buffer.
-    pub fn create_indirect_buffer(num: u32) {
+    pub fn create_indirect_buffer(num: u32) -> IndirectBuffer {
         unsafe {
-            bgfx_sys::bgfx_create_indirect_buffer(num);
+            let _ret = bgfx_sys::bgfx_create_indirect_buffer(num);
+            IndirectBuffer { handle: _ret }
         }
     }
     /// Destroy draw indirect buffer.
@@ -2122,15 +2157,17 @@ impl IndirectBuffer {
 
 impl OcclusionQuery {
     /// Create occlusion query.
-    pub fn create_occlusion_query() {
+    pub fn create_occlusion_query() -> OcclusionQuery {
         unsafe {
-            bgfx_sys::bgfx_create_occlusion_query();
+            let _ret = bgfx_sys::bgfx_create_occlusion_query();
+            OcclusionQuery { handle: _ret }
         }
     }
     /// Retrieve occlusion query result from previous frame.
-    pub fn get_result(&self, result: &mut i32) {
+    pub fn get_result(&self, result: &mut i32) -> OcclusionQueryResult {
         unsafe {
-            bgfx_sys::bgfx_get_result(self.handle, result);
+            let _ret = bgfx_sys::bgfx_get_result(self.handle, result);
+            std::mem::transmute(_ret)
         }
     }
     /// Destroy occlusion query.
@@ -2149,15 +2186,17 @@ impl OcclusionQuery {
 
 impl Program {
     /// Create program with vertex and fragment shaders.
-    pub fn create_program(vsh: Shader, fsh: Shader, destroy_shaders: bool) {
+    pub fn create_program(vsh: Shader, fsh: Shader, destroy_shaders: bool) -> Program {
         unsafe {
-            bgfx_sys::bgfx_create_program(vsh.handle, fsh.handle, destroy_shaders);
+            let _ret = bgfx_sys::bgfx_create_program(vsh.handle, fsh.handle, destroy_shaders);
+            Program { handle: _ret }
         }
     }
     /// Create program with compute shader.
-    pub fn create_compute_program(csh: Shader, destroy_shaders: bool) {
+    pub fn create_compute_program(csh: Shader, destroy_shaders: bool) -> Program {
         unsafe {
-            bgfx_sys::bgfx_create_compute_program(csh.handle, destroy_shaders);
+            let _ret = bgfx_sys::bgfx_create_compute_program(csh.handle, destroy_shaders);
+            Program { handle: _ret }
         }
     }
     /// Destroy program.
@@ -2170,9 +2209,10 @@ impl Program {
 
 impl Shader {
     /// Create shader from memory buffer.
-    pub fn create_shader(mem: &Memory) {
+    pub fn create_shader(mem: &Memory) -> Shader {
         unsafe {
-            bgfx_sys::bgfx_create_shader(mem.handle);
+            let _ret = bgfx_sys::bgfx_create_shader(mem.handle);
+            Shader { handle: _ret }
         }
     }
     /// Set shader debug name.
@@ -2192,25 +2232,28 @@ impl Shader {
         }
     }
     /// Create program with vertex and fragment shaders.
-    pub fn create_program(&self, fsh: Shader, destroy_shaders: bool) {
+    pub fn create_program(&self, fsh: Shader, destroy_shaders: bool) -> Program {
         unsafe {
-            bgfx_sys::bgfx_create_program(self.handle, fsh.handle, destroy_shaders);
+            let _ret = bgfx_sys::bgfx_create_program(self.handle, fsh.handle, destroy_shaders);
+            Program { handle: _ret }
         }
     }
     /// Create program with compute shader.
-    pub fn create_compute_program(&self, destroy_shaders: bool) {
+    pub fn create_compute_program(&self, destroy_shaders: bool) -> Program {
         unsafe {
-            bgfx_sys::bgfx_create_compute_program(self.handle, destroy_shaders);
+            let _ret = bgfx_sys::bgfx_create_compute_program(self.handle, destroy_shaders);
+            Program { handle: _ret }
         }
     }
 }
 
 impl Texture {
     /// Create texture from memory buffer.
-    pub fn create_texture(mem: &Memory, flags: u64, skip: u8, info: &mut TextureInfo) {
+    pub fn create_texture(mem: &Memory, flags: u64, skip: u8, info: &mut TextureInfo) -> Texture {
         unsafe {
             let _info = std::mem::transmute(info);
-            bgfx_sys::bgfx_create_texture(mem.handle, flags, skip, _info);
+            let _ret = bgfx_sys::bgfx_create_texture(mem.handle, flags, skip, _info);
+            Texture { handle: _ret }
         }
     }
     /// Create 2D texture.
@@ -2222,9 +2265,9 @@ impl Texture {
         format: TextureFormat,
         flags: u64,
         mem: &Memory,
-    ) {
+    ) -> Texture {
         unsafe {
-            bgfx_sys::bgfx_create_texture_2d(
+            let _ret = bgfx_sys::bgfx_create_texture_2d(
                 width,
                 height,
                 has_mips,
@@ -2233,6 +2276,7 @@ impl Texture {
                 flags,
                 mem.handle,
             );
+            Texture { handle: _ret }
         }
     }
     /// Create texture with size based on backbuffer ratio. Texture will maintain ratio
@@ -2243,15 +2287,16 @@ impl Texture {
         num_layers: u16,
         format: TextureFormat,
         flags: u64,
-    ) {
+    ) -> Texture {
         unsafe {
-            bgfx_sys::bgfx_create_texture_2d_scaled(
+            let _ret = bgfx_sys::bgfx_create_texture_2d_scaled(
                 ratio as _,
                 has_mips,
                 num_layers,
                 format as _,
                 flags,
             );
+            Texture { handle: _ret }
         }
     }
     /// Create 3D texture.
@@ -2262,14 +2307,14 @@ impl Texture {
         has_mips: bool,
         format: TextureFormat,
         params: CreateTexture3DArgs,
-    ) {
+    ) -> Texture {
         unsafe {
             let _mem = if let Some(h) = params.mem {
                 h.handle
             } else {
                 std::ptr::null()
             };
-            bgfx_sys::bgfx_create_texture_3d(
+            let _ret = bgfx_sys::bgfx_create_texture_3d(
                 width,
                 height,
                 depth,
@@ -2278,6 +2323,7 @@ impl Texture {
                 params.flags,
                 _mem,
             );
+            Texture { handle: _ret }
         }
     }
     /// Create Cube texture.
@@ -2287,14 +2333,14 @@ impl Texture {
         num_layers: u16,
         format: TextureFormat,
         params: CreateTextureCubeArgs,
-    ) {
+    ) -> Texture {
         unsafe {
             let _mem = if let Some(h) = params.mem {
                 h.handle
             } else {
                 std::ptr::null()
             };
-            bgfx_sys::bgfx_create_texture_cube(
+            let _ret = bgfx_sys::bgfx_create_texture_cube(
                 size,
                 has_mips,
                 num_layers,
@@ -2302,6 +2348,7 @@ impl Texture {
                 params.flags,
                 _mem,
             );
+            Texture { handle: _ret }
         }
     }
     /// Update 2D texture.
@@ -2399,16 +2446,6 @@ impl Texture {
             bgfx_sys::bgfx_set_texture_name(self.handle, name.as_ptr() as _, name.len() as i32)
         }
     }
-    /// Returns texture direct access pointer.
-    ///
-    /// @attention Availability depends on: [CapsFlags::TEXTURE_DIRECT_ACCESS]. This feature
-    ///   is available on GPUs that have unified memory architecture (UMA) support.
-    ///
-    pub fn get_direct_access_ptr(&self) {
-        unsafe {
-            bgfx_sys::bgfx_get_direct_access_ptr(self.handle);
-        }
-    }
     /// Destroy texture.
     pub fn destroy_texture(&self) {
         unsafe {
@@ -2416,9 +2453,10 @@ impl Texture {
         }
     }
     /// Obtain texture handle of frame buffer attachment.
-    pub fn get_texture(handle: FrameBuffer, attachment: u8) {
+    pub fn get_texture(handle: FrameBuffer, attachment: u8) -> Texture {
         unsafe {
-            bgfx_sys::bgfx_get_texture(handle.handle, attachment);
+            let _ret = bgfx_sys::bgfx_get_texture(handle.handle, attachment);
+            Texture { handle: _ret }
         }
     }
 }
@@ -2450,9 +2488,10 @@ impl Uniform {
     ///      - `u_modelViewProj mat4` - concatenated model view projection matrix.
     ///      - `u_alphaRef float` - alpha reference value for alpha test.
     ///
-    pub fn create_uniform(name: &i8, type_r: UniformType, num: u16) {
+    pub fn create_uniform(name: &i8, type_r: UniformType, num: u16) -> Uniform {
         unsafe {
-            bgfx_sys::bgfx_create_uniform(name, type_r as _, num);
+            let _ret = bgfx_sys::bgfx_create_uniform(name, type_r as _, num);
+            Uniform { handle: _ret }
         }
     }
     /// Retrieve uniform info.
@@ -2478,10 +2517,15 @@ impl Uniform {
 
 impl VertexBuffer {
     /// Create static vertex buffer.
-    pub fn create_vertex_buffer(mem: &Memory, layout: &VertexLayoutBuilder, flags: u16) {
+    pub fn create_vertex_buffer(
+        mem: &Memory,
+        layout: &VertexLayoutBuilder,
+        flags: u16,
+    ) -> VertexBuffer {
         unsafe {
             let _layout = std::mem::transmute(layout);
-            bgfx_sys::bgfx_create_vertex_buffer(mem.handle, _layout, flags);
+            let _ret = bgfx_sys::bgfx_create_vertex_buffer(mem.handle, _layout, flags);
+            VertexBuffer { handle: _ret }
         }
     }
     /// Set static vertex buffer debug name.
@@ -2510,10 +2554,11 @@ impl VertexBuffer {
 
 impl VertexLayout {
     /// Create vertex layout.
-    pub fn create_vertex_layout(layout: &VertexLayoutBuilder) {
+    pub fn create_vertex_layout(layout: &VertexLayoutBuilder) -> VertexLayout {
         unsafe {
             let _layout = std::mem::transmute(layout);
-            bgfx_sys::bgfx_create_vertex_layout(_layout);
+            let _ret = bgfx_sys::bgfx_create_vertex_layout(_layout);
+            VertexLayout { handle: _ret }
         }
     }
     /// Destroy vertex layout.
@@ -2700,20 +2745,21 @@ impl VertexLayoutBuilder {
     }
 
     /// Start VertexLayout.
-    pub fn begin(&self, renderer_type: RendererType) {
+    pub fn begin(&self, renderer_type: RendererType) -> &Self {
         unsafe {
             let _self = std::mem::transmute(self);
-            bgfx_sys::bgfx_vertex_layout_begin(_self, renderer_type as _);
+            let _ret = bgfx_sys::bgfx_vertex_layout_begin(_self, renderer_type as _);
+            self
         }
     }
     /// Add attribute to VertexLayout.
     ///
     /// @remarks Must be called between begin/end.
     ///
-    pub fn add(&self, attrib: Attrib, num: u8, type_r: AttribType, params: AddArgs) {
+    pub fn add(&self, attrib: Attrib, num: u8, type_r: AttribType, params: AddArgs) -> &Self {
         unsafe {
             let _self = std::mem::transmute(self);
-            bgfx_sys::bgfx_vertex_layout_add(
+            let _ret = bgfx_sys::bgfx_vertex_layout_add(
                 _self,
                 attrib as _,
                 num,
@@ -2721,20 +2767,23 @@ impl VertexLayoutBuilder {
                 params.normalized,
                 params.as_int,
             );
+            self
         }
     }
     /// Returns `true` if VertexLayout contains attribute.
-    pub fn has(&self, attrib: Attrib) {
+    pub fn has(&self, attrib: Attrib) -> bool {
         unsafe {
             let _self = std::mem::transmute(self);
-            bgfx_sys::bgfx_vertex_layout_has(_self, attrib as _);
+            let _ret = bgfx_sys::bgfx_vertex_layout_has(_self, attrib as _);
+            _ret
         }
     }
     /// Skip `_num` bytes in vertex stream.
-    pub fn skip(&self, num: u8) {
+    pub fn skip(&self, num: u8) -> &Self {
         unsafe {
             let _self = std::mem::transmute(self);
-            bgfx_sys::bgfx_vertex_layout_skip(_self, num);
+            let _ret = bgfx_sys::bgfx_vertex_layout_skip(_self, num);
+            self
         }
     }
     /// End VertexLayout.
@@ -2799,10 +2848,11 @@ impl Encoder {
     /// @remark
     ///   To scissor for all primitives in view see `bgfx::setViewScissor`.
     ///
-    pub fn set_scissor(&self, x: u16, y: u16, width: u16, height: u16) {
+    pub fn set_scissor(&self, x: u16, y: u16, width: u16, height: u16) -> u16 {
         unsafe {
             let _self = std::mem::transmute(self);
-            bgfx_sys::bgfx_encoder_set_scissor(_self, x, y, width, height);
+            let _ret = bgfx_sys::bgfx_encoder_set_scissor(_self, x, y, width, height);
+            _ret
         }
     }
     /// Set scissor from cache for draw primitive.
@@ -2818,10 +2868,11 @@ impl Encoder {
     }
     /// Set model matrix for draw primitive. If it is not called,
     /// the model will be rendered with an identity model matrix.
-    pub fn set_transform(&self, mtx: &c_void, num: u16) {
+    pub fn set_transform(&self, mtx: &c_void, num: u16) -> u32 {
         unsafe {
             let _self = std::mem::transmute(self);
-            bgfx_sys::bgfx_encoder_set_transform(_self, mtx, num);
+            let _ret = bgfx_sys::bgfx_encoder_set_transform(_self, mtx, num);
+            _ret
         }
     }
     ///  Set model matrix from matrix cache for draw primitive.
@@ -2835,11 +2886,12 @@ impl Encoder {
     ///
     /// @attention Pointer returned can be modifed until `bgfx::frame` is called.
     ///
-    pub fn alloc_transform(&self, transform: &mut Transform, num: u16) {
+    pub fn alloc_transform(&self, transform: &mut Transform, num: u16) -> u32 {
         unsafe {
             let _self = std::mem::transmute(self);
             let _transform = std::mem::transmute(transform);
-            bgfx_sys::bgfx_encoder_alloc_transform(_self, _transform, num);
+            let _ret = bgfx_sys::bgfx_encoder_alloc_transform(_self, _transform, num);
+            _ret
         }
     }
     /// Set shader uniform parameter for draw primitive.
@@ -3320,12 +3372,6 @@ impl Encoder {
     }
 }
 
-/// Returns name of renderer.
-pub fn get_renderer_name(type_r: RendererType) {
-    unsafe {
-        bgfx_sys::bgfx_get_renderer_name(type_r as _);
-    }
-}
 pub fn init_ctor(init: &Init) {
     unsafe {
         let _init = std::mem::transmute(init);
@@ -3333,10 +3379,11 @@ pub fn init_ctor(init: &Init) {
     }
 }
 /// Initialize bgfx library.
-pub fn init(init: &Init) {
+pub fn init(init: &Init) -> bool {
     unsafe {
         let _init = std::mem::transmute(init);
-        bgfx_sys::bgfx_init(_init);
+        let _ret = bgfx_sys::bgfx_init(_init);
+        _ret
     }
 }
 /// Shutdown bgfx library.
@@ -3358,9 +3405,10 @@ pub fn reset(width: u32, height: u32, params: ResetArgs) {
 /// Advance to next frame. When using multithreaded renderer, this call
 /// just swaps internal buffers, kicks render thread, and returns. In
 /// singlethreaded renderer this call does frame rendering.
-pub fn frame(capture: bool) {
+pub fn frame(capture: bool) -> u32 {
     unsafe {
-        bgfx_sys::bgfx_frame(capture);
+        let _ret = bgfx_sys::bgfx_frame(capture);
+        _ret
     }
 }
 /// Returns current renderer backend API type.
@@ -3368,9 +3416,10 @@ pub fn frame(capture: bool) {
 /// @remarks
 ///   Library must be initialized.
 ///
-pub fn get_renderer_type() {
+pub fn get_renderer_type() -> RendererType {
     unsafe {
-        bgfx_sys::bgfx_get_renderer_type();
+        let _ret = bgfx_sys::bgfx_get_renderer_type();
+        std::mem::transmute(_ret)
     }
 }
 /// Returns renderer capabilities.
@@ -3378,18 +3427,20 @@ pub fn get_renderer_type() {
 /// @remarks
 ///   Library must be initialized.
 ///
-pub fn get_caps() {
+pub fn get_caps() -> &'static Caps {
     unsafe {
-        bgfx_sys::bgfx_get_caps();
+        let _ret = bgfx_sys::bgfx_get_caps();
+        std::mem::transmute(_ret)
     }
 }
 /// Returns performance counters.
 ///
 /// @attention Pointer returned is valid until `bgfx::frame` is called.
 ///
-pub fn get_stats() {
+pub fn get_stats() -> &'static Stats {
     unsafe {
-        bgfx_sys::bgfx_get_stats();
+        let _ret = bgfx_sys::bgfx_get_stats();
+        std::mem::transmute(_ret)
     }
 }
 /// Set debug flags.
@@ -3411,9 +3462,10 @@ pub fn dbg_text_image(x: u16, y: u16, width: u16, height: u16, data: &c_void, pi
     }
 }
 /// Create static index buffer.
-pub fn create_index_buffer(mem: &Memory, flags: u16) {
+pub fn create_index_buffer(mem: &Memory, flags: u16) -> IndexBuffer {
     unsafe {
-        bgfx_sys::bgfx_create_index_buffer(mem.handle, flags);
+        let _ret = bgfx_sys::bgfx_create_index_buffer(mem.handle, flags);
+        IndexBuffer { handle: _ret }
     }
 }
 /// Set static index buffer debug name.
@@ -3429,10 +3481,11 @@ pub fn destroy_index_buffer(handle: IndexBuffer) {
     }
 }
 /// Create vertex layout.
-pub fn create_vertex_layout(layout: &VertexLayoutBuilder) {
+pub fn create_vertex_layout(layout: &VertexLayoutBuilder) -> VertexLayout {
     unsafe {
         let _layout = std::mem::transmute(layout);
-        bgfx_sys::bgfx_create_vertex_layout(_layout);
+        let _ret = bgfx_sys::bgfx_create_vertex_layout(_layout);
+        VertexLayout { handle: _ret }
     }
 }
 /// Destroy vertex layout.
@@ -3442,10 +3495,15 @@ pub fn destroy_vertex_layout(layout_handle: VertexLayout) {
     }
 }
 /// Create static vertex buffer.
-pub fn create_vertex_buffer(mem: &Memory, layout: &VertexLayoutBuilder, flags: u16) {
+pub fn create_vertex_buffer(
+    mem: &Memory,
+    layout: &VertexLayoutBuilder,
+    flags: u16,
+) -> VertexBuffer {
     unsafe {
         let _layout = std::mem::transmute(layout);
-        bgfx_sys::bgfx_create_vertex_buffer(mem.handle, _layout, flags);
+        let _ret = bgfx_sys::bgfx_create_vertex_buffer(mem.handle, _layout, flags);
+        VertexBuffer { handle: _ret }
     }
 }
 /// Set static vertex buffer debug name.
@@ -3461,15 +3519,17 @@ pub fn destroy_vertex_buffer(handle: VertexBuffer) {
     }
 }
 /// Create empty dynamic index buffer.
-pub fn create_dynamic_index_buffer(num: u32, flags: u16) {
+pub fn create_dynamic_index_buffer(num: u32, flags: u16) -> DynamicIndexBuffer {
     unsafe {
-        bgfx_sys::bgfx_create_dynamic_index_buffer(num, flags);
+        let _ret = bgfx_sys::bgfx_create_dynamic_index_buffer(num, flags);
+        DynamicIndexBuffer { handle: _ret }
     }
 }
 /// Create dynamic index buffer and initialized it.
-pub fn create_dynamic_index_buffer_mem(mem: &Memory, flags: u16) {
+pub fn create_dynamic_index_buffer_mem(mem: &Memory, flags: u16) -> DynamicIndexBuffer {
     unsafe {
-        bgfx_sys::bgfx_create_dynamic_index_buffer_mem(mem.handle, flags);
+        let _ret = bgfx_sys::bgfx_create_dynamic_index_buffer_mem(mem.handle, flags);
+        DynamicIndexBuffer { handle: _ret }
     }
 }
 /// Update dynamic index buffer.
@@ -3485,17 +3545,27 @@ pub fn destroy_dynamic_index_buffer(handle: DynamicIndexBuffer) {
     }
 }
 /// Create empty dynamic vertex buffer.
-pub fn create_dynamic_vertex_buffer(num: u32, layout: &VertexLayoutBuilder, flags: u16) {
+pub fn create_dynamic_vertex_buffer(
+    num: u32,
+    layout: &VertexLayoutBuilder,
+    flags: u16,
+) -> DynamicVertexBuffer {
     unsafe {
         let _layout = std::mem::transmute(layout);
-        bgfx_sys::bgfx_create_dynamic_vertex_buffer(num, _layout, flags);
+        let _ret = bgfx_sys::bgfx_create_dynamic_vertex_buffer(num, _layout, flags);
+        DynamicVertexBuffer { handle: _ret }
     }
 }
 /// Create dynamic vertex buffer and initialize it.
-pub fn create_dynamic_vertex_buffer_mem(mem: &Memory, layout: &VertexLayoutBuilder, flags: u16) {
+pub fn create_dynamic_vertex_buffer_mem(
+    mem: &Memory,
+    layout: &VertexLayoutBuilder,
+    flags: u16,
+) -> DynamicVertexBuffer {
     unsafe {
         let _layout = std::mem::transmute(layout);
-        bgfx_sys::bgfx_create_dynamic_vertex_buffer_mem(mem.handle, _layout, flags);
+        let _ret = bgfx_sys::bgfx_create_dynamic_vertex_buffer_mem(mem.handle, _layout, flags);
+        DynamicVertexBuffer { handle: _ret }
     }
 }
 /// Update dynamic vertex buffer.
@@ -3511,22 +3581,25 @@ pub fn destroy_dynamic_vertex_buffer(handle: DynamicVertexBuffer) {
     }
 }
 /// Returns number of requested or maximum available indices.
-pub fn get_avail_transient_index_buffer(num: u32, index_32: bool) {
+pub fn get_avail_transient_index_buffer(num: u32, index_32: bool) -> u32 {
     unsafe {
-        bgfx_sys::bgfx_get_avail_transient_index_buffer(num, index_32);
+        let _ret = bgfx_sys::bgfx_get_avail_transient_index_buffer(num, index_32);
+        _ret
     }
 }
 /// Returns number of requested or maximum available vertices.
-pub fn get_avail_transient_vertex_buffer(num: u32, layout: &VertexLayoutBuilder) {
+pub fn get_avail_transient_vertex_buffer(num: u32, layout: &VertexLayoutBuilder) -> u32 {
     unsafe {
         let _layout = std::mem::transmute(layout);
-        bgfx_sys::bgfx_get_avail_transient_vertex_buffer(num, _layout);
+        let _ret = bgfx_sys::bgfx_get_avail_transient_vertex_buffer(num, _layout);
+        _ret
     }
 }
 /// Returns number of requested or maximum available instance buffer slots.
-pub fn get_avail_instance_data_buffer(num: u32, stride: u16) {
+pub fn get_avail_instance_data_buffer(num: u32, stride: u16) -> u32 {
     unsafe {
-        bgfx_sys::bgfx_get_avail_instance_data_buffer(num, stride);
+        let _ret = bgfx_sys::bgfx_get_avail_instance_data_buffer(num, stride);
+        _ret
     }
 }
 /// Allocate transient index buffer.
@@ -3560,12 +3633,12 @@ pub fn alloc_transient_buffers(
     tib: &mut TransientIndexBuffer,
     num_indices: u32,
     index_32: bool,
-) {
+) -> bool {
     unsafe {
         let _tvb = std::mem::transmute(tvb);
         let _layout = std::mem::transmute(layout);
         let _tib = std::mem::transmute(tib);
-        bgfx_sys::bgfx_alloc_transient_buffers(
+        let _ret = bgfx_sys::bgfx_alloc_transient_buffers(
             _tvb,
             _layout,
             num_vertices,
@@ -3573,6 +3646,7 @@ pub fn alloc_transient_buffers(
             num_indices,
             index_32,
         );
+        _ret
     }
 }
 /// Allocate instance data buffer.
@@ -3583,9 +3657,10 @@ pub fn alloc_instance_data_buffer(idb: &mut InstanceDataBuffer, num: u32, stride
     }
 }
 /// Create draw indirect buffer.
-pub fn create_indirect_buffer(num: u32) {
+pub fn create_indirect_buffer(num: u32) -> IndirectBuffer {
     unsafe {
-        bgfx_sys::bgfx_create_indirect_buffer(num);
+        let _ret = bgfx_sys::bgfx_create_indirect_buffer(num);
+        IndirectBuffer { handle: _ret }
     }
 }
 /// Destroy draw indirect buffer.
@@ -3595,9 +3670,10 @@ pub fn destroy_indirect_buffer(handle: IndirectBuffer) {
     }
 }
 /// Create shader from memory buffer.
-pub fn create_shader(mem: &Memory) {
+pub fn create_shader(mem: &Memory) -> Shader {
     unsafe {
-        bgfx_sys::bgfx_create_shader(mem.handle);
+        let _ret = bgfx_sys::bgfx_create_shader(mem.handle);
+        Shader { handle: _ret }
     }
 }
 /// Set shader debug name.
@@ -3617,15 +3693,17 @@ pub fn destroy_shader(handle: Shader) {
     }
 }
 /// Create program with vertex and fragment shaders.
-pub fn create_program(vsh: Shader, fsh: Shader, destroy_shaders: bool) {
+pub fn create_program(vsh: Shader, fsh: Shader, destroy_shaders: bool) -> Program {
     unsafe {
-        bgfx_sys::bgfx_create_program(vsh.handle, fsh.handle, destroy_shaders);
+        let _ret = bgfx_sys::bgfx_create_program(vsh.handle, fsh.handle, destroy_shaders);
+        Program { handle: _ret }
     }
 }
 /// Create program with compute shader.
-pub fn create_compute_program(csh: Shader, destroy_shaders: bool) {
+pub fn create_compute_program(csh: Shader, destroy_shaders: bool) -> Program {
     unsafe {
-        bgfx_sys::bgfx_create_compute_program(csh.handle, destroy_shaders);
+        let _ret = bgfx_sys::bgfx_create_compute_program(csh.handle, destroy_shaders);
+        Program { handle: _ret }
     }
 }
 /// Destroy program.
@@ -3641,16 +3719,18 @@ pub fn is_texture_valid(
     num_layers: u16,
     format: TextureFormat,
     flags: u64,
-) {
+) -> bool {
     unsafe {
-        bgfx_sys::bgfx_is_texture_valid(depth, cube_map, num_layers, format as _, flags);
+        let _ret = bgfx_sys::bgfx_is_texture_valid(depth, cube_map, num_layers, format as _, flags);
+        _ret
     }
 }
 /// Validate frame buffer parameters.
-pub fn is_frame_buffer_valid(num: u8, attachment: &Attachment) {
+pub fn is_frame_buffer_valid(num: u8, attachment: &Attachment) -> bool {
     unsafe {
         let _attachment = std::mem::transmute(attachment);
-        bgfx_sys::bgfx_is_frame_buffer_valid(num, _attachment);
+        let _ret = bgfx_sys::bgfx_is_frame_buffer_valid(num, _attachment);
+        _ret
     }
 }
 /// Calculate amount of memory required for texture.
@@ -3679,10 +3759,11 @@ pub fn calc_texture_size(
     }
 }
 /// Create texture from memory buffer.
-pub fn create_texture(mem: &Memory, flags: u64, skip: u8, info: &mut TextureInfo) {
+pub fn create_texture(mem: &Memory, flags: u64, skip: u8, info: &mut TextureInfo) -> Texture {
     unsafe {
         let _info = std::mem::transmute(info);
-        bgfx_sys::bgfx_create_texture(mem.handle, flags, skip, _info);
+        let _ret = bgfx_sys::bgfx_create_texture(mem.handle, flags, skip, _info);
+        Texture { handle: _ret }
     }
 }
 /// Create 2D texture.
@@ -3694,9 +3775,9 @@ pub fn create_texture_2d(
     format: TextureFormat,
     flags: u64,
     mem: &Memory,
-) {
+) -> Texture {
     unsafe {
-        bgfx_sys::bgfx_create_texture_2d(
+        let _ret = bgfx_sys::bgfx_create_texture_2d(
             width,
             height,
             has_mips,
@@ -3705,6 +3786,7 @@ pub fn create_texture_2d(
             flags,
             mem.handle,
         );
+        Texture { handle: _ret }
     }
 }
 /// Create texture with size based on backbuffer ratio. Texture will maintain ratio
@@ -3715,15 +3797,16 @@ pub fn create_texture_2d_scaled(
     num_layers: u16,
     format: TextureFormat,
     flags: u64,
-) {
+) -> Texture {
     unsafe {
-        bgfx_sys::bgfx_create_texture_2d_scaled(
+        let _ret = bgfx_sys::bgfx_create_texture_2d_scaled(
             ratio as _,
             has_mips,
             num_layers,
             format as _,
             flags,
         );
+        Texture { handle: _ret }
     }
 }
 /// Create 3D texture.
@@ -3734,14 +3817,14 @@ pub fn create_texture_3d(
     has_mips: bool,
     format: TextureFormat,
     params: CreateTexture3DArgs,
-) {
+) -> Texture {
     unsafe {
         let _mem = if let Some(h) = params.mem {
             h.handle
         } else {
             std::ptr::null()
         };
-        bgfx_sys::bgfx_create_texture_3d(
+        let _ret = bgfx_sys::bgfx_create_texture_3d(
             width,
             height,
             depth,
@@ -3750,6 +3833,7 @@ pub fn create_texture_3d(
             params.flags,
             _mem,
         );
+        Texture { handle: _ret }
     }
 }
 /// Create Cube texture.
@@ -3759,14 +3843,14 @@ pub fn create_texture_cube(
     num_layers: u16,
     format: TextureFormat,
     params: CreateTextureCubeArgs,
-) {
+) -> Texture {
     unsafe {
         let _mem = if let Some(h) = params.mem {
             h.handle
         } else {
             std::ptr::null()
         };
-        bgfx_sys::bgfx_create_texture_cube(
+        let _ret = bgfx_sys::bgfx_create_texture_cube(
             size,
             has_mips,
             num_layers,
@@ -3774,6 +3858,7 @@ pub fn create_texture_cube(
             params.flags,
             _mem,
         );
+        Texture { handle: _ret }
     }
 }
 /// Update 2D texture.
@@ -3871,16 +3956,6 @@ pub fn set_texture_name(handle: Texture, name: &i8, len: i32) {
         bgfx_sys::bgfx_set_texture_name(handle.handle, name, len);
     }
 }
-/// Returns texture direct access pointer.
-///
-/// @attention Availability depends on: [CapsFlags::TEXTURE_DIRECT_ACCESS]. This feature
-///   is available on GPUs that have unified memory architecture (UMA) support.
-///
-pub fn get_direct_access_ptr(handle: Texture) {
-    unsafe {
-        bgfx_sys::bgfx_get_direct_access_ptr(handle.handle);
-    }
-}
 /// Destroy texture.
 pub fn destroy_texture(handle: Texture) {
     unsafe {
@@ -3888,9 +3963,15 @@ pub fn destroy_texture(handle: Texture) {
     }
 }
 /// Create frame buffer (simple).
-pub fn create_frame_buffer(width: u16, height: u16, format: TextureFormat, texture_flags: u64) {
+pub fn create_frame_buffer(
+    width: u16,
+    height: u16,
+    format: TextureFormat,
+    texture_flags: u64,
+) -> FrameBuffer {
     unsafe {
-        bgfx_sys::bgfx_create_frame_buffer(width, height, format as _, texture_flags);
+        let _ret = bgfx_sys::bgfx_create_frame_buffer(width, height, format as _, texture_flags);
+        FrameBuffer { handle: _ret }
     }
 }
 /// Create frame buffer with size based on backbuffer ratio. Frame buffer will maintain ratio
@@ -3899,15 +3980,23 @@ pub fn create_frame_buffer_scaled(
     ratio: BackbufferRatio,
     format: TextureFormat,
     texture_flags: u64,
-) {
+) -> FrameBuffer {
     unsafe {
-        bgfx_sys::bgfx_create_frame_buffer_scaled(ratio as _, format as _, texture_flags);
+        let _ret =
+            bgfx_sys::bgfx_create_frame_buffer_scaled(ratio as _, format as _, texture_flags);
+        FrameBuffer { handle: _ret }
     }
 }
 /// Create MRT frame buffer from texture handles (simple).
-pub fn create_frame_buffer_from_handles(num: u8, handles: &Texture, destroy_texture: bool) {
+pub fn create_frame_buffer_from_handles(
+    num: u8,
+    handles: &Texture,
+    destroy_texture: bool,
+) -> FrameBuffer {
     unsafe {
-        bgfx_sys::bgfx_create_frame_buffer_from_handles(num, &handles.handle, destroy_texture);
+        let _ret =
+            bgfx_sys::bgfx_create_frame_buffer_from_handles(num, &handles.handle, destroy_texture);
+        FrameBuffer { handle: _ret }
     }
 }
 /// Create MRT frame buffer from texture handles with specific layer and
@@ -3916,10 +4005,12 @@ pub fn create_frame_buffer_from_attachment(
     num: u8,
     attachment: &Attachment,
     destroy_texture: bool,
-) {
+) -> FrameBuffer {
     unsafe {
         let _attachment = std::mem::transmute(attachment);
-        bgfx_sys::bgfx_create_frame_buffer_from_attachment(num, _attachment, destroy_texture);
+        let _ret =
+            bgfx_sys::bgfx_create_frame_buffer_from_attachment(num, _attachment, destroy_texture);
+        FrameBuffer { handle: _ret }
     }
 }
 /// Create frame buffer for multiple window rendering.
@@ -3934,15 +4025,16 @@ pub fn create_frame_buffer_from_nwh(
     width: u16,
     height: u16,
     params: CreateFrameBufferFromNwhArgs,
-) {
+) -> FrameBuffer {
     unsafe {
-        bgfx_sys::bgfx_create_frame_buffer_from_nwh(
+        let _ret = bgfx_sys::bgfx_create_frame_buffer_from_nwh(
             nwh,
             width,
             height,
             params.format as _,
             params.depth_format as _,
         );
+        FrameBuffer { handle: _ret }
     }
 }
 /// Set frame buffer debug name.
@@ -3952,9 +4044,10 @@ pub fn set_frame_buffer_name(handle: FrameBuffer, name: &i8, len: i32) {
     }
 }
 /// Obtain texture handle of frame buffer attachment.
-pub fn get_texture(handle: FrameBuffer, attachment: u8) {
+pub fn get_texture(handle: FrameBuffer, attachment: u8) -> Texture {
     unsafe {
-        bgfx_sys::bgfx_get_texture(handle.handle, attachment);
+        let _ret = bgfx_sys::bgfx_get_texture(handle.handle, attachment);
+        Texture { handle: _ret }
     }
 }
 /// Destroy frame buffer.
@@ -3989,9 +4082,10 @@ pub fn destroy_frame_buffer(handle: FrameBuffer) {
 ///      - `u_modelViewProj mat4` - concatenated model view projection matrix.
 ///      - `u_alphaRef float` - alpha reference value for alpha test.
 ///
-pub fn create_uniform(name: &i8, type_r: UniformType, num: u16) {
+pub fn create_uniform(name: &i8, type_r: UniformType, num: u16) -> Uniform {
     unsafe {
-        bgfx_sys::bgfx_create_uniform(name, type_r as _, num);
+        let _ret = bgfx_sys::bgfx_create_uniform(name, type_r as _, num);
+        Uniform { handle: _ret }
     }
 }
 /// Retrieve uniform info.
@@ -4008,15 +4102,17 @@ pub fn destroy_uniform(handle: Uniform) {
     }
 }
 /// Create occlusion query.
-pub fn create_occlusion_query() {
+pub fn create_occlusion_query() -> OcclusionQuery {
     unsafe {
-        bgfx_sys::bgfx_create_occlusion_query();
+        let _ret = bgfx_sys::bgfx_create_occlusion_query();
+        OcclusionQuery { handle: _ret }
     }
 }
 /// Retrieve occlusion query result from previous frame.
-pub fn get_result(handle: OcclusionQuery, result: &mut i32) {
+pub fn get_result(handle: OcclusionQuery, result: &mut i32) -> OcclusionQueryResult {
     unsafe {
-        bgfx_sys::bgfx_get_result(handle.handle, result);
+        let _ret = bgfx_sys::bgfx_get_result(handle.handle, result);
+        std::mem::transmute(_ret)
     }
 }
 /// Destroy occlusion query.
@@ -4118,9 +4214,10 @@ pub fn reset_view(id: ViewId) {
     }
 }
 /// Begin submitting draw calls from thread.
-pub fn encoder_begin(for_thread: bool) {
+pub fn encoder_begin(for_thread: bool) -> &'static Encoder {
     unsafe {
-        bgfx_sys::bgfx_encoder_begin(for_thread);
+        let _ret = bgfx_sys::bgfx_encoder_begin(for_thread);
+        std::mem::transmute(_ret)
     }
 }
 /// End submitting draw calls from thread.
@@ -4152,9 +4249,10 @@ pub fn request_screen_shot(handle: FrameBuffer, file_path: &i8) {
 ///   allow creating separate rendering thread. If it is called before
 ///   to bgfx::init, render thread won't be created by bgfx::init call.
 ///
-pub fn render_frame(msecs: i32) {
+pub fn render_frame(msecs: i32) -> RenderFrame {
     unsafe {
-        bgfx_sys::bgfx_render_frame(msecs);
+        let _ret = bgfx_sys::bgfx_render_frame(msecs);
+        std::mem::transmute(_ret)
     }
 }
 /// Set platform data.
@@ -4174,9 +4272,10 @@ pub fn set_platform_data(data: &PlatformData) {
 ///
 /// @warning Must be called only on render thread.
 ///
-pub fn get_internal_data() {
+pub fn get_internal_data() -> &'static InternalData {
     unsafe {
-        bgfx_sys::bgfx_get_internal_data();
+        let _ret = bgfx_sys::bgfx_get_internal_data();
+        std::mem::transmute(_ret)
     }
 }
 /// Sets a debug marker. This allows you to group graphics calls together for easy browsing in
@@ -4221,9 +4320,10 @@ pub fn set_stencil(fstencil: u32, bstencil: u32) {
 /// @remark
 ///   To scissor for all primitives in view see `bgfx::setViewScissor`.
 ///
-pub fn set_scissor(x: u16, y: u16, width: u16, height: u16) {
+pub fn set_scissor(x: u16, y: u16, width: u16, height: u16) -> u16 {
     unsafe {
-        bgfx_sys::bgfx_set_scissor(x, y, width, height);
+        let _ret = bgfx_sys::bgfx_set_scissor(x, y, width, height);
+        _ret
     }
 }
 /// Set scissor from cache for draw primitive.
@@ -4238,9 +4338,10 @@ pub fn set_scissor_cached(cache: u16) {
 }
 /// Set model matrix for draw primitive. If it is not called,
 /// the model will be rendered with an identity model matrix.
-pub fn set_transform(mtx: &c_void, num: u16) {
+pub fn set_transform(mtx: &c_void, num: u16) -> u32 {
     unsafe {
-        bgfx_sys::bgfx_set_transform(mtx, num);
+        let _ret = bgfx_sys::bgfx_set_transform(mtx, num);
+        _ret
     }
 }
 ///  Set model matrix from matrix cache for draw primitive.
@@ -4253,10 +4354,11 @@ pub fn set_transform_cached(cache: u32, num: u16) {
 ///
 /// @attention Pointer returned can be modifed until `bgfx::frame` is called.
 ///
-pub fn alloc_transform(transform: &mut Transform, num: u16) {
+pub fn alloc_transform(transform: &mut Transform, num: u16) -> u32 {
     unsafe {
         let _transform = std::mem::transmute(transform);
-        bgfx_sys::bgfx_alloc_transform(_transform, num);
+        let _ret = bgfx_sys::bgfx_alloc_transform(_transform, num);
+        _ret
     }
 }
 /// Set shader uniform parameter for draw primitive.
