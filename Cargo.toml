@@ -2,6 +2,7 @@
 name = "bgfx-rs"
 license = "BSD-2-Clause"
 authors = ["Daniel Collin <daniel@collin.com>"]
+categories = [rendering::graphics-api]
 version = "0.1.0"
 edition = "2018"
 readme = "README.md"
@@ -11,5 +12,10 @@ maintenance = {status = "actively-developed"}
 
 [dependencies]
 bitflags = "1.2"
-# bgfx-sys = { git = "https://github.com/emoon/bgfx-sys" }
-bgfx-sys = { path = "../bgfx-sys" }
+bgfx-sys = { git = "https://github.com/emoon/bgfx-sys" }
+
+[dev-dependencies]
+glfw = "0.41"
+raw-window-handle = "0.3"
+glam = "0.15"
+
