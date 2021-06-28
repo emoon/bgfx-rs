@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Install deps
-      run: sudo apt-get install mesa-common-dev libx11-dev libgl1-mesa-dev
+      run: sudo apt-get install mesa-common-dev libx11-dev libgl1-mesa-dev libxrandr-dev
     - uses: actions/checkout@v2
     - name: Build
       run: cargo build --verbose
