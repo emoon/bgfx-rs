@@ -1072,62 +1072,62 @@ bitflags! {
     }
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct DynamicIndexBuffer {
     handle: bgfx_sys::bgfx_dynamic_index_buffer_handle_t,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct DynamicVertexBuffer {
     handle: bgfx_sys::bgfx_dynamic_vertex_buffer_handle_t,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct FrameBuffer {
     handle: bgfx_sys::bgfx_frame_buffer_handle_t,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct IndexBuffer {
     handle: bgfx_sys::bgfx_index_buffer_handle_t,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct IndirectBuffer {
     handle: bgfx_sys::bgfx_indirect_buffer_handle_t,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct OcclusionQuery {
     handle: bgfx_sys::bgfx_occlusion_query_handle_t,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct Program {
     handle: bgfx_sys::bgfx_program_handle_t,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct Shader {
     handle: bgfx_sys::bgfx_shader_handle_t,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct Texture {
     handle: bgfx_sys::bgfx_texture_handle_t,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct Uniform {
     handle: bgfx_sys::bgfx_uniform_handle_t,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct VertexBuffer {
     handle: bgfx_sys::bgfx_vertex_buffer_handle_t,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct VertexLayout {
     handle: bgfx_sys::bgfx_vertex_layout_handle_t,
 }
@@ -1967,13 +1967,6 @@ impl DynamicIndexBuffer {
         }
     }
     /// * `handle`:
-    /// Dynamic index buffer handle.
-    pub fn destroy_dynamic_index_buffer(&self) {
-        unsafe {
-            bgfx_sys::bgfx_destroy_dynamic_index_buffer(self.handle);
-        }
-    }
-    /// * `handle`:
     /// Dynamic index buffer.
     /// * `first_index`:
     /// First index to render.
@@ -1982,6 +1975,14 @@ impl DynamicIndexBuffer {
     pub fn set_dynamic_index_buffer(&self, first_index: u32, num_indices: u32) {
         unsafe {
             bgfx_sys::bgfx_set_dynamic_index_buffer(self.handle, first_index, num_indices);
+        }
+    }
+}
+
+impl Drop for DynamicIndexBuffer {
+    fn drop(&mut self) {
+        unsafe {
+            bgfx_sys::bgfx_destroy_dynamic_index_buffer(self.handle);
         }
     }
 }
@@ -2055,13 +2056,6 @@ impl DynamicVertexBuffer {
         }
     }
     /// * `handle`:
-    /// Dynamic vertex buffer handle.
-    pub fn destroy_dynamic_vertex_buffer(&self) {
-        unsafe {
-            bgfx_sys::bgfx_destroy_dynamic_vertex_buffer(self.handle);
-        }
-    }
-    /// * `handle`:
     /// Dynamic vertex buffer.
     /// * `start_vertex`:
     /// First instance data.
@@ -2074,6 +2068,14 @@ impl DynamicVertexBuffer {
                 start_vertex,
                 num,
             );
+        }
+    }
+}
+
+impl Drop for DynamicVertexBuffer {
+    fn drop(&mut self) {
+        unsafe {
+            bgfx_sys::bgfx_destroy_dynamic_vertex_buffer(self.handle);
         }
     }
 }
@@ -2219,13 +2221,6 @@ impl FrameBuffer {
         }
     }
     /// * `handle`:
-    /// Frame buffer handle.
-    pub fn destroy_frame_buffer(&self) {
-        unsafe {
-            bgfx_sys::bgfx_destroy_frame_buffer(self.handle);
-        }
-    }
-    /// * `handle`:
     /// Frame buffer handle. If handle is ]BGFX_INVALID_HANDLE] request will be
     /// made for main window back buffer.
     /// * `file_path`:
@@ -2233,6 +2228,14 @@ impl FrameBuffer {
     pub fn request_screen_shot(&self, file_path: &i8) {
         unsafe {
             bgfx_sys::bgfx_request_screen_shot(self.handle, file_path);
+        }
+    }
+}
+
+impl Drop for FrameBuffer {
+    fn drop(&mut self) {
+        unsafe {
+            bgfx_sys::bgfx_destroy_frame_buffer(self.handle);
         }
     }
 }
@@ -2272,13 +2275,6 @@ impl IndexBuffer {
         }
     }
     /// * `handle`:
-    /// Static index buffer handle.
-    pub fn destroy_index_buffer(&self) {
-        unsafe {
-            bgfx_sys::bgfx_destroy_index_buffer(self.handle);
-        }
-    }
-    /// * `handle`:
     /// Index buffer.
     /// * `first_index`:
     /// First index to render.
@@ -2287,6 +2283,14 @@ impl IndexBuffer {
     pub fn set_index_buffer(&self, first_index: u32, num_indices: u32) {
         unsafe {
             bgfx_sys::bgfx_set_index_buffer(self.handle, first_index, num_indices);
+        }
+    }
+}
+
+impl Drop for IndexBuffer {
+    fn drop(&mut self) {
+        unsafe {
+            bgfx_sys::bgfx_destroy_index_buffer(self.handle);
         }
     }
 }
@@ -2300,9 +2304,10 @@ impl IndirectBuffer {
             IndirectBuffer { handle: _ret }
         }
     }
-    /// * `handle`:
-    /// Indirect buffer handle.
-    pub fn destroy_indirect_buffer(&self) {
+}
+
+impl Drop for IndirectBuffer {
+    fn drop(&mut self) {
         unsafe {
             bgfx_sys::bgfx_destroy_indirect_buffer(self.handle);
         }
@@ -2328,19 +2333,20 @@ impl OcclusionQuery {
         }
     }
     /// * `handle`:
-    /// Handle to occlusion query object.
-    pub fn destroy_occlusion_query(&self) {
-        unsafe {
-            bgfx_sys::bgfx_destroy_occlusion_query(self.handle);
-        }
-    }
-    /// * `handle`:
     /// Occlusion query handle.
     /// * `visible`:
     /// Render if occlusion query is visible.
     pub fn set_condition(&self, visible: bool) {
         unsafe {
             bgfx_sys::bgfx_set_condition(self.handle, visible);
+        }
+    }
+}
+
+impl Drop for OcclusionQuery {
+    fn drop(&mut self) {
+        unsafe {
+            bgfx_sys::bgfx_destroy_occlusion_query(self.handle);
         }
     }
 }
@@ -2368,9 +2374,10 @@ impl Program {
             Program { handle: _ret }
         }
     }
-    /// * `handle`:
-    /// Program handle.
-    pub fn destroy_program(&self) {
+}
+
+impl Drop for Program {
+    fn drop(&mut self) {
         unsafe {
             bgfx_sys::bgfx_destroy_program(self.handle);
         }
@@ -2398,13 +2405,6 @@ impl Shader {
             bgfx_sys::bgfx_set_shader_name(self.handle, name.as_ptr() as _, name.len() as i32)
         }
     }
-    /// * `handle`:
-    /// Shader handle.
-    pub fn destroy_shader(&self) {
-        unsafe {
-            bgfx_sys::bgfx_destroy_shader(self.handle);
-        }
-    }
     /// * `vsh`:
     /// Vertex shader.
     /// * `fsh`:
@@ -2425,6 +2425,14 @@ impl Shader {
         unsafe {
             let _ret = bgfx_sys::bgfx_create_compute_program(self.handle, destroy_shaders);
             Program { handle: _ret }
+        }
+    }
+}
+
+impl Drop for Shader {
+    fn drop(&mut self) {
+        unsafe {
+            bgfx_sys::bgfx_destroy_shader(self.handle);
         }
     }
 }
@@ -2785,19 +2793,20 @@ impl Texture {
         }
     }
     /// * `handle`:
-    /// Texture handle.
-    pub fn destroy_texture(&self) {
-        unsafe {
-            bgfx_sys::bgfx_destroy_texture(self.handle);
-        }
-    }
-    /// * `handle`:
     /// Frame buffer handle.
     /// * `attachment`:
     pub fn get_texture(handle: FrameBuffer, attachment: u8) -> Texture {
         unsafe {
             let _ret = bgfx_sys::bgfx_get_texture(handle.handle, attachment);
             Texture { handle: _ret }
+        }
+    }
+}
+
+impl Drop for Texture {
+    fn drop(&mut self) {
+        unsafe {
+            bgfx_sys::bgfx_destroy_texture(self.handle);
         }
     }
 }
@@ -2826,13 +2835,6 @@ impl Uniform {
         }
     }
     /// * `handle`:
-    /// Handle to uniform object.
-    pub fn destroy_uniform(&self) {
-        unsafe {
-            bgfx_sys::bgfx_destroy_uniform(self.handle);
-        }
-    }
-    /// * `handle`:
     /// Uniform.
     /// * `value`:
     /// Pointer to uniform data.
@@ -2842,6 +2844,14 @@ impl Uniform {
     pub fn set_uniform(&self, value: &c_void, num: u16) {
         unsafe {
             bgfx_sys::bgfx_set_uniform(self.handle, value, num);
+        }
+    }
+}
+
+impl Drop for Uniform {
+    fn drop(&mut self) {
+        unsafe {
+            bgfx_sys::bgfx_destroy_uniform(self.handle);
         }
     }
 }
@@ -2890,13 +2900,6 @@ impl VertexBuffer {
         }
     }
     /// * `handle`:
-    /// Static vertex buffer handle.
-    pub fn destroy_vertex_buffer(&self) {
-        unsafe {
-            bgfx_sys::bgfx_destroy_vertex_buffer(self.handle);
-        }
-    }
-    /// * `handle`:
     /// Vertex buffer.
     /// * `start_vertex`:
     /// First instance data.
@@ -2911,6 +2914,14 @@ impl VertexBuffer {
     }
 }
 
+impl Drop for VertexBuffer {
+    fn drop(&mut self) {
+        unsafe {
+            bgfx_sys::bgfx_destroy_vertex_buffer(self.handle);
+        }
+    }
+}
+
 impl VertexLayout {
     /// * `layout`:
     /// Vertex layout.
@@ -2921,9 +2932,10 @@ impl VertexLayout {
             VertexLayout { handle: _ret }
         }
     }
-    /// * `layout_handle`:
-    /// Vertex layout handle.
-    pub fn destroy_vertex_layout(&self) {
+}
+
+impl Drop for VertexLayout {
+    fn drop(&mut self) {
         unsafe {
             bgfx_sys::bgfx_destroy_vertex_layout(self.handle);
         }
@@ -4093,20 +4105,6 @@ pub fn create_index_buffer(mem: &Memory, flags: u16) -> IndexBuffer {
         IndexBuffer { handle: _ret }
     }
 }
-/// * `handle`:
-/// Static index buffer handle.
-/// * `name`:
-/// Static index buffer name.
-/// * `len`:
-/// Static index buffer name length (if length is INT32_MAX, it's expected
-/// that _name is zero terminated string.
-/// * `handle`:
-/// Static index buffer handle.
-pub fn destroy_index_buffer(handle: IndexBuffer) {
-    unsafe {
-        bgfx_sys::bgfx_destroy_index_buffer(handle.handle);
-    }
-}
 /// * `layout`:
 /// Vertex layout.
 pub fn create_vertex_layout(layout: &VertexLayoutBuilder) -> VertexLayout {
@@ -4114,13 +4112,6 @@ pub fn create_vertex_layout(layout: &VertexLayoutBuilder) -> VertexLayout {
         let _layout = std::mem::transmute(layout);
         let _ret = bgfx_sys::bgfx_create_vertex_layout(_layout);
         VertexLayout { handle: _ret }
-    }
-}
-/// * `layout_handle`:
-/// Vertex layout handle.
-pub fn destroy_vertex_layout(layout_handle: VertexLayout) {
-    unsafe {
-        bgfx_sys::bgfx_destroy_vertex_layout(layout_handle.handle);
     }
 }
 /// * `mem`:
@@ -4147,20 +4138,6 @@ pub fn create_vertex_buffer(
         let _layout = std::mem::transmute(layout);
         let _ret = bgfx_sys::bgfx_create_vertex_buffer(mem.handle, _layout, flags);
         VertexBuffer { handle: _ret }
-    }
-}
-/// * `handle`:
-/// Static vertex buffer handle.
-/// * `name`:
-/// Static vertex buffer name.
-/// * `len`:
-/// Static vertex buffer name length (if length is INT32_MAX, it's expected
-/// that _name is zero terminated string.
-/// * `handle`:
-/// Static vertex buffer handle.
-pub fn destroy_vertex_buffer(handle: VertexBuffer) {
-    unsafe {
-        bgfx_sys::bgfx_destroy_vertex_buffer(handle.handle);
     }
 }
 /// * `num`:
@@ -4214,13 +4191,6 @@ pub fn create_dynamic_index_buffer_mem(mem: &Memory, flags: u16) -> DynamicIndex
 pub fn update_dynamic_index_buffer(handle: DynamicIndexBuffer, start_index: u32, mem: &Memory) {
     unsafe {
         bgfx_sys::bgfx_update_dynamic_index_buffer(handle.handle, start_index, mem.handle);
-    }
-}
-/// * `handle`:
-/// Dynamic index buffer handle.
-pub fn destroy_dynamic_index_buffer(handle: DynamicIndexBuffer) {
-    unsafe {
-        bgfx_sys::bgfx_destroy_dynamic_index_buffer(handle.handle);
     }
 }
 /// * `num`:
@@ -4288,13 +4258,6 @@ pub fn create_dynamic_vertex_buffer_mem(
 pub fn update_dynamic_vertex_buffer(handle: DynamicVertexBuffer, start_vertex: u32, mem: &Memory) {
     unsafe {
         bgfx_sys::bgfx_update_dynamic_vertex_buffer(handle.handle, start_vertex, mem.handle);
-    }
-}
-/// * `handle`:
-/// Dynamic vertex buffer handle.
-pub fn destroy_dynamic_vertex_buffer(handle: DynamicVertexBuffer) {
-    unsafe {
-        bgfx_sys::bgfx_destroy_dynamic_vertex_buffer(handle.handle);
     }
 }
 /// * `num`:
@@ -4422,33 +4385,12 @@ pub fn create_indirect_buffer(num: u32) -> IndirectBuffer {
         IndirectBuffer { handle: _ret }
     }
 }
-/// * `handle`:
-/// Indirect buffer handle.
-pub fn destroy_indirect_buffer(handle: IndirectBuffer) {
-    unsafe {
-        bgfx_sys::bgfx_destroy_indirect_buffer(handle.handle);
-    }
-}
 /// * `mem`:
 /// Shader binary.
 pub fn create_shader(mem: &Memory) -> Shader {
     unsafe {
         let _ret = bgfx_sys::bgfx_create_shader(mem.handle);
         Shader { handle: _ret }
-    }
-}
-/// * `handle`:
-/// Shader handle.
-/// * `name`:
-/// Shader name.
-/// * `len`:
-/// Shader name length (if length is INT32_MAX, it's expected
-/// that _name is zero terminated string).
-/// * `handle`:
-/// Shader handle.
-pub fn destroy_shader(handle: Shader) {
-    unsafe {
-        bgfx_sys::bgfx_destroy_shader(handle.handle);
     }
 }
 /// * `vsh`:
@@ -4471,13 +4413,6 @@ pub fn create_compute_program(csh: Shader, destroy_shaders: bool) -> Program {
     unsafe {
         let _ret = bgfx_sys::bgfx_create_compute_program(csh.handle, destroy_shaders);
         Program { handle: _ret }
-    }
-}
-/// * `handle`:
-/// Program handle.
-pub fn destroy_program(handle: Program) {
-    unsafe {
-        bgfx_sys::bgfx_destroy_program(handle.handle);
     }
 }
 /// * `depth`:
@@ -4895,20 +4830,6 @@ pub fn update_texture_cube(
         );
     }
 }
-/// * `handle`:
-/// Texture handle.
-/// * `name`:
-/// Texture name.
-/// * `len`:
-/// Texture name length (if length is INT32_MAX, it's expected
-/// that _name is zero terminated string.
-/// * `handle`:
-/// Texture handle.
-pub fn destroy_texture(handle: Texture) {
-    unsafe {
-        bgfx_sys::bgfx_destroy_texture(handle.handle);
-    }
-}
 /// * `width`:
 /// Texture width.
 /// * `height`:
@@ -5022,25 +4943,11 @@ pub fn create_frame_buffer_from_nwh(
 }
 /// * `handle`:
 /// Frame buffer handle.
-/// * `name`:
-/// Frame buffer name.
-/// * `len`:
-/// Frame buffer name length (if length is INT32_MAX, it's expected
-/// that _name is zero terminated string.
-/// * `handle`:
-/// Frame buffer handle.
 /// * `attachment`:
 pub fn get_texture(handle: FrameBuffer, attachment: u8) -> Texture {
     unsafe {
         let _ret = bgfx_sys::bgfx_get_texture(handle.handle, attachment);
         Texture { handle: _ret }
-    }
-}
-/// * `handle`:
-/// Frame buffer handle.
-pub fn destroy_frame_buffer(handle: FrameBuffer) {
-    unsafe {
-        bgfx_sys::bgfx_destroy_frame_buffer(handle.handle);
     }
 }
 /// * `name`:
@@ -5065,13 +4972,6 @@ pub fn get_uniform_info(handle: Uniform, info: &mut UniformInfo) {
         bgfx_sys::bgfx_get_uniform_info(handle.handle, _info);
     }
 }
-/// * `handle`:
-/// Handle to uniform object.
-pub fn destroy_uniform(handle: Uniform) {
-    unsafe {
-        bgfx_sys::bgfx_destroy_uniform(handle.handle);
-    }
-}
 pub fn create_occlusion_query() -> OcclusionQuery {
     unsafe {
         let _ret = bgfx_sys::bgfx_create_occlusion_query();
@@ -5089,17 +4989,6 @@ pub fn get_result(handle: OcclusionQuery, result: &mut i32) -> OcclusionQueryRes
         std::mem::transmute(_ret)
     }
 }
-/// * `handle`:
-/// Handle to occlusion query object.
-pub fn destroy_occlusion_query(handle: OcclusionQuery) {
-    unsafe {
-        bgfx_sys::bgfx_destroy_occlusion_query(handle.handle);
-    }
-}
-/// * `id`:
-/// View id.
-/// * `name`:
-/// View name.
 /// * `id`:
 /// View id.
 /// * `x`:
