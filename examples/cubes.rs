@@ -95,7 +95,7 @@ fn load_shader_program(vs: &str, ps: &str) -> std::io::Result<Program> {
     let vs_shader = bgfx::create_shader(&vs_data);
     let ps_shader = bgfx::create_shader(&ps_data);
 
-    Ok(bgfx::create_program(vs_shader, ps_shader, false))
+    Ok(bgfx::create_program(&vs_shader, &ps_shader, false))
 }
 
 fn main() -> std::io::Result<()> {
@@ -141,6 +141,8 @@ fn main() -> std::io::Result<()> {
             ..Default::default()
         },
     );
+
+    {
 
     let layout = VertexLayoutBuilder::new();
     layout.begin(RendererType::Noop);
@@ -210,14 +212,17 @@ fn main() -> std::io::Result<()> {
                 let transform = Mat4::from_translation(Vec3::new(x, y, 0.0)) * rot;
 
                 bgfx::set_transform(&transform.to_cols_array(), 1);
-                bgfx::set_vertex_buffer(0, vbh, 0, std::u32::MAX);
-                bgfx::set_index_buffer(ibh, 0, std::u32::MAX);
+                bgfx::set_vertex_buffer(0, &vbh, 0, std::u32::MAX);
+                bgfx::set_index_buffer(&ibh, 0, std::u32::MAX);
+
                 bgfx::set_state(state, 0);
-                bgfx::submit(0, shader_program, SubmitArgs::default());
+                bgfx::submit(0, &shader_program, SubmitArgs::default());
             }
         }
 
         bgfx::frame(false);
+    }
+
     }
 
     bgfx::shutdown();

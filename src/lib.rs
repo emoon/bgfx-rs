@@ -2358,7 +2358,7 @@ impl Program {
     /// Fragment shader.
     /// * `destroy_shaders`:
     /// If true, shaders will be destroyed when program is destroyed.
-    pub fn create_program(vsh: Shader, fsh: Shader, destroy_shaders: bool) -> Program {
+    pub fn create_program(vsh: &Shader, fsh: &Shader, destroy_shaders: bool) -> Program {
         unsafe {
             let _ret = bgfx_sys::bgfx_create_program(vsh.handle, fsh.handle, destroy_shaders);
             Program { handle: _ret }
@@ -2368,7 +2368,7 @@ impl Program {
     /// Compute shader.
     /// * `destroy_shaders`:
     /// If true, shaders will be destroyed when program is destroyed.
-    pub fn create_compute_program(csh: Shader, destroy_shaders: bool) -> Program {
+    pub fn create_compute_program(csh: &Shader, destroy_shaders: bool) -> Program {
         unsafe {
             let _ret = bgfx_sys::bgfx_create_compute_program(csh.handle, destroy_shaders);
             Program { handle: _ret }
@@ -2411,7 +2411,7 @@ impl Shader {
     /// Fragment shader.
     /// * `destroy_shaders`:
     /// If true, shaders will be destroyed when program is destroyed.
-    pub fn create_program(&self, fsh: Shader, destroy_shaders: bool) -> Program {
+    pub fn create_program(&self, fsh: &Shader, destroy_shaders: bool) -> Program {
         unsafe {
             let _ret = bgfx_sys::bgfx_create_program(self.handle, fsh.handle, destroy_shaders);
             Program { handle: _ret }
@@ -2795,7 +2795,7 @@ impl Texture {
     /// * `handle`:
     /// Frame buffer handle.
     /// * `attachment`:
-    pub fn get_texture(handle: FrameBuffer, attachment: u8) -> Texture {
+    pub fn get_texture(handle: &FrameBuffer, attachment: u8) -> Texture {
         unsafe {
             let _ret = bgfx_sys::bgfx_get_texture(handle.handle, attachment);
             Texture { handle: _ret }
@@ -3073,7 +3073,7 @@ impl Attachment {
     /// Mip level.
     /// * `resolve`:
     /// Resolve flags. See: [ResolveFlags]
-    pub fn init(&self, handle: Texture, params: InitArgs) {
+    pub fn init(&self, handle: &Texture, params: InitArgs) {
         unsafe {
             let _self = std::mem::transmute(self);
             bgfx_sys::bgfx_attachment_init(
@@ -3230,7 +3230,7 @@ impl Encoder {
     /// Occlusion query handle.
     /// * `visible`:
     /// Render if occlusion query is visible.
-    pub fn set_condition(&self, handle: OcclusionQuery, visible: bool) {
+    pub fn set_condition(&self, handle: &OcclusionQuery, visible: bool) {
         unsafe {
             let _self = std::mem::transmute(self);
             bgfx_sys::bgfx_encoder_set_condition(_self, handle.handle, visible);
@@ -3289,7 +3289,7 @@ impl Encoder {
     /// * `num`:
     /// Number of elements. Passing `UINT16_MAX` will
     /// use the _num passed on uniform creation.
-    pub fn set_uniform(&self, handle: Uniform, value: &c_void, num: u16) {
+    pub fn set_uniform(&self, handle: &Uniform, value: &c_void, num: u16) {
         unsafe {
             let _self = std::mem::transmute(self);
             bgfx_sys::bgfx_encoder_set_uniform(_self, handle.handle, value, num);
@@ -3301,7 +3301,7 @@ impl Encoder {
     /// First index to render.
     /// * `num_indices`:
     /// Number of indices to render.
-    pub fn set_index_buffer(&self, handle: IndexBuffer, first_index: u32, num_indices: u32) {
+    pub fn set_index_buffer(&self, handle: &IndexBuffer, first_index: u32, num_indices: u32) {
         unsafe {
             let _self = std::mem::transmute(self);
             bgfx_sys::bgfx_encoder_set_index_buffer(_self, handle.handle, first_index, num_indices);
@@ -3315,7 +3315,7 @@ impl Encoder {
     /// Number of indices to render.
     pub fn set_dynamic_index_buffer(
         &self,
-        handle: DynamicIndexBuffer,
+        handle: &DynamicIndexBuffer,
         first_index: u32,
         num_indices: u32,
     ) {
@@ -3363,7 +3363,7 @@ impl Encoder {
     pub fn set_vertex_buffer(
         &self,
         stream: u8,
-        handle: VertexBuffer,
+        handle: &VertexBuffer,
         start_vertex: u32,
         num_vertices: u32,
     ) {
@@ -3393,10 +3393,10 @@ impl Encoder {
     pub fn set_vertex_buffer_with_layout(
         &self,
         stream: u8,
-        handle: VertexBuffer,
+        handle: &VertexBuffer,
         start_vertex: u32,
         num_vertices: u32,
-        layout_handle: VertexLayout,
+        layout_handle: &VertexLayout,
     ) {
         unsafe {
             let _self = std::mem::transmute(self);
@@ -3428,7 +3428,7 @@ impl Encoder {
     pub fn set_dynamic_vertex_buffer(
         &self,
         stream: u8,
-        handle: DynamicVertexBuffer,
+        handle: &DynamicVertexBuffer,
         start_vertex: u32,
         num_vertices: u32,
     ) {
@@ -3458,10 +3458,10 @@ impl Encoder {
     pub fn set_dynamic_vertex_buffer_with_layout(
         &self,
         stream: u8,
-        handle: DynamicVertexBuffer,
+        handle: &DynamicVertexBuffer,
         start_vertex: u32,
         num_vertices: u32,
-        layout_handle: VertexLayout,
+        layout_handle: &VertexLayout,
     ) {
         unsafe {
             let _self = std::mem::transmute(self);
@@ -3520,7 +3520,7 @@ impl Encoder {
         tvb: &TransientVertexBuffer,
         start_vertex: u32,
         num_vertices: u32,
-        layout_handle: VertexLayout,
+        layout_handle: &VertexLayout,
     ) {
         unsafe {
             let _self = std::mem::transmute(self);
@@ -3566,7 +3566,7 @@ impl Encoder {
     /// Dynamic vertex buffer.
     pub fn set_instance_data_from_vertex_buffer(
         &self,
-        handle: VertexBuffer,
+        handle: &VertexBuffer,
         start_vertex: u32,
         num: u32,
     ) {
@@ -3588,7 +3588,7 @@ impl Encoder {
     /// Number of data instances.
     pub fn set_instance_data_from_dynamic_vertex_buffer(
         &self,
-        handle: DynamicVertexBuffer,
+        handle: &DynamicVertexBuffer,
         start_vertex: u32,
         num: u32,
     ) {
@@ -3622,7 +3622,7 @@ impl Encoder {
     ///     mode.
     ///   - [SamplerFlags::[MIN/MAG/MIP]_[POINT/ANISOTROPIC]] - Point or anisotropic
     ///     sampling.
-    pub fn set_texture(&self, stage: u8, sampler: Uniform, handle: Texture, flags: u32) {
+    pub fn set_texture(&self, stage: u8, sampler: &Uniform, handle: &Texture, flags: u32) {
         unsafe {
             let _self = std::mem::transmute(self);
             bgfx_sys::bgfx_encoder_set_texture(_self, stage, sampler.handle, handle.handle, flags);
@@ -3644,7 +3644,7 @@ impl Encoder {
     /// Depth for sorting.
     /// * `flags`:
     /// Discard or preserve states. See [DiscardFlags].
-    pub fn submit(&self, id: ViewId, program: Program, params: SubmitArgs) {
+    pub fn submit(&self, id: ViewId, program: &Program, params: SubmitArgs) {
         unsafe {
             let _self = std::mem::transmute(self);
             bgfx_sys::bgfx_encoder_submit(_self, id, program.handle, params.depth, params.flags);
@@ -3663,8 +3663,8 @@ impl Encoder {
     pub fn submit_occlusion_query(
         &self,
         id: ViewId,
-        program: Program,
-        occlusion_query: OcclusionQuery,
+        program: &Program,
+        occlusion_query: &OcclusionQuery,
         params: SubmitOcclusionQueryArgs,
     ) {
         unsafe {
@@ -3696,8 +3696,8 @@ impl Encoder {
     pub fn submit_indirect(
         &self,
         id: ViewId,
-        program: Program,
-        indirect_handle: IndirectBuffer,
+        program: &Program,
+        indirect_handle: &IndirectBuffer,
         params: SubmitIndirectArgs,
     ) {
         unsafe {
@@ -3720,7 +3720,7 @@ impl Encoder {
     /// Index buffer handle.
     /// * `access`:
     /// Buffer access. See [Access].
-    pub fn set_compute_index_buffer(&self, stage: u8, handle: IndexBuffer, access: Access) {
+    pub fn set_compute_index_buffer(&self, stage: u8, handle: &IndexBuffer, access: Access) {
         unsafe {
             let _self = std::mem::transmute(self);
             bgfx_sys::bgfx_encoder_set_compute_index_buffer(
@@ -3737,7 +3737,7 @@ impl Encoder {
     /// Vertex buffer handle.
     /// * `access`:
     /// Buffer access. See [Access].
-    pub fn set_compute_vertex_buffer(&self, stage: u8, handle: VertexBuffer, access: Access) {
+    pub fn set_compute_vertex_buffer(&self, stage: u8, handle: &VertexBuffer, access: Access) {
         unsafe {
             let _self = std::mem::transmute(self);
             bgfx_sys::bgfx_encoder_set_compute_vertex_buffer(
@@ -3757,7 +3757,7 @@ impl Encoder {
     pub fn set_compute_dynamic_index_buffer(
         &self,
         stage: u8,
-        handle: DynamicIndexBuffer,
+        handle: &DynamicIndexBuffer,
         access: Access,
     ) {
         unsafe {
@@ -3779,7 +3779,7 @@ impl Encoder {
     pub fn set_compute_dynamic_vertex_buffer(
         &self,
         stage: u8,
-        handle: DynamicVertexBuffer,
+        handle: &DynamicVertexBuffer,
         access: Access,
     ) {
         unsafe {
@@ -3798,7 +3798,7 @@ impl Encoder {
     /// Indirect buffer handle.
     /// * `access`:
     /// Buffer access. See [Access].
-    pub fn set_compute_indirect_buffer(&self, stage: u8, handle: IndirectBuffer, access: Access) {
+    pub fn set_compute_indirect_buffer(&self, stage: u8, handle: &IndirectBuffer, access: Access) {
         unsafe {
             let _self = std::mem::transmute(self);
             bgfx_sys::bgfx_encoder_set_compute_indirect_buffer(
@@ -3822,7 +3822,7 @@ impl Encoder {
     pub fn set_image(
         &self,
         stage: u8,
-        handle: Texture,
+        handle: &Texture,
         mip: u8,
         access: Access,
         format: TextureFormat,
@@ -3851,7 +3851,7 @@ impl Encoder {
     /// Number of groups Z.
     /// * `flags`:
     /// Discard or preserve states. See [DiscardFlags].
-    pub fn dispatch(&self, id: ViewId, program: Program, params: DispatchArgs) {
+    pub fn dispatch(&self, id: ViewId, program: &Program, params: DispatchArgs) {
         unsafe {
             let _self = std::mem::transmute(self);
             bgfx_sys::bgfx_encoder_dispatch(
@@ -3880,8 +3880,8 @@ impl Encoder {
     pub fn dispatch_indirect(
         &self,
         id: ViewId,
-        program: Program,
-        indirect_handle: IndirectBuffer,
+        program: &Program,
+        indirect_handle: &IndirectBuffer,
         params: DispatchIndirectArgs,
     ) {
         unsafe {
@@ -3941,12 +3941,12 @@ impl Encoder {
     pub fn blit(
         &self,
         id: ViewId,
-        dst: Texture,
+        dst: &Texture,
         dst_mip: u8,
         dst_x: u16,
         dst_y: u16,
         dst_z: u16,
-        src: Texture,
+        src: &Texture,
         params: BlitArgs,
     ) {
         unsafe {
@@ -4188,7 +4188,7 @@ pub fn create_dynamic_index_buffer_mem(mem: &Memory, flags: u16) -> DynamicIndex
 /// Start index.
 /// * `mem`:
 /// Index buffer data.
-pub fn update_dynamic_index_buffer(handle: DynamicIndexBuffer, start_index: u32, mem: &Memory) {
+pub fn update_dynamic_index_buffer(handle: &DynamicIndexBuffer, start_index: u32, mem: &Memory) {
     unsafe {
         bgfx_sys::bgfx_update_dynamic_index_buffer(handle.handle, start_index, mem.handle);
     }
@@ -4255,7 +4255,7 @@ pub fn create_dynamic_vertex_buffer_mem(
 /// Start vertex.
 /// * `mem`:
 /// Vertex buffer data.
-pub fn update_dynamic_vertex_buffer(handle: DynamicVertexBuffer, start_vertex: u32, mem: &Memory) {
+pub fn update_dynamic_vertex_buffer(handle: &DynamicVertexBuffer, start_vertex: u32, mem: &Memory) {
     unsafe {
         bgfx_sys::bgfx_update_dynamic_vertex_buffer(handle.handle, start_vertex, mem.handle);
     }
@@ -4399,7 +4399,7 @@ pub fn create_shader(mem: &Memory) -> Shader {
 /// Fragment shader.
 /// * `destroy_shaders`:
 /// If true, shaders will be destroyed when program is destroyed.
-pub fn create_program(vsh: Shader, fsh: Shader, destroy_shaders: bool) -> Program {
+pub fn create_program(vsh: &Shader, fsh: &Shader, destroy_shaders: bool) -> Program {
     unsafe {
         let _ret = bgfx_sys::bgfx_create_program(vsh.handle, fsh.handle, destroy_shaders);
         Program { handle: _ret }
@@ -4409,7 +4409,7 @@ pub fn create_program(vsh: Shader, fsh: Shader, destroy_shaders: bool) -> Progra
 /// Compute shader.
 /// * `destroy_shaders`:
 /// If true, shaders will be destroyed when program is destroyed.
-pub fn create_compute_program(csh: Shader, destroy_shaders: bool) -> Program {
+pub fn create_compute_program(csh: &Shader, destroy_shaders: bool) -> Program {
     unsafe {
         let _ret = bgfx_sys::bgfx_create_compute_program(csh.handle, destroy_shaders);
         Program { handle: _ret }
@@ -4697,7 +4697,7 @@ pub fn create_texture_cube(
 /// Pitch of input image (bytes). When _pitch is set to
 /// UINT16_MAX, it will be calculated internally based on _width.
 pub fn update_texture_2d(
-    handle: Texture,
+    handle: &Texture,
     layer: u16,
     mip: u8,
     x: u16,
@@ -4740,7 +4740,7 @@ pub fn update_texture_2d(
 /// * `mem`:
 /// Texture update data.
 pub fn update_texture_3d(
-    handle: Texture,
+    handle: &Texture,
     mip: u8,
     x: u16,
     y: u16,
@@ -4804,7 +4804,7 @@ pub fn update_texture_3d(
 /// Pitch of input image (bytes). When _pitch is set to
 /// UINT16_MAX, it will be calculated internally based on _width.
 pub fn update_texture_cube(
-    handle: Texture,
+    handle: &Texture,
     layer: u16,
     side: u8,
     mip: u8,
@@ -4944,7 +4944,7 @@ pub fn create_frame_buffer_from_nwh(
 /// * `handle`:
 /// Frame buffer handle.
 /// * `attachment`:
-pub fn get_texture(handle: FrameBuffer, attachment: u8) -> Texture {
+pub fn get_texture(handle: &FrameBuffer, attachment: u8) -> Texture {
     unsafe {
         let _ret = bgfx_sys::bgfx_get_texture(handle.handle, attachment);
         Texture { handle: _ret }
@@ -4966,7 +4966,7 @@ pub fn create_uniform(name: &i8, type_r: UniformType, num: u16) -> Uniform {
 /// Handle to uniform object.
 /// * `info`:
 /// Uniform info.
-pub fn get_uniform_info(handle: Uniform, info: &mut UniformInfo) {
+pub fn get_uniform_info(handle: &Uniform, info: &mut UniformInfo) {
     unsafe {
         let _info = std::mem::transmute(info);
         bgfx_sys::bgfx_get_uniform_info(handle.handle, _info);
@@ -4983,7 +4983,7 @@ pub fn create_occlusion_query() -> OcclusionQuery {
 /// * `result`:
 /// Number of pixels that passed test. This argument
 /// can be `NULL` if result of occlusion query is not needed.
-pub fn get_result(handle: OcclusionQuery, result: &mut i32) -> OcclusionQueryResult {
+pub fn get_result(handle: &OcclusionQuery, result: &mut i32) -> OcclusionQueryResult {
     unsafe {
         let _ret = bgfx_sys::bgfx_get_result(handle.handle, result);
         std::mem::transmute(_ret)
@@ -5103,7 +5103,7 @@ pub fn set_view_mode(id: ViewId, mode: ViewMode) {
 /// Frame buffer handle. Passing ]BGFX_INVALID_HANDLE] as
 /// frame buffer handle will draw primitives from this view into
 /// default back buffer.
-pub fn set_view_frame_buffer(id: ViewId, handle: FrameBuffer) {
+pub fn set_view_frame_buffer(id: ViewId, handle: &FrameBuffer) {
     unsafe {
         bgfx_sys::bgfx_set_view_frame_buffer(id, handle.handle);
     }
@@ -5135,7 +5135,7 @@ pub fn encoder_end(encoder: &Encoder) {
 /// made for main window back buffer.
 /// * `file_path`:
 /// Will be passed to `bgfx::CallbackI::screenShot` callback.
-pub fn request_screen_shot(handle: FrameBuffer, file_path: &i8) {
+pub fn request_screen_shot(handle: &FrameBuffer, file_path: &i8) {
     unsafe {
         bgfx_sys::bgfx_request_screen_shot(handle.handle, file_path);
     }
@@ -5191,7 +5191,7 @@ pub fn set_state(state: u64, rgba: u32) {
 /// Occlusion query handle.
 /// * `visible`:
 /// Render if occlusion query is visible.
-pub fn set_condition(handle: OcclusionQuery, visible: bool) {
+pub fn set_condition(handle: &OcclusionQuery, visible: bool) {
     unsafe {
         bgfx_sys::bgfx_set_condition(handle.handle, visible);
     }
@@ -5245,7 +5245,7 @@ pub fn alloc_transform(transform: &mut Transform, num: u16) -> u32 {
 /// * `num`:
 /// Number of elements. Passing `UINT16_MAX` will
 /// use the _num passed on uniform creation.
-pub fn set_uniform(handle: Uniform, value: &c_void, num: u16) {
+pub fn set_uniform(handle: &Uniform, value: &c_void, num: u16) {
     unsafe {
         bgfx_sys::bgfx_set_uniform(handle.handle, value, num);
     }
@@ -5256,7 +5256,7 @@ pub fn set_uniform(handle: Uniform, value: &c_void, num: u16) {
 /// First index to render.
 /// * `num_indices`:
 /// Number of indices to render.
-pub fn set_index_buffer(handle: IndexBuffer, first_index: u32, num_indices: u32) {
+pub fn set_index_buffer(handle: &IndexBuffer, first_index: u32, num_indices: u32) {
     unsafe {
         bgfx_sys::bgfx_set_index_buffer(handle.handle, first_index, num_indices);
     }
@@ -5267,7 +5267,7 @@ pub fn set_index_buffer(handle: IndexBuffer, first_index: u32, num_indices: u32)
 /// First index to render.
 /// * `num_indices`:
 /// Number of indices to render.
-pub fn set_dynamic_index_buffer(handle: DynamicIndexBuffer, first_index: u32, num_indices: u32) {
+pub fn set_dynamic_index_buffer(handle: &DynamicIndexBuffer, first_index: u32, num_indices: u32) {
     unsafe {
         bgfx_sys::bgfx_set_dynamic_index_buffer(handle.handle, first_index, num_indices);
     }
@@ -5292,7 +5292,7 @@ pub fn set_transient_index_buffer(tib: &TransientIndexBuffer, first_index: u32, 
 /// First vertex to render.
 /// * `num_vertices`:
 /// Number of vertices to render.
-pub fn set_vertex_buffer(stream: u8, handle: VertexBuffer, start_vertex: u32, num_vertices: u32) {
+pub fn set_vertex_buffer(stream: u8, handle: &VertexBuffer, start_vertex: u32, num_vertices: u32) {
     unsafe {
         bgfx_sys::bgfx_set_vertex_buffer(stream, handle.handle, start_vertex, num_vertices);
     }
@@ -5311,10 +5311,10 @@ pub fn set_vertex_buffer(stream: u8, handle: VertexBuffer, start_vertex: u32, nu
 /// of vertex buffer will be used.
 pub fn set_vertex_buffer_with_layout(
     stream: u8,
-    handle: VertexBuffer,
+    handle: &VertexBuffer,
     start_vertex: u32,
     num_vertices: u32,
-    layout_handle: VertexLayout,
+    layout_handle: &VertexLayout,
 ) {
     unsafe {
         bgfx_sys::bgfx_set_vertex_buffer_with_layout(
@@ -5336,7 +5336,7 @@ pub fn set_vertex_buffer_with_layout(
 /// Number of vertices to render.
 pub fn set_dynamic_vertex_buffer(
     stream: u8,
-    handle: DynamicVertexBuffer,
+    handle: &DynamicVertexBuffer,
     start_vertex: u32,
     num_vertices: u32,
 ) {
@@ -5358,10 +5358,10 @@ pub fn set_dynamic_vertex_buffer(
 /// of vertex buffer will be used.
 pub fn set_dynamic_vertex_buffer_with_layout(
     stream: u8,
-    handle: DynamicVertexBuffer,
+    handle: &DynamicVertexBuffer,
     start_vertex: u32,
     num_vertices: u32,
-    layout_handle: VertexLayout,
+    layout_handle: &VertexLayout,
 ) {
     unsafe {
         bgfx_sys::bgfx_set_dynamic_vertex_buffer_with_layout(
@@ -5409,7 +5409,7 @@ pub fn set_transient_vertex_buffer_with_layout(
     tvb: &TransientVertexBuffer,
     start_vertex: u32,
     num_vertices: u32,
-    layout_handle: VertexLayout,
+    layout_handle: &VertexLayout,
 ) {
     unsafe {
         let _tvb = std::mem::transmute(tvb);
@@ -5449,7 +5449,7 @@ pub fn set_instance_data_buffer(idb: &InstanceDataBuffer, start: u32, num: u32) 
 /// Number of data instances.
 /// Set instance data buffer for draw primitive.
 /// Dynamic vertex buffer.
-pub fn set_instance_data_from_vertex_buffer(handle: VertexBuffer, start_vertex: u32, num: u32) {
+pub fn set_instance_data_from_vertex_buffer(handle: &VertexBuffer, start_vertex: u32, num: u32) {
     unsafe {
         bgfx_sys::bgfx_set_instance_data_from_vertex_buffer(handle.handle, start_vertex, num);
     }
@@ -5461,7 +5461,7 @@ pub fn set_instance_data_from_vertex_buffer(handle: VertexBuffer, start_vertex: 
 /// * `num`:
 /// Number of data instances.
 pub fn set_instance_data_from_dynamic_vertex_buffer(
-    handle: DynamicVertexBuffer,
+    handle: &DynamicVertexBuffer,
     start_vertex: u32,
     num: u32,
 ) {
@@ -5492,7 +5492,7 @@ pub fn set_instance_count(num_instances: u32) {
 ///     mode.
 ///   - [SamplerFlags::[MIN/MAG/MIP]_[POINT/ANISOTROPIC]] - Point or anisotropic
 ///     sampling.
-pub fn set_texture(stage: u8, sampler: Uniform, handle: Texture, flags: u32) {
+pub fn set_texture(stage: u8, sampler: &Uniform, handle: &Texture, flags: u32) {
     unsafe {
         bgfx_sys::bgfx_set_texture(stage, sampler.handle, handle.handle, flags);
     }
@@ -5512,7 +5512,7 @@ pub fn touch(id: ViewId) {
 /// Depth for sorting.
 /// * `flags`:
 /// Which states to discard for next draw. See [DiscardFlags].
-pub fn submit(id: ViewId, program: Program, params: SubmitArgs) {
+pub fn submit(id: ViewId, program: &Program, params: SubmitArgs) {
     unsafe {
         bgfx_sys::bgfx_submit(id, program.handle, params.depth, params.flags);
     }
@@ -5529,8 +5529,8 @@ pub fn submit(id: ViewId, program: Program, params: SubmitArgs) {
 /// Which states to discard for next draw. See [DiscardFlags].
 pub fn submit_occlusion_query(
     id: ViewId,
-    program: Program,
-    occlusion_query: OcclusionQuery,
+    program: &Program,
+    occlusion_query: &OcclusionQuery,
     params: SubmitOcclusionQueryArgs,
 ) {
     unsafe {
@@ -5559,8 +5559,8 @@ pub fn submit_occlusion_query(
 /// Which states to discard for next draw. See [DiscardFlags].
 pub fn submit_indirect(
     id: ViewId,
-    program: Program,
-    indirect_handle: IndirectBuffer,
+    program: &Program,
+    indirect_handle: &IndirectBuffer,
     params: SubmitIndirectArgs,
 ) {
     unsafe {
@@ -5581,7 +5581,7 @@ pub fn submit_indirect(
 /// Index buffer handle.
 /// * `access`:
 /// Buffer access. See [Access].
-pub fn set_compute_index_buffer(stage: u8, handle: IndexBuffer, access: Access) {
+pub fn set_compute_index_buffer(stage: u8, handle: &IndexBuffer, access: Access) {
     unsafe {
         bgfx_sys::bgfx_set_compute_index_buffer(stage, handle.handle, access as _);
     }
@@ -5592,7 +5592,7 @@ pub fn set_compute_index_buffer(stage: u8, handle: IndexBuffer, access: Access) 
 /// Vertex buffer handle.
 /// * `access`:
 /// Buffer access. See [Access].
-pub fn set_compute_vertex_buffer(stage: u8, handle: VertexBuffer, access: Access) {
+pub fn set_compute_vertex_buffer(stage: u8, handle: &VertexBuffer, access: Access) {
     unsafe {
         bgfx_sys::bgfx_set_compute_vertex_buffer(stage, handle.handle, access as _);
     }
@@ -5603,7 +5603,7 @@ pub fn set_compute_vertex_buffer(stage: u8, handle: VertexBuffer, access: Access
 /// Dynamic index buffer handle.
 /// * `access`:
 /// Buffer access. See [Access].
-pub fn set_compute_dynamic_index_buffer(stage: u8, handle: DynamicIndexBuffer, access: Access) {
+pub fn set_compute_dynamic_index_buffer(stage: u8, handle: &DynamicIndexBuffer, access: Access) {
     unsafe {
         bgfx_sys::bgfx_set_compute_dynamic_index_buffer(stage, handle.handle, access as _);
     }
@@ -5614,7 +5614,7 @@ pub fn set_compute_dynamic_index_buffer(stage: u8, handle: DynamicIndexBuffer, a
 /// Dynamic vertex buffer handle.
 /// * `access`:
 /// Buffer access. See [Access].
-pub fn set_compute_dynamic_vertex_buffer(stage: u8, handle: DynamicVertexBuffer, access: Access) {
+pub fn set_compute_dynamic_vertex_buffer(stage: u8, handle: &DynamicVertexBuffer, access: Access) {
     unsafe {
         bgfx_sys::bgfx_set_compute_dynamic_vertex_buffer(stage, handle.handle, access as _);
     }
@@ -5625,7 +5625,7 @@ pub fn set_compute_dynamic_vertex_buffer(stage: u8, handle: DynamicVertexBuffer,
 /// Indirect buffer handle.
 /// * `access`:
 /// Buffer access. See [Access].
-pub fn set_compute_indirect_buffer(stage: u8, handle: IndirectBuffer, access: Access) {
+pub fn set_compute_indirect_buffer(stage: u8, handle: &IndirectBuffer, access: Access) {
     unsafe {
         bgfx_sys::bgfx_set_compute_indirect_buffer(stage, handle.handle, access as _);
     }
@@ -5640,7 +5640,7 @@ pub fn set_compute_indirect_buffer(stage: u8, handle: IndirectBuffer, access: Ac
 /// Image access. See [Access].
 /// * `format`:
 /// Texture format. See: [TextureFormat].
-pub fn set_image(stage: u8, handle: Texture, mip: u8, access: Access, format: TextureFormat) {
+pub fn set_image(stage: u8, handle: &Texture, mip: u8, access: Access, format: TextureFormat) {
     unsafe {
         bgfx_sys::bgfx_set_image(stage, handle.handle, mip, access as _, format as _);
     }
@@ -5657,7 +5657,7 @@ pub fn set_image(stage: u8, handle: Texture, mip: u8, access: Access, format: Te
 /// Number of groups Z.
 /// * `flags`:
 /// Discard or preserve states. See [DiscardFlags].
-pub fn dispatch(id: ViewId, program: Program, params: DispatchArgs) {
+pub fn dispatch(id: ViewId, program: &Program, params: DispatchArgs) {
     unsafe {
         bgfx_sys::bgfx_dispatch(
             id,
@@ -5683,8 +5683,8 @@ pub fn dispatch(id: ViewId, program: Program, params: DispatchArgs) {
 /// Discard or preserve states. See [DiscardFlags].
 pub fn dispatch_indirect(
     id: ViewId,
-    program: Program,
-    indirect_handle: IndirectBuffer,
+    program: &Program,
+    indirect_handle: &IndirectBuffer,
     params: DispatchIndirectArgs,
 ) {
     unsafe {
@@ -5740,12 +5740,12 @@ pub fn discard(flags: u8) {
 /// unused.
 pub fn blit(
     id: ViewId,
-    dst: Texture,
+    dst: &Texture,
     dst_mip: u8,
     dst_x: u16,
     dst_y: u16,
     dst_z: u16,
-    src: Texture,
+    src: &Texture,
     params: BlitArgs,
 ) {
     unsafe {
