@@ -48,9 +48,7 @@ fn main() {
 
     bgfx::set_platform_data(&pd);
 
-    // TODO: run ctor inside new
     let mut init = Init::new();
-    bgfx::init_ctor(&init);
 
     init.type_r = RendererType::Count;
     init.resolution.width = WIDTH as u32;

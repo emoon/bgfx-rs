@@ -3002,6 +3002,10 @@ impl Init {
     pub fn new() -> Init {
         let t = MaybeUninit::<Init>::zeroed();
         let t = unsafe { t.assume_init() };
+        unsafe {
+            let _init = std::mem::transmute(&t);
+            bgfx_sys::bgfx_init_ctor(_init);
+        }
         t
     }
 }
@@ -3972,13 +3976,6 @@ impl Encoder {
     }
 }
 
-/// * `init`:
-pub fn init_ctor(init: &Init) {
-    unsafe {
-        let _init = std::mem::transmute(init);
-        bgfx_sys::bgfx_init_ctor(_init);
-    }
-}
 /// * `init`:
 /// Initialization parameters. See: `bgfx::Init` for more info.
 pub fn init(init: &Init) -> bool {
