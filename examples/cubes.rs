@@ -1,5 +1,5 @@
+use bgfx_rs::bgfx as bgfx;
 use bgfx::*;
-use bgfx_rs as bgfx;
 use glam::{EulerRot, Mat4, Vec3};
 use glfw::{Action, Context, Key, Window};
 use raw_window_handle::{HasRawWindowHandle, RawWindowHandle};
