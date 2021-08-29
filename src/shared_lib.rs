@@ -25,6 +25,8 @@ pub enum Fatal {
 pub enum RendererType {
     /// No rendering.
     Noop,
+    /// AGC
+    Agc,
     /// Direct3D 9.0
     Direct3D9,
     /// Direct3D 11.0
@@ -710,23 +712,23 @@ bitflags! {
 bitflags! {
     pub struct BufferComputeFormatFlags : u16 {
         /// 1 8-bit value
-        const F_8_X_1 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_F8X1 as _;
+        const 8_X_1 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT__8X1 as _;
         /// 2 8-bit values
-        const F_8_X_2 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_F8X2 as _;
+        const 8_X_2 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT__8X2 as _;
         /// 4 8-bit values
-        const F_8_X_4 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_F8X4 as _;
+        const 8_X_4 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT__8X4 as _;
         /// 1 16-bit value
-        const F_16_X_1 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_F16X1 as _;
+        const 16_X_1 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT__16X1 as _;
         /// 2 16-bit values
-        const F_16_X_2 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_F16X2 as _;
+        const 16_X_2 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT__16X2 as _;
         /// 4 16-bit values
-        const F_16_X_4 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_F16X4 as _;
+        const 16_X_4 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT__16X4 as _;
         /// 1 32-bit value
-        const F_32_X_1 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_F32X1 as _;
+        const 32_X_1 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT__32X1 as _;
         /// 2 32-bit values
-        const F_32_X_2 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_F32X2 as _;
+        const 32_X_2 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT__32X2 as _;
         /// 4 32-bit values
-        const F_32_X_4 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_F32X4 as _;
+        const 32_X_4 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT__32X4 as _;
     }
 }
 
@@ -1681,11 +1683,11 @@ pub struct Init {
     pub limits: Limits,
     /// Provide application specific callback interface.
     /// See: `bgfx::CallbackI`
-    pub callback: *const c_void,
+    pub callback: *const CallbackI,
     /// Custom allocator. When a custom allocator is not
     /// specified, bgfx uses the CRT allocator. Bgfx assumes
     /// custom allocator is thread safe.
-    pub allocator: *const c_void,
+    pub allocator: *const bx::AllocatorI,
 }
 /// Transient index buffer.
 #[repr(C)]

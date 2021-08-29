@@ -20,6 +20,8 @@ pub enum Fatal {
 pub enum RendererType {
     /// No rendering.
     Noop,
+    /// AGC
+    Agc,
     /// Direct3D 9.0
     Direct3D9,
     /// Direct3D 11.0
@@ -2180,7 +2182,7 @@ impl FrameBuffer {
     /// * `depth_format`:
     /// Window back buffer depth format.
     pub fn create_frame_buffer_from_nwh(
-        nwh: &c_void,
+        nwh: *mut c_void,
         width: u16,
         height: u16,
         params: CreateFrameBufferFromNwhArgs,
@@ -4919,7 +4921,7 @@ pub fn create_frame_buffer_from_attachment(
 /// * `depth_format`:
 /// Window back buffer depth format.
 pub fn create_frame_buffer_from_nwh(
-    nwh: &c_void,
+    nwh: *mut c_void,
     width: u16,
     height: u16,
     params: CreateFrameBufferFromNwhArgs,

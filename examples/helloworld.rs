@@ -1,8 +1,7 @@
 use bgfx::*;
-use bgfx_rs as bgfx;
+use bgfx_rs::bgfx;
 use glfw::{Action, Context, Key, Window};
-use raw_window_handle::HasRawWindowHandle;
-use raw_window_handle::RawWindowHandle;
+use raw_window_handle::{HasRawWindowHandle, RawWindowHandle};
 
 const WIDTH: usize = 1280;
 const HEIGHT: usize = 720;
@@ -28,6 +27,16 @@ fn update_platform_handle(pd: &mut PlatformData, window: &Window) {
     }
 }
 
+#[cfg(target_os = "linux")]
+fn get_render_type() -> RendererType {
+    RendererType::OpenGL
+}
+
+#[cfg(not(target_os = "linux"))]
+fn get_render_type() -> RendererType {
+    RenderType::Count
+}
+
 fn main() {
     let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
 
@@ -50,7 +59,7 @@ fn main() {
 
     let mut init = Init::new();
 
-    init.type_r = RendererType::Count;
+    init.type_r = get_render_type();
     init.resolution.width = WIDTH as u32;
     init.resolution.height = HEIGHT as u32;
     init.resolution.reset = ResetFlags::VSYNC.bits();
