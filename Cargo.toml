@@ -19,7 +19,6 @@ maintenance = {status = "actively-developed"}
 
 [dependencies]
 bitflags = "1.2"
-# bgfx-sys = "0.1"
 bgfx-sys = "0.2"
 
 [dev-dependencies]
