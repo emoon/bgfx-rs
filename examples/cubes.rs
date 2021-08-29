@@ -74,6 +74,7 @@ fn load_shader_file(name: &str) -> std::io::Result<Vec<u8>> {
         RendererType::OpenGL => path.push("glsl"),
         RendererType::Metal => path.push("metal"),
         RendererType::OpenGLES => path.push("essl"),
+        RendererType::Vulkan => path.push("spirv"),
         e => panic!("Unsupported render type {:#?}", e),
     }
 
@@ -100,7 +101,8 @@ fn load_shader_program(vs: &str, ps: &str) -> std::io::Result<Program> {
 
 #[cfg(target_os = "linux")]
 fn get_render_type() -> RendererType {
-    RendererType::OpenGL
+    //RendererType::OpenGL
+    RendererType::Vulkan
 }
 
 #[cfg(not(target_os = "linux"))]
