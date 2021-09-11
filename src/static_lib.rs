@@ -1,6 +1,7 @@
 use core::ffi::c_void;
 use std::mem::MaybeUninit;
 
+use cfixed_string::CFixedString;
 /// Fatal error enum.
 #[repr(u32)]
 #[derive(Clone, Copy, PartialEq, Debug)]
@@ -2811,18 +2812,6 @@ impl Drop for Texture {
 }
 
 impl Uniform {
-    /// * `name`:
-    /// Uniform name in shader.
-    /// * `type_r`:
-    /// Type of uniform (See: `bgfx::UniformType`).
-    /// * `num`:
-    /// Number of elements in array.
-    pub fn create_uniform(name: &i8, type_r: UniformType, num: u16) -> Uniform {
-        unsafe {
-            let _ret = bgfx_sys::bgfx_create_uniform(name, type_r as _, num);
-            Uniform { handle: _ret }
-        }
-    }
     /// * `handle`:
     /// Handle to uniform object.
     /// * `info`:
@@ -4946,18 +4935,6 @@ pub fn get_texture(handle: &FrameBuffer, attachment: u8) -> Texture {
         Texture { handle: _ret }
     }
 }
-/// * `name`:
-/// Uniform name in shader.
-/// * `type_r`:
-/// Type of uniform (See: `bgfx::UniformType`).
-/// * `num`:
-/// Number of elements in array.
-pub fn create_uniform(name: &i8, type_r: UniformType, num: u16) -> Uniform {
-    unsafe {
-        let _ret = bgfx_sys::bgfx_create_uniform(name, type_r as _, num);
-        Uniform { handle: _ret }
-    }
-}
 /// * `handle`:
 /// Handle to uniform object.
 /// * `info`:
@@ -5764,7 +5741,7 @@ pub fn blit(
     }
 }
 
-type ViewId = u16;
+pub type ViewId = u16;
 
 /// Returns the number of uniforms and uniform handles used inside a shader.
 ///
@@ -5857,5 +5834,19 @@ pub fn set_transform(mtx: &[f32; 16], num: u16) -> u32 {
     unsafe {
         let _mtx = std::mem::transmute(mtx);
         bgfx_sys::bgfx_set_transform(_mtx, num)
+    }
+}
+
+/// * `name`:
+/// Uniform name in shader.
+/// * `type_r`:
+/// Type of uniform (See: `bgfx::UniformType`).
+/// * `num`:
+/// Number of elements in array.
+pub fn create_uniform(name: &str, type_r: UniformType, num: u16) -> Uniform {
+    unsafe {
+        let name_ = CFixedString::from_str(name);
+        let _ret = bgfx_sys::bgfx_create_uniform(name_.as_ptr() as _, type_r as _, num);
+        Uniform { handle: _ret }
     }
 }

@@ -6,6 +6,7 @@ pub fn set_interface(face: *const bgfx_sys::bgfx_interface_vtbl_t) {
 g_vtbl = face;
 }
 
+use cfixed_string::CFixedString;
 /// Fatal error enum.
 #[repr(u32)]
 #[derive(Clone, Copy, PartialEq, Debug)]
@@ -712,23 +713,23 @@ bitflags! {
 bitflags! {
     pub struct BufferComputeFormatFlags : u16 {
         /// 1 8-bit value
-        const 8_X_1 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT__8X1 as _;
+        const F_8_X_1 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_F8X1 as _;
         /// 2 8-bit values
-        const 8_X_2 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT__8X2 as _;
+        const F_8_X_2 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_F8X2 as _;
         /// 4 8-bit values
-        const 8_X_4 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT__8X4 as _;
+        const F_8_X_4 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_F8X4 as _;
         /// 1 16-bit value
-        const 16_X_1 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT__16X1 as _;
+        const F_16_X_1 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_F16X1 as _;
         /// 2 16-bit values
-        const 16_X_2 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT__16X2 as _;
+        const F_16_X_2 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_F16X2 as _;
         /// 4 16-bit values
-        const 16_X_4 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT__16X4 as _;
+        const F_16_X_4 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_F16X4 as _;
         /// 1 32-bit value
-        const 32_X_1 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT__32X1 as _;
+        const F_32_X_1 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_F32X1 as _;
         /// 2 32-bit values
-        const 32_X_2 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT__32X2 as _;
+        const F_32_X_2 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_F32X2 as _;
         /// 4 32-bit values
-        const 32_X_4 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT__32X4 as _;
+        const F_32_X_4 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_F32X4 as _;
     }
 }
 
@@ -2816,18 +2817,6 @@ impl Drop for Texture {
 }
 
 impl Uniform {
-    /// * `name`:
-    /// Uniform name in shader.
-    /// * `type_r`:
-    /// Type of uniform (See: `bgfx::UniformType`).
-    /// * `num`:
-    /// Number of elements in array.
-    pub fn create_uniform(name: &i8, type_r: UniformType, num: u16) -> Uniform {
-        unsafe {
-            let _ret = (*g_vtbl.bgfx_create_uniform).unwrap()(name, type_r as _, num);
-            Uniform { handle: _ret }
-        }
-    }
     /// * `handle`:
     /// Handle to uniform object.
     /// * `info`:
@@ -4951,18 +4940,6 @@ pub fn get_texture(handle: &FrameBuffer, attachment: u8) -> Texture {
         Texture { handle: _ret }
     }
 }
-/// * `name`:
-/// Uniform name in shader.
-/// * `type_r`:
-/// Type of uniform (See: `bgfx::UniformType`).
-/// * `num`:
-/// Number of elements in array.
-pub fn create_uniform(name: &i8, type_r: UniformType, num: u16) -> Uniform {
-    unsafe {
-        let _ret = (*g_vtbl.bgfx_create_uniform).unwrap()(name, type_r as _, num);
-        Uniform { handle: _ret }
-    }
-}
 /// * `handle`:
 /// Handle to uniform object.
 /// * `info`:
@@ -5769,7 +5746,7 @@ pub fn blit(
     }
 }
 
-type ViewId = u16;
+pub type ViewId = u16;
 
 /// Returns the number of uniforms and uniform handles used inside a shader.
 ///
@@ -5862,5 +5839,21 @@ pub fn set_transform(mtx: &[f32; 16], num: u16) -> u32 {
     unsafe {
         let _mtx = std::mem::transmute(mtx);
         (*g_vtbl.bgfx_set_transform).unwrap()(_mtx, num)
+    }
+}
+
+impl Uniform {
+    /// * `name`:
+    /// Uniform name in shader.
+    /// * `type_r`:
+    /// Type of uniform (See: `bgfx::UniformType`).
+    /// * `num`:
+    /// Number of elements in array.
+    pub fn create_uniform(name: &str, type_r: UniformType, num: u16) -> Uniform {
+        unsafe {
+            let name_ = CFixedString::from_str(name);
+            let _ret = (*g_vtbl.bgfx_create_uniform).unwrap()(name_ as _, type_r as _, num);
+            Uniform { handle: _ret }
+        }
     }
 }
