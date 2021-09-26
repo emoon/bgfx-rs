@@ -18,7 +18,7 @@ exclude = [
 maintenance = {status = "actively-developed"}
 
 [dependencies]
-bgfx-sys = "0.2"
+bgfx-sys = "0.3"
 bitflags = "1.2"
 cfixed-string = "1.0"
 
