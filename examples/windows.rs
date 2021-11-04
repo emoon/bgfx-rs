@@ -6,6 +6,7 @@ use raw_window_handle::{HasRawWindowHandle, RawWindowHandle};
 
 fn get_platform_data(window: &Window) -> PlatformData {
     let mut pd = PlatformData::new();
+
     match window.raw_window_handle() {
         #[cfg(any(
             target_os = "linux",
@@ -15,7 +16,6 @@ fn get_platform_data(window: &Window) -> PlatformData {
             target_os = "openbsd"
         ))]
         RawWindowHandle::Xlib(data) => {
-            println!("X11");
             pd.nwh = data.window as *mut c_void;
             pd.ndt = data.display as *mut c_void;
         }
@@ -27,18 +27,17 @@ fn get_platform_data(window: &Window) -> PlatformData {
             target_os = "openbsd"
         ))]
         RawWindowHandle::Wayland(data) => {
-            println!("Wayland");
             pd.ndt = data.surface; // same as window, on wayland there ins't a concept of windows
-            pd.nwh = data.display; // same as window, on wayland there ins't a concept of windows
+            pd.nwh = data.display;
         }
 
         #[cfg(target_os = "macos")]
         RawWindowHandle::MacOS(data) => {
-            return data.window;
+            pd.nwh = data.ns_window;
         }
         #[cfg(target_os = "windows")]
         RawWindowHandle::Windows(data) => {
-            pd.nwh = data.window;
+            pd.nwh = data.hwnd;
         }
         _ => panic!("Unsupported Window Manager"),
     }
@@ -54,10 +53,8 @@ fn get_render_type() -> RendererType {
 }
 
 fn main() {
-    println!("GLFW");
     let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).expect("Error initializing library");
 
-    println!("Hello");
     let (mut window, events) = glfw
         .create_window(1080 as _, 900 as _, "Window 1", glfw::WindowMode::Windowed)
         .expect("Failed to create GLFW window.");
@@ -65,7 +62,6 @@ fn main() {
     let (mut window2, events2) = glfw
         .create_window(1080 as _, 900 as _, "Window 2", glfw::WindowMode::Windowed)
         .expect("Failed to create GLFW window.");
-    println!("0");
 
     window.set_pos(200, 200);
     window.set_size_polling(true);
@@ -77,26 +73,17 @@ fn main() {
 
     window.set_key_polling(true);
     window2.set_key_polling(true);
-    // window2.set_key_polling(true);
-    let mut init = Init::new();
 
+    let mut init = Init::new();
     init.type_r = get_render_type();
     init.resolution.height = 0;
     init.resolution.width = 0;
-    init.resolution.reset = ResetFlags::VSYNC.bits();
+    init.resolution.reset = ResetFlags::NONE.bits(); // this makes the window recreation smoth
     init.platform_data = get_platform_data(&window);
 
-    println!("Got platform data");
-
-    let before = std::time::SystemTime::now();
     if !bgfx::init(&init) {
         panic!("failed to init bgfx");
     }
-    let after = std::time::SystemTime::now();
-    println!(
-        "Initialized library in {:?} seconds",
-        after.duration_since(before).unwrap()
-    );
 
     let mut framebuffer = bgfx::create_frame_buffer_from_nwh(
         get_platform_data(&window).nwh as *mut c_void,
@@ -111,7 +98,6 @@ fn main() {
         window2.get_size().1 as u16,
         CreateFrameBufferFromNwhArgs::default(),
     );
-    println!("2");
 
     let windows = [window, window2];
 
@@ -120,7 +106,6 @@ fn main() {
         glfw.poll_events();
         // first window
         for (_, event) in glfw::flush_messages(&events) {
-            println!("{:?}", event);
             if let glfw::WindowEvent::Key(Key::Escape, _, Action::Press, _) = event {
                 should_close = true;
             }
@@ -163,8 +148,7 @@ fn main() {
 
             if id == 0 {
                 bgfx::set_view_frame_buffer(id, &framebuffer);
-            }
-            else {
+            } else {
                 bgfx::set_view_frame_buffer(id, &framebuffer2);
             }
             let size = window.get_framebuffer_size();
@@ -188,8 +172,7 @@ fn main() {
         bgfx::frame(false);
     }
 
-    println!("Before exit");
+    drop(framebuffer);
+    drop(framebuffer2);
     bgfx::shutdown();
-    // unsafe{ glfwTerminate() };
-    println!("after exit");
 }
