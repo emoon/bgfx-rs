@@ -59,7 +59,7 @@ fn main() {
         .create_window(1080 as _, 900 as _, "Window 1", glfw::WindowMode::Windowed)
         .expect("Failed to create GLFW window.");
 
-    let (mut window2, events2) = glfw
+    let (mut window2, _events2) = glfw
         .create_window(1080 as _, 900 as _, "Window 2", glfw::WindowMode::Windowed)
         .expect("Failed to create GLFW window.");
 
@@ -85,78 +85,45 @@ fn main() {
         panic!("failed to init bgfx");
     }
 
-    let mut framebuffer = bgfx::create_frame_buffer_from_nwh(
-        get_platform_data(&window).nwh as *mut c_void,
-        window.get_size().0 as u16,
-        window.get_size().1 as u16,
-        CreateFrameBufferFromNwhArgs::default(),
-    );
-
-    let mut framebuffer2 = bgfx::create_frame_buffer_from_nwh(
-        get_platform_data(&window2).nwh as *mut c_void,
-        window2.get_size().0 as u16,
-        window2.get_size().1 as u16,
-        CreateFrameBufferFromNwhArgs::default(),
-    );
+    {
 
     let windows = [window, window2];
+    let mut framebuffers = [None, None];
+    let mut frame_sizes = [(0, 0), (0, 0)];
 
     let mut should_close = false;
     while !should_close {
         glfw.poll_events();
-        // first window
         for (_, event) in glfw::flush_messages(&events) {
             if let glfw::WindowEvent::Key(Key::Escape, _, Action::Press, _) = event {
                 should_close = true;
             }
-
-            if let WindowEvent::Size(_, _) = event {
-                let window = &windows[0];
-
-                framebuffer = bgfx::create_frame_buffer_from_nwh(
-                    get_platform_data(&window).nwh as *mut c_void,
-                    window.get_size().0 as u16,
-                    window.get_size().1 as u16,
-                    CreateFrameBufferFromNwhArgs::default(),
-                );
-            }
         }
 
-        // second window
-        for (_, event) in glfw::flush_messages(&events2) {
-            if let glfw::WindowEvent::Key(Key::Escape, _, Action::Press, _) = event {
-                should_close = true;
-            }
-
-            if let WindowEvent::Size(width, height) = event {
-                let window = &windows[1];
-
-                framebuffer2 = bgfx::create_frame_buffer_from_nwh(
-                    get_platform_data(&window).nwh as *mut c_void,
-                    width as u16,
-                    height as u16,
-                    CreateFrameBufferFromNwhArgs::default(),
-                );
-            }
-        }
-
-        let mut idx = 0;
-
-        for window in windows.iter() {
-            let id: u16 = idx;
-            let color = if idx & 1 == 0 { 0x103030ff } else { 0x755413ff };
-
-            if id == 0 {
-                bgfx::set_view_frame_buffer(id, &framebuffer);
-            } else {
-                bgfx::set_view_frame_buffer(id, &framebuffer2);
-            }
+        for idx in 0..2 {
+            let window = &windows[idx];
             let size = window.get_framebuffer_size();
 
-            // bgfx::reset(size.0 as _, size.1 as _, ResetArgs::default());
-            bgfx::set_view_rect(id, 0, 0, size.0 as _, size.1 as _);
+            if framebuffers[idx].is_none() && frame_sizes[idx] != size {
+                framebuffers[idx] = Some(bgfx::create_frame_buffer_from_nwh(
+                    get_platform_data(&window).nwh as *mut c_void,
+                    size.0 as u16,
+                    size.1 as u16,
+                    CreateFrameBufferFromNwhArgs::default(),
+                ));
+
+                frame_sizes[idx] = size;
+            }
+
+            if let Some(frame_buffer) = &framebuffers[idx] {
+                bgfx::set_view_frame_buffer(idx as _, &frame_buffer);
+            }
+
+            let color = if idx & 1 == 0 { 0x103030ff } else { 0x755413ff };
+
+            bgfx::set_view_rect(idx as _, 0, 0, size.0 as _, size.1 as _);
             bgfx::set_view_clear(
-                id,
+                idx as _,
                 ClearFlags::COLOR.bits() | ClearFlags::DEPTH.bits(),
                 SetViewClearArgs {
                     rgba: color,
@@ -165,14 +132,13 @@ fn main() {
                 },
             );
 
-            bgfx::touch(id);
-            idx += 1;
+            bgfx::touch(idx as _);
         }
 
         bgfx::frame(false);
     }
 
-    drop(framebuffer);
-    drop(framebuffer2);
+    }
+
     bgfx::shutdown();
 }
