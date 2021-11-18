@@ -2827,18 +2827,6 @@ impl Uniform {
             (*g_vtbl.bgfx_get_uniform_info).unwrap()(self.handle, _info);
         }
     }
-    /// * `handle`:
-    /// Uniform.
-    /// * `value`:
-    /// Pointer to uniform data.
-    /// * `num`:
-    /// Number of elements. Passing `UINT16_MAX` will
-    /// use the _num passed on uniform creation.
-    pub fn set_uniform(&self, value: &c_void, num: u16) {
-        unsafe {
-            (*g_vtbl.bgfx_set_uniform).unwrap()(self.handle, value, num);
-        }
-    }
 }
 
 impl Drop for Uniform {
@@ -3277,19 +3265,6 @@ impl Encoder {
             let _transform = std::mem::transmute(transform);
             let _ret = (*g_vtbl.bgfx_encoder_alloc_transform).unwrap()(_self, _transform, num);
             _ret
-        }
-    }
-    /// * `handle`:
-    /// Uniform.
-    /// * `value`:
-    /// Pointer to uniform data.
-    /// * `num`:
-    /// Number of elements. Passing `UINT16_MAX` will
-    /// use the _num passed on uniform creation.
-    pub fn set_uniform(&self, handle: &Uniform, value: &c_void, num: u16) {
-        unsafe {
-            let _self = std::mem::transmute(self);
-            (*g_vtbl.bgfx_encoder_set_uniform).unwrap()(_self, handle.handle, value, num);
         }
     }
     /// * `handle`:
@@ -5217,18 +5192,6 @@ pub fn alloc_transform(transform: &mut Transform, num: u16) -> u32 {
     }
 }
 /// * `handle`:
-/// Uniform.
-/// * `value`:
-/// Pointer to uniform data.
-/// * `num`:
-/// Number of elements. Passing `UINT16_MAX` will
-/// use the _num passed on uniform creation.
-pub fn set_uniform(handle: &Uniform, value: &c_void, num: u16) {
-    unsafe {
-        (*g_vtbl.bgfx_set_uniform).unwrap()(handle.handle, value, num);
-    }
-}
-/// * `handle`:
 /// Index buffer.
 /// * `first_index`:
 /// First index to render.
@@ -5842,6 +5805,18 @@ pub fn set_transform(mtx: &[f32; 16], num: u16) -> u32 {
     }
 }
 
+impl Encoder {
+    /// * `handle`: Uniform.
+    /// * `value`: Pointer to uniform data.
+    /// * `num`: Number of elements. Passing `u16::MAX` will use the _num passed on uniform creation.
+    pub fn set_uniform(&self, handle: &Uniform, value: &[f32], num: u16) {
+        unsafe {
+            let _self = std::mem::transmute(self);
+            (*g_vtbl.bgfx_encoder_set_uniform).unwrap()(_self, handle.handle, value.as_ptr() as _, num);
+        }
+    }
+}
+
 impl Uniform {
     /// * `name`:
     /// Uniform name in shader.
@@ -5855,5 +5830,23 @@ impl Uniform {
             let _ret = (*g_vtbl.bgfx_create_uniform).unwrap()(name_ as _, type_r as _, num);
             Uniform { handle: _ret }
         }
+    }
+
+    /// * `handle`: Uniform.
+    /// * `value`: Pointer to uniform data.
+    /// * `num`: Number of elements. Passing `u16::MAX` will use the _num passed on uniform creation.
+    pub fn set_uniform(&self, value: &[f32], num: u16) {
+        unsafe {
+            (*g_vtbl.bgfx_set_uniform).unwrap()(self.handle, value.as_ptr() as _, num);
+        }
+    }
+}
+
+/// * `handle`: Uniform.
+/// * `value`: Pointer to uniform data.
+/// * `num`: Number of elements. Passing `u16::MAX` will use the _num passed on uniform creation.
+pub fn set_uniform(handle: &Uniform, value: &[f32], num: u16) {
+    unsafe {
+        (*g_vtbl.bgfx_set_uniform).unwrap()(handle.handle, value.as_ptr() as _, num);
     }
 }

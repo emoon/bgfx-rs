@@ -2190,7 +2190,7 @@ impl FrameBuffer {
     ) -> FrameBuffer {
         unsafe {
             let _ret = bgfx_sys::bgfx_create_frame_buffer_from_nwh(
-                nwh,
+                nwh as _,
                 width,
                 height,
                 params.format as _,
@@ -2822,18 +2822,6 @@ impl Uniform {
             bgfx_sys::bgfx_get_uniform_info(self.handle, _info);
         }
     }
-    /// * `handle`:
-    /// Uniform.
-    /// * `value`:
-    /// Pointer to uniform data.
-    /// * `num`:
-    /// Number of elements. Passing `UINT16_MAX` will
-    /// use the _num passed on uniform creation.
-    pub fn set_uniform(&self, value: &c_void, num: u16) {
-        unsafe {
-            bgfx_sys::bgfx_set_uniform(self.handle, value, num);
-        }
-    }
 }
 
 impl Drop for Uniform {
@@ -3272,19 +3260,6 @@ impl Encoder {
             let _transform = std::mem::transmute(transform);
             let _ret = bgfx_sys::bgfx_encoder_alloc_transform(_self, _transform, num);
             _ret
-        }
-    }
-    /// * `handle`:
-    /// Uniform.
-    /// * `value`:
-    /// Pointer to uniform data.
-    /// * `num`:
-    /// Number of elements. Passing `UINT16_MAX` will
-    /// use the _num passed on uniform creation.
-    pub fn set_uniform(&self, handle: &Uniform, value: &c_void, num: u16) {
-        unsafe {
-            let _self = std::mem::transmute(self);
-            bgfx_sys::bgfx_encoder_set_uniform(_self, handle.handle, value, num);
         }
     }
     /// * `handle`:
@@ -5212,18 +5187,6 @@ pub fn alloc_transform(transform: &mut Transform, num: u16) -> u32 {
     }
 }
 /// * `handle`:
-/// Uniform.
-/// * `value`:
-/// Pointer to uniform data.
-/// * `num`:
-/// Number of elements. Passing `UINT16_MAX` will
-/// use the _num passed on uniform creation.
-pub fn set_uniform(handle: &Uniform, value: &c_void, num: u16) {
-    unsafe {
-        bgfx_sys::bgfx_set_uniform(handle.handle, value, num);
-    }
-}
-/// * `handle`:
 /// Index buffer.
 /// * `first_index`:
 /// First index to render.
@@ -5837,16 +5800,48 @@ pub fn set_transform(mtx: &[f32; 16], num: u16) -> u32 {
     }
 }
 
-/// * `name`:
-/// Uniform name in shader.
-/// * `type_r`:
-/// Type of uniform (See: `bgfx::UniformType`).
-/// * `num`:
-/// Number of elements in array.
-pub fn create_uniform(name: &str, type_r: UniformType, num: u16) -> Uniform {
+impl Encoder {
+    /// * `handle`: Uniform.
+    /// * `value`: Pointer to uniform data.
+    /// * `num`: Number of elements. Passing `u16::MAX` will use the _num passed on uniform creation.
+    pub fn set_uniform(&self, handle: &Uniform, value: &[f32], num: u16) {
+        unsafe {
+            let _self = std::mem::transmute(self);
+            bgfx_sys::bgfx_encoder_set_uniform(_self, handle.handle, value.as_ptr() as _, num);
+        }
+    }
+}
+
+impl Uniform {
+    /// * `name`:
+    /// Uniform name in shader.
+    /// * `type_r`:
+    /// Type of uniform (See: `bgfx::UniformType`).
+    /// * `num`:
+    /// Number of elements in array.
+    pub fn create(name: &str, type_r: UniformType, num: u16) -> Uniform {
+        unsafe {
+            let name_ = CFixedString::from_str(name);
+            let _ret = bgfx_sys::bgfx_create_uniform(name_.as_ptr() as _, type_r as _, num);
+            Uniform { handle: _ret }
+        }
+    }
+
+    /// * `handle`: Uniform.
+    /// * `value`: uniform data.
+    /// * `num`: Number of elements. Passing `u16::MAX` will use the num passed on uniform creation.
+    pub fn set(&self, value: &[f32], num: u16) {
+        unsafe {
+            bgfx_sys::bgfx_set_uniform(self.handle, value.as_ptr() as _, num);
+        }
+    }
+}
+
+/// * `handle`: Uniform.
+/// * `value`: Pointer to uniform data.
+/// * `num`: Number of elements. Passing `u16::MAX` will use the _num passed on uniform creation.
+pub fn set_uniform(handle: &Uniform, value: &[f32], num: u16) {
     unsafe {
-        let name_ = CFixedString::from_str(name);
-        let _ret = bgfx_sys::bgfx_create_uniform(name_.as_ptr() as _, type_r as _, num);
-        Uniform { handle: _ret }
+        bgfx_sys::bgfx_set_uniform(handle.handle, value.as_ptr() as _, num);
     }
 }
