@@ -34,7 +34,7 @@ fn get_render_type() -> RendererType {
 
 #[cfg(not(target_os = "linux"))]
 fn get_render_type() -> RendererType {
-    RenderType::Count
+    RendererType::Count
 }
 
 fn main() {

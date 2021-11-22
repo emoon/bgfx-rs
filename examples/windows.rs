@@ -49,7 +49,7 @@ fn get_render_type() -> RendererType {
     #[cfg(any(target_os = "linux", target_os = "windows"))]
     return RendererType::Vulkan;
     #[cfg(target_os = "macos")]
-    return RenderType::Metal;
+    return RendererType::Metal;
 }
 
 fn main() {
