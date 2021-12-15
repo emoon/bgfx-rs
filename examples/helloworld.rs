@@ -39,6 +39,7 @@ fn get_render_type() -> RendererType {
 
 fn main() {
     let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
+    glfw.window_hint(glfw::WindowHint::ClientApi(glfw::ClientApiHint::NoApi));
 
     let (mut window, events) = glfw
         .create_window(
@@ -50,7 +51,6 @@ fn main() {
         .expect("Failed to create GLFW window.");
 
     window.set_key_polling(true);
-    window.make_current();
 
     let mut pd = bgfx::PlatformData::new();
     update_platform_handle(&mut pd, &window);

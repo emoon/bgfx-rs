@@ -54,6 +54,7 @@ fn get_render_type() -> RendererType {
 
 fn main() {
     let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).expect("Error initializing library");
+    glfw.window_hint(glfw::WindowHint::ClientApi(glfw::ClientApiHint::NoApi));
 
     let (mut window, events) = glfw
         .create_window(1080 as _, 900 as _, "Window 1", glfw::WindowMode::Windowed)
@@ -78,7 +79,7 @@ fn main() {
     init.type_r = get_render_type();
     init.resolution.height = 0;
     init.resolution.width = 0;
-    init.resolution.reset = ResetFlags::NONE.bits(); // this makes the window recreation smoth
+    init.resolution.reset = ResetFlags::VSYNC.bits(); // this makes the window recreation smoth
     init.platform_data = get_platform_data(&window);
 
     if !bgfx::init(&init) {
