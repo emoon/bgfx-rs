@@ -105,7 +105,7 @@ fn main() {
             let window = &windows[idx];
             let size = window.get_framebuffer_size();
 
-            if framebuffers[idx].is_none() && frame_sizes[idx] != size {
+            if framebuffers[idx].is_none() || frame_sizes[idx] != size {
                 framebuffers[idx] = Some(bgfx::create_frame_buffer_from_nwh(
                     get_platform_data(&window).nwh as *mut c_void,
                     size.0 as u16,
