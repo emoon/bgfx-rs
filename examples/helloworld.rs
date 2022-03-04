@@ -1,6 +1,6 @@
 use bgfx::*;
 use bgfx_rs::bgfx;
-use glfw::{Action, Context, Key, Window};
+use glfw::{Action, Key, Window};
 use raw_window_handle::{HasRawWindowHandle, RawWindowHandle};
 
 const WIDTH: usize = 1280;
