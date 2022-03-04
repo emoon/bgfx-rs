@@ -18,8 +18,8 @@ fn get_platform_data(window: &Window) -> PlatformData {
             target_os = "openbsd"
         ))]
         RawWindowHandle::Xlib(data) => {
-            pd.nwh = data.window as *mut c_void;
-            pd.ndt = data.display as *mut c_void;
+            pd.nwh = data.window as *mut _;
+            pd.ndt = data.display as *mut _;
         }
         #[cfg(any(
             target_os = "linux",
