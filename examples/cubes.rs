@@ -1,7 +1,7 @@
 use bgfx::*;
 use bgfx_rs::bgfx;
 use glam::{EulerRot, Mat4, Vec3};
-use glfw::{Action, Context, Key, Window};
+use glfw::{Action, Key, Window};
 use raw_window_handle::{HasRawWindowHandle, RawWindowHandle};
 use std::{path::PathBuf, time::Instant};
 
@@ -44,25 +44,45 @@ static CUBE_INDICES: [u16; 36] = [
     6, 3, 7,
 ];
 
-#[cfg(target_os = "linux")]
-fn update_platform_handle(pd: &mut PlatformData, window: &Window) {
-    match window.raw_window_handle() {
-        RawWindowHandle::Xlib(x_data) => {
-            pd.ndt = x_data.display;
-            pd.nwh = x_data.window as *mut core::ffi::c_void;
-        }
-        _ => panic!("Unsupported window type"),
-    }
-}
+fn get_platform_data(window: &Window) -> PlatformData {
+    let mut pd = PlatformData::new();
 
-#[cfg(target_os = "windows")]
-fn update_platform_handle(pd: &mut PlatformData, window: &Window) {
     match window.raw_window_handle() {
-        RawWindowHandle::Windows(data) => {
-            pd.nwh = data.hwnd as *mut core::ffi::c_void;
+        #[cfg(any(
+            target_os = "linux",
+            target_os = "dragonfly",
+            target_os = "freebsd",
+            target_os = "netbsd",
+            target_os = "openbsd"
+        ))]
+        RawWindowHandle::Xlib(data) => {
+            pd.nwh = data.window as *mut c_void;
+            pd.ndt = data.display as *mut c_void;
         }
-        _ => panic!("Unsupported window type"),
+        #[cfg(any(
+            target_os = "linux",
+            target_os = "dragonfly",
+            target_os = "freebsd",
+            target_os = "netbsd",
+            target_os = "openbsd"
+        ))]
+        RawWindowHandle::Wayland(data) => {
+            pd.ndt = data.surface; // same as window, on wayland there ins't a concept of windows
+            pd.nwh = data.display;
+        }
+
+        #[cfg(target_os = "macos")]
+        RawWindowHandle::MacOS(data) => {
+            pd.nwh = data.ns_window;
+        }
+        #[cfg(target_os = "windows")]
+        RawWindowHandle::Windows(data) => {
+            pd.nwh = data.hwnd;
+        }
+        _ => panic!("Unsupported Window Manager"),
     }
+
+    return pd;
 }
 
 fn load_shader_file(name: &str) -> std::io::Result<Vec<u8>> {
@@ -101,7 +121,6 @@ fn load_shader_program(vs: &str, ps: &str) -> std::io::Result<Program> {
 
 #[cfg(target_os = "linux")]
 fn get_render_type() -> RendererType {
-    //RendererType::OpenGL
     RendererType::Vulkan
 }
 
@@ -125,19 +144,13 @@ fn main() -> std::io::Result<()> {
 
     window.set_key_polling(true);
 
-    let mut pd = bgfx::PlatformData::new();
-    update_platform_handle(&mut pd, &window);
-
-    bgfx::set_platform_data(&pd);
-
-    // TODO: run ctor inside new
     let mut init = Init::new();
 
     init.type_r = get_render_type();
     init.resolution.width = WIDTH as u32;
     init.resolution.height = HEIGHT as u32;
     init.resolution.reset = ResetFlags::VSYNC.bits();
-    init.platform_data = pd;
+    init.platform_data = get_platform_data(&window);
 
     if !bgfx::init(&init) {
         panic!("failed to init bgfx");
