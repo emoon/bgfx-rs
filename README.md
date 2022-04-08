@@ -17,7 +17,7 @@ Usage
 ```toml
 # Cargo.toml
 [dependencies]
-bgfx-rs = "0.8"
+bgfx-rs = "0.9"
 ```
 
 The library doesn't include any window handling and that has to be provided by the user. See [examples](https://github.com/emoon/bgfx-rs/tree/main/examples) an how to use [GLFW](https://crates.io/crates/glfw)

@@ -2,6 +2,10 @@
 
 This project follows semantic versioning.
 
+### v0.9 (2022-04-08)
+
+- [fixed] Fixed a crash when using dynamic vertex buffers
+
 ### v0.3 (2021-09-11)
 
 - [changed] Made ViewId public
