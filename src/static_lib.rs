@@ -1695,7 +1695,7 @@ pub struct TransientIndexBuffer {
     /// First index.
     pub start_index: u32,
     /// Index buffer handle.
-    pub handle: IndexBuffer,
+    pub handle: u16,
     /// Index buffer format is 16-bits if true, otherwise it is 32-bit.
     pub is_index_16: bool,
 }
@@ -1711,9 +1711,9 @@ pub struct TransientVertexBuffer {
     /// Vertex stride.
     pub stride: u16,
     /// Vertex buffer handle.
-    pub handle: VertexBuffer,
+    pub handle: u16,
     /// Vertex layout handle.
-    pub layout_handle: VertexLayout,
+    pub layout_handle: u16,
 }
 /// Instance data buffer info.
 #[repr(C)]
@@ -1729,7 +1729,7 @@ pub struct InstanceDataBuffer {
     /// Vertex buffer stride.
     pub stride: u16,
     /// Vertex buffer object handle.
-    pub handle: VertexBuffer,
+    pub handle: u16,
 }
 /// Texture info.
 #[repr(C)]
