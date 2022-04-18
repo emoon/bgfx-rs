@@ -2227,7 +2227,7 @@ impl FrameBuffer {
     /// Will be passed to `bgfx::CallbackI::screenShot` callback.
     pub fn request_screen_shot(&self, file_path: &i8) {
         unsafe {
-            bgfx_sys::bgfx_request_screen_shot(self.handle, file_path);
+            bgfx_sys::bgfx_request_screen_shot(self.handle, file_path as *const i8 as *const ::std::os::raw::c_char);
         }
     }
 }
@@ -3184,7 +3184,7 @@ impl Encoder {
     pub fn set_marker(&self, marker: &i8) {
         unsafe {
             let _self = std::mem::transmute(self);
-            bgfx_sys::bgfx_encoder_set_marker(_self, marker);
+            bgfx_sys::bgfx_encoder_set_marker(_self, marker as *const i8 as *const ::std::os::raw::c_char);
         }
     }
     /// * `state`:
@@ -5085,7 +5085,7 @@ pub fn encoder_end(encoder: &Encoder) {
 /// Will be passed to `bgfx::CallbackI::screenShot` callback.
 pub fn request_screen_shot(handle: &FrameBuffer, file_path: &i8) {
     unsafe {
-        bgfx_sys::bgfx_request_screen_shot(handle.handle, file_path);
+        bgfx_sys::bgfx_request_screen_shot(handle.handle, file_path as *const i8 as *const ::std::os::raw::c_char);
     }
 }
 /// * `msecs`:
@@ -5114,7 +5114,7 @@ pub fn get_internal_data() -> &'static InternalData {
 /// Marker string.
 pub fn set_marker(marker: &i8) {
     unsafe {
-        bgfx_sys::bgfx_set_marker(marker);
+        bgfx_sys::bgfx_set_marker(marker as *const i8 as *const ::std::os::raw::c_char);
     }
 }
 /// * `state`:
