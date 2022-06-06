@@ -1568,7 +1568,7 @@ pub struct Caps {
     /// Enumerated GPUs.
     pub gpu: [GPU; 4usize],
     /// Renderer runtime limits.
-    pub limits: Limits,
+    pub limits: CapsLimits,
     /// Supported texture format capabilities flags:
     ///   - [CapsFormatFlags::TEXTURE_NONE] - Texture format is not supported.
     ///   - [CapsFormatFlags::TEXTURE_2D] - Texture format is supported.
