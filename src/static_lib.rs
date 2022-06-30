@@ -441,8 +441,7 @@ bitflags! {
 }
 
 bitflags! {
-/// Use BGFX_STATE_BLEND_FUNC(_src, _dst) or BGFX_STATE_BLEND_FUNC_SEPARATE(_srcRGB, _dstRGB, _srcA, _dstA)
-/// helper macros.
+/// Use [state_blend_func] or [state_blend_func_separate] functions
     pub struct StateBlendFlags : u64 {
         /// 0, 0, 0, 0
         const ZERO = bgfx_sys::BGFX_STATE_BLEND_ZERO as _;
@@ -474,8 +473,7 @@ bitflags! {
 }
 
 bitflags! {
-/// Use BGFX_STATE_BLEND_EQUATION(_equation) or BGFX_STATE_BLEND_EQUATION_SEPARATE(_equationRGB, _equationA)
-/// helper macros.
+/// use [state_blend_equation] or [state_blend_equation_separate] helper functions
     pub struct StateBlendEquationFlags : u64 {
         /// Blend add: src + dst.
         const ADD = bgfx_sys::BGFX_STATE_BLEND_EQUATION_ADD as _;
@@ -2227,7 +2225,10 @@ impl FrameBuffer {
     /// Will be passed to `bgfx::CallbackI::screenShot` callback.
     pub fn request_screen_shot(&self, file_path: &i8) {
         unsafe {
-            bgfx_sys::bgfx_request_screen_shot(self.handle, file_path as *const i8 as *const ::std::os::raw::c_char);
+            bgfx_sys::bgfx_request_screen_shot(
+                self.handle,
+                file_path as *const i8 as *const ::std::os::raw::c_char,
+            );
         }
     }
 }
@@ -3184,14 +3185,17 @@ impl Encoder {
     pub fn set_marker(&self, marker: &i8) {
         unsafe {
             let _self = std::mem::transmute(self);
-            bgfx_sys::bgfx_encoder_set_marker(_self, marker as *const i8 as *const ::std::os::raw::c_char);
+            bgfx_sys::bgfx_encoder_set_marker(
+                _self,
+                marker as *const i8 as *const ::std::os::raw::c_char,
+            );
         }
     }
     /// * `state`:
     /// State flags. Default state for primitive type is
     ///   triangles. See: [StateFlags::DEFAULT].
     ///   - [StateDepthTestFlags] - Depth test function.
-    ///   - [StateBlendFlags] - See remark 1 about BGFX_STATE_BLEND_FUNC.
+    ///   - [StateBlendFlags] - See remark 1 about [state_blend_func].
     ///   - [StateBlendEquationFlags] - See remark 2.
     ///   - [StateCullFlags] - Backface culling mode.
     ///   - [StateWriteFlags] - Enable R, G, B, A or Z write.
@@ -5085,7 +5089,10 @@ pub fn encoder_end(encoder: &Encoder) {
 /// Will be passed to `bgfx::CallbackI::screenShot` callback.
 pub fn request_screen_shot(handle: &FrameBuffer, file_path: &i8) {
     unsafe {
-        bgfx_sys::bgfx_request_screen_shot(handle.handle, file_path as *const i8 as *const ::std::os::raw::c_char);
+        bgfx_sys::bgfx_request_screen_shot(
+            handle.handle,
+            file_path as *const i8 as *const ::std::os::raw::c_char,
+        );
     }
 }
 /// * `msecs`:
@@ -5121,7 +5128,7 @@ pub fn set_marker(marker: &i8) {
 /// State flags. Default state for primitive type is
 ///   triangles. See: [StateFlags::DEFAULT].
 ///   - [StateDepthTestFlags] - Depth test function.
-///   - [StateBlendFlags] - See remark 1 about BGFX_STATE_BLEND_FUNC.
+///   - [StateBlendFlags] - See remark 1 about .
 ///   - [StateBlendEquationFlags] - See remark 2.
 ///   - [StateCullFlags] - Backface culling mode.
 ///   - [StateWriteFlags] - Enable R, G, B, A or Z write.
@@ -5844,4 +5851,88 @@ pub fn set_uniform(handle: &Uniform, value: &[f32], num: u16) {
     unsafe {
         bgfx_sys::bgfx_set_uniform(handle.handle, value.as_ptr() as _, num);
     }
+}
+
+#[inline]
+/// Blend function separate.
+pub fn state_blend_func_separate(
+    src_rgb: StateBlendFlags,
+    dst_rgb: StateBlendFlags,
+    src_a: StateBlendFlags,
+    dst_a: StateBlendFlags,
+) -> u64 {
+    src_rgb.bits() | (dst_rgb.bits() << 4) | ((src_a.bits() | (dst_a.bits() << 4)) << 8)
+}
+
+#[inline]
+/// Blend equation separate.
+pub fn state_blend_equation_separate(
+    equation_rgb: StateBlendEquationFlags,
+    equation_a: StateBlendEquationFlags,
+) -> u64 {
+    equation_rgb.bits() | (equation_a.bits() << 3)
+}
+
+/// Blend function.
+#[inline]
+pub fn state_blend_func(src: StateBlendFlags, dst: StateBlendFlags) -> u64 {
+    state_blend_func_separate(src, dst, src, dst)
+}
+
+/// Blend equation.
+pub fn state_blend_equation(equation: StateBlendEquationFlags) -> u64 {
+    state_blend_equation_separate(equation, equation)
+}
+
+/// Utility predefined blend modes.
+
+/// Additive blending.
+#[inline]
+pub fn state_blend_add() -> u64 {
+    state_blend_func(StateBlendFlags::ONE, StateBlendFlags::ONE)
+}
+
+/// Alpha blend.
+#[inline]
+pub fn state_blend_alpha() -> u64 {
+    state_blend_func(StateBlendFlags::SRC_ALPHA, StateBlendFlags::INV_SRC_ALPHA)
+}
+
+/// Selects darker color of blend.
+#[inline]
+pub fn state_blend_darken() -> u64 {
+    state_blend_func(StateBlendFlags::ONE, StateBlendFlags::ONE)
+        | state_blend_equation(StateBlendEquationFlags::MIN)
+}
+
+/// Selects lighter color of blend.
+#[inline]
+pub fn state_blend_lighten() -> u64 {
+    state_blend_func(StateBlendFlags::ONE, StateBlendFlags::ONE)
+        | state_blend_equation(StateBlendEquationFlags::MAX)
+}
+
+/// Selects lighter color of blend.
+#[inline]
+pub fn state_blend_multiply() -> u64 {
+    state_blend_func(StateBlendFlags::DST_COLOR, StateBlendFlags::ZERO)
+}
+
+/// Opaque pixels will cover the pixels directly below them without any math or algorithm applied to them.
+#[inline]
+pub fn state_blend_normal() -> u64 {
+    state_blend_func(StateBlendFlags::ONE, StateBlendFlags::INV_SRC_ALPHA)
+}
+
+/// Multiplies the inverse of the blend and base colors.
+#[inline]
+pub fn state_blend_screen() -> u64 {
+    state_blend_func(StateBlendFlags::ONE, StateBlendFlags::INV_SRC_COLOR)
+}
+
+/// Decreases the brightness of the base color based on the value of the blend color.
+#[inline]
+pub fn state_blend_linear_burn() -> u64 {
+    state_blend_func(StateBlendFlags::DST_COLOR, StateBlendFlags::INV_DST_COLOR)
+        | state_blend_equation(StateBlendEquationFlags::SUB)
 }
