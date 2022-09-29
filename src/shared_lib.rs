@@ -2012,7 +2012,7 @@ impl DynamicVertexBuffer {
     ///       index buffers.
     pub fn create_dynamic_vertex_buffer(
         num: u32,
-        layout: &VertexLayoutBuilder,
+        layout: &BuiltVertexLayout,
         flags: u16,
     ) -> DynamicVertexBuffer {
         unsafe {
@@ -2040,7 +2040,7 @@ impl DynamicVertexBuffer {
     ///       index buffers.
     pub fn create_dynamic_vertex_buffer_mem(
         mem: &Memory,
-        layout: &VertexLayoutBuilder,
+        layout: &BuiltVertexLayout,
         flags: u16,
     ) -> DynamicVertexBuffer {
         unsafe {
@@ -2855,7 +2855,7 @@ impl VertexBuffer {
     ///  - [BufferFlags::INDEX32] - Buffer is using 32-bit indices. This flag has effect only on index buffers.
     pub fn create_vertex_buffer(
         mem: &Memory,
-        layout: &VertexLayoutBuilder,
+        layout: &BuiltVertexLayout,
         flags: u16,
     ) -> VertexBuffer {
         unsafe {
@@ -2906,7 +2906,7 @@ impl Drop for VertexBuffer {
 impl VertexLayout {
     /// * `layout`:
     /// Vertex layout.
-    pub fn create_vertex_layout(layout: &VertexLayoutBuilder) -> VertexLayout {
+    pub fn create_vertex_layout(layout: &BuiltVertexLayout) -> VertexLayout {
         unsafe {
             let _layout = std::mem::transmute(layout);
             let _ret = (*g_vtbl.bgfx_create_vertex_layout).unwrap()(_layout);
@@ -3106,22 +3106,21 @@ impl Stats {
     }
 }
 
+pub struct BuiltVertexLayout(VertexLayoutBuilder);
+
 impl VertexLayoutBuilder {
-    pub fn new() -> VertexLayoutBuilder {
+    /// * `renderer_type`:
+    /// Renderer backend type. See: `bgfx::RendererType`
+    pub fn begin(renderer_type: RendererType) -> VertexLayoutBuilder {
         let t = MaybeUninit::<VertexLayoutBuilder>::zeroed();
         let t = unsafe { t.assume_init() };
+        unsafe {
+            let _t = std::mem::transmute(&t);
+            let _ret = (*g_vtbl.bgfx_vertex_layout_begin).unwrap()(_t, renderer_type as _);
+        }
         t
     }
 
-    /// * `renderer_type`:
-    /// Renderer backend type. See: `bgfx::RendererType`
-    pub fn begin(&self, renderer_type: RendererType) -> &Self {
-        unsafe {
-            let _self = std::mem::transmute(self);
-            let _ret = (*g_vtbl.bgfx_vertex_layout_begin).unwrap()(_self, renderer_type as _);
-            self
-        }
-    }
     /// * `attrib`:
     /// Attribute semantics. See: `bgfx::Attrib`
     /// * `num`:
@@ -3137,9 +3136,9 @@ impl VertexLayoutBuilder {
     /// Packaging rule for vertexPack, vertexUnpack, and
     /// vertexConvert for AttribType::Uint8 and AttribType::Int16.
     /// Unpacking code must be implemented inside vertex shader.
-    pub fn add(&self, attrib: Attrib, num: u8, type_r: AttribType, params: AddArgs) -> &Self {
+    pub fn add(mut self, attrib: Attrib, num: u8, type_r: AttribType, params: AddArgs) -> Self {
         unsafe {
-            let _self = std::mem::transmute(self);
+            let _self = std::mem::transmute(&mut self);
             let _ret = bgfx_sys::bgfx_vertex_layout_add(
                 _self,
                 attrib as _,
@@ -3162,18 +3161,19 @@ impl VertexLayoutBuilder {
     }
     /// * `num`:
     /// Number of bytes to skip.
-    pub fn skip(&self, num: u8) -> &Self {
+    pub fn skip(mut self, num: u8) -> &Self {
         unsafe {
-            let _self = std::mem::transmute(self);
+            let _self = std::mem::transmute(&mut self);
             let _ret = (*g_vtbl.bgfx_vertex_layout_skip).unwrap()(_self, num);
             self
         }
     }
-    pub fn end(&self) {
+    pub fn end(mut self) {
         unsafe {
-            let _self = std::mem::transmute(self);
+            let _self = std::mem::transmute(&mut self);
             (*g_vtbl.bgfx_vertex_layout_end).unwrap()(_self);
         }
+        BuiltVertexLayout(self)
     }
 }
 
@@ -4072,7 +4072,7 @@ pub fn create_index_buffer(mem: &Memory, flags: u16) -> IndexBuffer {
 }
 /// * `layout`:
 /// Vertex layout.
-pub fn create_vertex_layout(layout: &VertexLayoutBuilder) -> VertexLayout {
+pub fn create_vertex_layout(layout: &BuiltVertexLayout) -> VertexLayout {
     unsafe {
         let _layout = std::mem::transmute(layout);
         let _ret = (*g_vtbl.bgfx_create_vertex_layout).unwrap()(_layout);
@@ -4096,7 +4096,7 @@ pub fn create_vertex_layout(layout: &VertexLayoutBuilder) -> VertexLayout {
 ///  - [BufferFlags::INDEX32] - Buffer is using 32-bit indices. This flag has effect only on index buffers.
 pub fn create_vertex_buffer(
     mem: &Memory,
-    layout: &VertexLayoutBuilder,
+    layout: &BuiltVertexLayout,
     flags: u16,
 ) -> VertexBuffer {
     unsafe {
@@ -4177,7 +4177,7 @@ pub fn update_dynamic_index_buffer(handle: &DynamicIndexBuffer, start_index: u32
 ///       index buffers.
 pub fn create_dynamic_vertex_buffer(
     num: u32,
-    layout: &VertexLayoutBuilder,
+    layout: &BuiltVertexLayout,
     flags: u16,
 ) -> DynamicVertexBuffer {
     unsafe {
@@ -4205,7 +4205,7 @@ pub fn create_dynamic_vertex_buffer(
 ///       index buffers.
 pub fn create_dynamic_vertex_buffer_mem(
     mem: &Memory,
-    layout: &VertexLayoutBuilder,
+    layout: &BuiltVertexLayout,
     flags: u16,
 ) -> DynamicVertexBuffer {
     unsafe {
@@ -4239,7 +4239,7 @@ pub fn get_avail_transient_index_buffer(num: u32, index_32: bool) -> u32 {
 /// Number of required vertices.
 /// * `layout`:
 /// Vertex layout.
-pub fn get_avail_transient_vertex_buffer(num: u32, layout: &VertexLayoutBuilder) -> u32 {
+pub fn get_avail_transient_vertex_buffer(num: u32, layout: &BuiltVertexLayout) -> u32 {
     unsafe {
         let _layout = std::mem::transmute(layout);
         let _ret = (*g_vtbl.bgfx_get_avail_transient_vertex_buffer).unwrap()(num, _layout);
@@ -4281,7 +4281,7 @@ pub fn alloc_transient_index_buffer(tib: &mut TransientIndexBuffer, num: u32, in
 pub fn alloc_transient_vertex_buffer(
     tvb: &mut TransientVertexBuffer,
     num: u32,
-    layout: &VertexLayoutBuilder,
+    layout: &BuiltVertexLayout,
 ) {
     unsafe {
         let _tvb = std::mem::transmute(tvb);
@@ -4307,7 +4307,7 @@ pub fn alloc_transient_vertex_buffer(
 /// Set to `true` if input indices will be 32-bit.
 pub fn alloc_transient_buffers(
     tvb: &mut TransientVertexBuffer,
-    layout: &VertexLayoutBuilder,
+    layout: &BuiltVertexLayout,
     num_vertices: u32,
     tib: &mut TransientIndexBuffer,
     num_indices: u32,
