@@ -167,19 +167,18 @@ fn main() -> std::io::Result<()> {
     );
 
     {
-        let layout = VertexLayoutBuilder::new();
-        layout.begin(RendererType::Noop);
-        layout.add(Attrib::Position, 3, AttribType::Float, AddArgs::default());
-        layout.add(
-            Attrib::Color0,
-            4,
-            AttribType::Uint8,
-            AddArgs {
-                normalized: true,
-                as_int: false,
-            },
-        );
-        layout.end();
+        let layout = VertexLayoutBuilder::begin(RendererType::Noop)
+            .add(Attrib::Position, 3, AttribType::Float, AddArgs::default())
+            .add(
+                Attrib::Color0,
+                4,
+                AttribType::Uint8,
+                AddArgs {
+                    normalized: true,
+                    as_int: false,
+                },
+            )
+            .end();
 
         let verts_mem = unsafe { Memory::reference(&CUBE_VERTICES) };
         let index_mem = unsafe { Memory::reference(&CUBE_INDICES) };

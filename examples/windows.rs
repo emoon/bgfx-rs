@@ -87,58 +87,56 @@ fn main() {
     }
 
     {
+        let windows = [window, window2];
+        let mut framebuffers = [None, None];
+        let mut frame_sizes = [(0, 0), (0, 0)];
 
-    let windows = [window, window2];
-    let mut framebuffers = [None, None];
-    let mut frame_sizes = [(0, 0), (0, 0)];
-
-    let mut should_close = false;
-    while !should_close {
-        glfw.poll_events();
-        for (_, event) in glfw::flush_messages(&events) {
-            if let glfw::WindowEvent::Key(Key::Escape, _, Action::Press, _) = event {
-                should_close = true;
+        let mut should_close = false;
+        while !should_close {
+            glfw.poll_events();
+            for (_, event) in glfw::flush_messages(&events) {
+                if let glfw::WindowEvent::Key(Key::Escape, _, Action::Press, _) = event {
+                    should_close = true;
+                }
             }
+
+            for idx in 0..2 {
+                let window = &windows[idx];
+                let size = window.get_framebuffer_size();
+
+                if framebuffers[idx].is_none() || frame_sizes[idx] != size {
+                    framebuffers[idx] = Some(bgfx::create_frame_buffer_from_nwh(
+                        get_platform_data(&window).nwh as *mut c_void,
+                        size.0 as u16,
+                        size.1 as u16,
+                        CreateFrameBufferFromNwhArgs::default(),
+                    ));
+
+                    frame_sizes[idx] = size;
+                }
+
+                if let Some(frame_buffer) = &framebuffers[idx] {
+                    bgfx::set_view_frame_buffer(idx as _, &frame_buffer);
+                }
+
+                let color = if idx & 1 == 0 { 0x103030ff } else { 0x755413ff };
+
+                bgfx::set_view_rect(idx as _, 0, 0, size.0 as _, size.1 as _);
+                bgfx::set_view_clear(
+                    idx as _,
+                    ClearFlags::COLOR.bits() | ClearFlags::DEPTH.bits(),
+                    SetViewClearArgs {
+                        rgba: color,
+                        depth: 1.0,
+                        stencil: 0,
+                    },
+                );
+
+                bgfx::touch(idx as _);
+            }
+
+            bgfx::frame(false);
         }
-
-        for idx in 0..2 {
-            let window = &windows[idx];
-            let size = window.get_framebuffer_size();
-
-            if framebuffers[idx].is_none() || frame_sizes[idx] != size {
-                framebuffers[idx] = Some(bgfx::create_frame_buffer_from_nwh(
-                    get_platform_data(&window).nwh as *mut c_void,
-                    size.0 as u16,
-                    size.1 as u16,
-                    CreateFrameBufferFromNwhArgs::default(),
-                ));
-
-                frame_sizes[idx] = size;
-            }
-
-            if let Some(frame_buffer) = &framebuffers[idx] {
-                bgfx::set_view_frame_buffer(idx as _, &frame_buffer);
-            }
-
-            let color = if idx & 1 == 0 { 0x103030ff } else { 0x755413ff };
-
-            bgfx::set_view_rect(idx as _, 0, 0, size.0 as _, size.1 as _);
-            bgfx::set_view_clear(
-                idx as _,
-                ClearFlags::COLOR.bits() | ClearFlags::DEPTH.bits(),
-                SetViewClearArgs {
-                    rgba: color,
-                    depth: 1.0,
-                    stencil: 0,
-                },
-            );
-
-            bgfx::touch(idx as _);
-        }
-
-        bgfx::frame(false);
-    }
-
     }
 
     bgfx::shutdown();

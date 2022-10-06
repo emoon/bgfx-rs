@@ -4093,11 +4093,7 @@ pub fn create_vertex_layout(layout: &BuiltVertexLayout) -> VertexLayout {
 ///      data is passed. If this flag is not specified, and more data is passed on update, the buffer
 ///      will be trimmed to fit the existing buffer size. This flag has effect only on dynamic buffers.
 ///  - [BufferFlags::INDEX32] - Buffer is using 32-bit indices. This flag has effect only on index buffers.
-pub fn create_vertex_buffer(
-    mem: &Memory,
-    layout: &BuiltVertexLayout,
-    flags: u16,
-) -> VertexBuffer {
+pub fn create_vertex_buffer(mem: &Memory, layout: &BuiltVertexLayout, flags: u16) -> VertexBuffer {
     unsafe {
         let _layout = std::mem::transmute(layout);
         let _ret = bgfx_sys::bgfx_create_vertex_buffer(mem.handle, _layout, flags);
