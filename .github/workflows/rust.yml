@@ -16,5 +16,8 @@ jobs:
     - name: Install deps
       run: sudo apt-get install mesa-common-dev libx11-dev libxcursor-dev libxinerama-dev libxkbcommon-dev libxrandr-dev libxi-dev libgl1-mesa-dev
     - uses: actions/checkout@v2
-    - name: Build
+    - name: Build Debug
       run: cargo build --verbose
+    - name: Build Release + examples
+      run: cargo build --release --verbose --example helloworld --example cubes
+

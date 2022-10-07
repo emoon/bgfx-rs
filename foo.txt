@@ -1,0 +1,829 @@
+diff --git a/src/static_lib.rs b/src/static_lib.rs
+index b098b2a..f6c4470 100644
+--- a/src/static_lib.rs
++++ b/src/static_lib.rs
+@@ -239,8 +239,11 @@ pub enum TextureFormat {
+     RGBA32I,
+     RGBA32U,
+     RGBA32F,
++    B5G6R5,
+     R5G6B5,
++    BGRA4,
+     RGBA4,
++    BGR5A1,
+     RGB5A1,
+     RGB10A2,
+     RG11B10F,
+@@ -441,7 +444,8 @@ bitflags! {
+ }
+ 
+ bitflags! {
+-/// Use [state_blend_func] or [state_blend_func_separate] functions
++/// Use [state_blend_func] or [state_blend_func_separate]
++/// helper macros.
+     pub struct StateBlendFlags : u64 {
+         /// 0, 0, 0, 0
+         const ZERO = bgfx_sys::BGFX_STATE_BLEND_ZERO as _;
+@@ -473,7 +477,8 @@ bitflags! {
+ }
+ 
+ bitflags! {
+-/// use [state_blend_equation] or [state_blend_equation_separate] helper functions
++/// Use [state_blend_equation] or [state_blend_equation_separate]
++/// helper macros.
+     pub struct StateBlendEquationFlags : u64 {
+         /// Blend add: src + dst.
+         const ADD = bgfx_sys::BGFX_STATE_BLEND_EQUATION_ADD as _;
+@@ -698,7 +703,7 @@ bitflags! {
+         const STATS = bgfx_sys::BGFX_DEBUG_STATS as _;
+         /// Enable debug text display.
+         const TEXT = bgfx_sys::BGFX_DEBUG_TEXT as _;
+-        /// Enable profiler.
++        /// Enable profiler. This causes per-view statistics to be collected, available through `bgfx::Stats::ViewStats`. This is unrelated to the profiler functions in `bgfx::CallbackI`.
+         const PROFILER = bgfx_sys::BGFX_DEBUG_PROFILER as _;
+     }
+ }
+@@ -706,23 +711,23 @@ bitflags! {
+ bitflags! {
+     pub struct BufferComputeFormatFlags : u16 {
+         /// 1 8-bit value
+-        const F_8_X_1 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_F8X1 as _;
++        const F_8_X_1 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_8X1 as _;
+         /// 2 8-bit values
+-        const F_8_X_2 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_F8X2 as _;
++        const F_8_X_2 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_8X2 as _;
+         /// 4 8-bit values
+-        const F_8_X_4 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_F8X4 as _;
++        const F_8_X_4 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_8X4 as _;
+         /// 1 16-bit value
+-        const F_16_X_1 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_F16X1 as _;
++        const F_16_X_1 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_16X1 as _;
+         /// 2 16-bit values
+-        const F_16_X_2 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_F16X2 as _;
++        const F_16_X_2 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_16X2 as _;
+         /// 4 16-bit values
+-        const F_16_X_4 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_F16X4 as _;
++        const F_16_X_4 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_16X4 as _;
+         /// 1 32-bit value
+-        const F_32_X_1 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_F32X1 as _;
++        const F_32_X_1 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_32X1 as _;
+         /// 2 32-bit values
+-        const F_32_X_2 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_F32X2 as _;
++        const F_32_X_2 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_32X2 as _;
+         /// 4 32-bit values
+-        const F_32_X_4 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_F32X4 as _;
++        const F_32_X_4 = bgfx_sys::BGFX_BUFFER_COMPUTE_FORMAT_32X4 as _;
+     }
+ }
+ 
+@@ -925,6 +930,8 @@ bitflags! {
+         const DEPTH_CLAMP = bgfx_sys::BGFX_RESET_DEPTH_CLAMP as _;
+         /// Suspend rendering.
+         const SUSPEND = bgfx_sys::BGFX_RESET_SUSPEND as _;
++        /// Transparent backbuffer. Availability depends on: [CapsFlags::TRANSPARENT_BACKBUFFER].
++        const TRANSPARENT_BACKBUFFER = bgfx_sys::BGFX_RESET_TRANSPARENT_BACKBUFFER as _;
+     }
+ }
+ 
+@@ -968,6 +975,8 @@ bitflags! {
+         const TEXTURE_3_D = bgfx_sys::BGFX_CAPS_TEXTURE_3D as _;
+         /// Texture blit is supported.
+         const TEXTURE_BLIT = bgfx_sys::BGFX_CAPS_TEXTURE_BLIT as _;
++        /// Transparent back buffer supported.
++        const TRANSPARENT_BACKBUFFER = bgfx_sys::BGFX_CAPS_TRANSPARENT_BACKBUFFER as _;
+         const TEXTURE_COMPARE_RESERVED = bgfx_sys::BGFX_CAPS_TEXTURE_COMPARE_RESERVED as _;
+         /// Texture compare less equal mode is supported.
+         const TEXTURE_COMPARE_LEQUAL = bgfx_sys::BGFX_CAPS_TEXTURE_COMPARE_LEQUAL as _;
+@@ -985,6 +994,8 @@ bitflags! {
+         const VERTEX_ID = bgfx_sys::BGFX_CAPS_VERTEX_ID as _;
+         /// Viewport layer is available in vertex shader.
+         const VIEWPORT_LAYER_ARRAY = bgfx_sys::BGFX_CAPS_VIEWPORT_LAYER_ARRAY as _;
++        /// Draw indirect with indirect count is supported.
++        const DRAW_INDIRECT_COUNT = bgfx_sys::BGFX_CAPS_DRAW_INDIRECT_COUNT as _;
+         /// All texture compare modes are supported.
+         const TEXTURE_COMPARE_ALL = bgfx_sys::BGFX_CAPS_TEXTURE_COMPARE_ALL as _;
+     }
+@@ -1046,10 +1057,16 @@ bitflags! {
+         const SOFTWARE_RASTERIZER = bgfx_sys::BGFX_PCI_ID_SOFTWARE_RASTERIZER as _;
+         /// AMD adapter.
+         const AMD = bgfx_sys::BGFX_PCI_ID_AMD as _;
++        /// Apple adapter.
++        const APPLE = bgfx_sys::BGFX_PCI_ID_APPLE as _;
+         /// Intel adapter.
+         const INTEL = bgfx_sys::BGFX_PCI_ID_INTEL as _;
+         /// nVidia adapter.
+         const NVIDIA = bgfx_sys::BGFX_PCI_ID_NVIDIA as _;
++        /// Microsoft adapter.
++        const MICROSOFT = bgfx_sys::BGFX_PCI_ID_MICROSOFT as _;
++        /// ARM adapter.
++        const ARM = bgfx_sys::BGFX_PCI_ID_ARM as _;
+     }
+ }
+ 
+@@ -1188,7 +1205,7 @@ pub struct ResetArgs {
+     ///   - [ResetFlags::FLIP_AFTER_RENDER] - This flag  specifies where flip
+     ///     occurs. Default behaviour is that flip occurs before rendering new
+     ///     frame. This flag only has effect when `BGFX_CONFIG_MULTITHREADED=0`.
+-    ///   - [ResetFlags::SRGB_BACKBUFFER] - Enable sRGB backbuffer.
++    ///   - [ResetFlags::SRGB_BACKBUFFER] - Enable sRGB back-buffer.
+     pub flags: u32,
+     /// Texture format. See: [TextureFormat].
+     pub format: TextureFormat,
+@@ -1391,7 +1408,7 @@ impl Default for SubmitOcclusionQueryArgs {
+ pub struct SubmitIndirectArgs {
+     /// First element in indirect buffer.
+     pub start: u16,
+-    /// Number of dispatches.
++    /// Number of draws.
+     pub num: u16,
+     /// Depth for sorting.
+     pub depth: u32,
+@@ -1410,6 +1427,28 @@ impl Default for SubmitIndirectArgs {
+     }
+ }
+ 
++pub struct SubmitIndirectCountArgs {
++    /// Element in number buffer.
++    pub num_index: u32,
++    /// Max number of draws.
++    pub num_max: u16,
++    /// Depth for sorting.
++    pub depth: u32,
++    /// Discard or preserve states. See [DiscardFlags].
++    pub flags: u8,
++}
++
++impl Default for SubmitIndirectCountArgs {
++    fn default() -> SubmitIndirectCountArgs {
++        SubmitIndirectCountArgs {
++            num_index: 0,
++            num_max: std::u16::MAX,
++            depth: 0,
++            flags: DiscardFlags::ALL.bits(),
++        }
++    }
++}
++
+ pub struct DispatchArgs {
+     /// Number of groups X.
+     pub num_x: u32,
+@@ -1487,7 +1526,7 @@ impl Default for BlitArgs {
+ 
+ /// GPU info.
+ #[repr(C)]
+-pub struct GPU {
++pub struct CapsGPU {
+     /// Vendor PCI id. See [PciIdFlags].
+     pub vendor_id: u16,
+     /// Device id.
+@@ -1564,7 +1603,7 @@ pub struct Caps {
+     /// Number of enumerated GPUs.
+     pub num_gp_us: u8,
+     /// Enumerated GPUs.
+-    pub gpu: [GPU; 4usize],
++    pub gpu: [CapsGPU; 4usize],
+     /// Renderer runtime limits.
+     pub limits: CapsLimits,
+     /// Supported texture format capabilities flags:
+@@ -1590,7 +1629,7 @@ pub struct Caps {
+     ///   - [CapsFormatFlags::TEXTURE_MSAA] - Texture can be sampled as MSAA.
+     ///   - [CapsFormatFlags::TEXTURE_MIP_AUTOGEN] - Texture format supports auto-generated
+     ///     mips.
+-    pub formats: [u16; 85usize],
++    pub formats: [u16; 88usize],
+ }
+ /// Internal data.
+ #[repr(C)]
+@@ -1605,15 +1644,16 @@ pub struct InternalData {
+ pub struct PlatformData {
+     /// Native display type (*nix specific).
+     pub ndt: *const c_void,
+-    /// Native window handle. If `NULL` bgfx will create headless
+-    /// context/device if renderer API supports it.
++    /// Native window handle. If `NULL`, bgfx will create a headless
++    /// context/device, provided the rendering API supports it.
+     pub nwh: *const c_void,
+-    /// GL context, or D3D device. If `NULL`, bgfx will create context/device.
++    /// GL context, D3D device, or Vulkan device. If `NULL`, bgfx
++    /// will create context/device.
+     pub context: *const c_void,
+     /// GL back-buffer, or D3D render target view. If `NULL` bgfx will
+     /// create back-buffer color surface.
+     pub back_buffer: *const c_void,
+-    /// Backbuffer depth/stencil. If `NULL` bgfx will create back-buffer
++    /// Backbuffer depth/stencil. If `NULL`, bgfx will create a back-buffer
+     /// depth/stencil surface.
+     pub back_buffer_ds: *const c_void,
+ }
+@@ -1635,7 +1675,7 @@ pub struct Resolution {
+ }
+ /// Configurable runtime limits parameters.
+ #[repr(C)]
+-pub struct Limits {
++pub struct InitLimits {
+     /// Maximum number of encoder threads.
+     pub max_encoders: u16,
+     /// Minimum resource command buffer size.
+@@ -1652,20 +1692,22 @@ pub struct Init {
+     /// a default rendering backend will be selected appropriate to the platform.
+     /// See: `bgfx::RendererType`
+     pub type_r: RendererType,
+-    /// Vendor PCI id. If set to [PciIdFlags::NONE] it will select the first
+-    /// device.
++    /// Vendor PCI ID. If set to [PciIdFlags::NONE], discrete and integrated
++    /// GPUs will be prioritised.
+     ///   - [PciIdFlags::NONE] - Autoselect adapter.
+     ///   - [PciIdFlags::SOFTWARE_RASTERIZER] - Software rasterizer.
+     ///   - [PciIdFlags::AMD] - AMD adapter.
++    ///   - [PciIdFlags::APPLE] - Apple adapter.
+     ///   - [PciIdFlags::INTEL] - Intel adapter.
+-    ///   - [PciIdFlags::NVIDIA] - nVidia adapter.
++    ///   - [PciIdFlags::NVIDIA] - NVIDIA adapter.
++    ///   - [PciIdFlags::MICROSOFT] - Microsoft adapter.
+     pub vendor_id: u16,
+-    /// Device id. If set to 0 it will select first device, or device with
+-    /// matching id.
++    /// Device ID. If set to 0 it will select first device, or device with
++    /// matching ID.
+     pub device_id: u16,
+     /// Capabilities initialization mask (default: UINT64_MAX).
+     pub capabilities: u64,
+-    /// Enable device for debuging.
++    /// Enable device for debugging.
+     pub debug: bool,
+     /// Enable device for profiling.
+     pub profile: bool,
+@@ -1674,14 +1716,14 @@ pub struct Init {
+     /// Backbuffer resolution and reset parameters. See: `bgfx::Resolution`.
+     pub resolution: Resolution,
+     /// Configurable runtime limits parameters.
+-    pub limits: Limits,
++    pub limits: InitLimits,
+     /// Provide application specific callback interface.
+     /// See: `bgfx::CallbackI`
+-    pub callback: *const c_void,
++    pub callback: *const CallbackI,
+     /// Custom allocator. When a custom allocator is not
+     /// specified, bgfx uses the CRT allocator. Bgfx assumes
+     /// custom allocator is thread safe.
+-    pub allocator: *const c_void,
++    pub allocator: *const bx::AllocatorI,
+ }
+ /// Transient index buffer.
+ #[repr(C)]
+@@ -1711,7 +1753,7 @@ pub struct TransientVertexBuffer {
+     /// Vertex buffer handle.
+     pub handle: u16,
+     /// Vertex layout handle.
+-    pub layout_handle: u16,
++    pub layout_handle: VertexLayout,
+ }
+ /// Instance data buffer info.
+ #[repr(C)]
+@@ -1800,6 +1842,8 @@ pub struct ViewStats {
+     pub gpu_time_begin: i64,
+     /// GPU end time.
+     pub gpu_time_end: i64,
++    /// Frame which generated gpuTimeBegin, gpuTimeEnd.
++    pub gpu_frame_num: u32,
+ }
+ /// Encoder stats.
+ #[repr(C)]
+@@ -1841,6 +1885,8 @@ pub struct Stats {
+     pub num_blit: u32,
+     /// GPU driver latency.
+     pub max_gpu_latency: u32,
++    /// Frame which generated gpuTimeBegin, gpuTimeEnd.
++    pub gpu_frame_num: u32,
+     /// Number of used dynamic index buffers.
+     pub num_dynamic_index_buffers: u16,
+     /// Number of used dynamic vertex buffers.
+@@ -2181,14 +2227,14 @@ impl FrameBuffer {
+     /// * `depth_format`:
+     /// Window back buffer depth format.
+     pub fn create_frame_buffer_from_nwh(
+-        nwh: *mut c_void,
++        nwh: *const c_void,
+         width: u16,
+         height: u16,
+         params: CreateFrameBufferFromNwhArgs,
+     ) -> FrameBuffer {
+         unsafe {
+             let _ret = bgfx_sys::bgfx_create_frame_buffer_from_nwh(
+-                nwh as _,
++                nwh,
+                 width,
+                 height,
+                 params.format as _,
+@@ -2223,12 +2269,9 @@ impl FrameBuffer {
+     /// made for main window back buffer.
+     /// * `file_path`:
+     /// Will be passed to `bgfx::CallbackI::screenShot` callback.
+-    pub fn request_screen_shot(&self, file_path: &i8) {
++    pub fn request_screen_shot(&self, file_path: *const i8) {
+         unsafe {
+-            bgfx_sys::bgfx_request_screen_shot(
+-                self.handle,
+-                file_path as *const i8 as *const ::std::os::raw::c_char,
+-            );
++            bgfx_sys::bgfx_request_screen_shot(self.handle, file_path);
+         }
+     }
+ }
+@@ -2327,7 +2370,7 @@ impl OcclusionQuery {
+     /// * `result`:
+     /// Number of pixels that passed test. This argument
+     /// can be `NULL` if result of occlusion query is not needed.
+-    pub fn get_result(&self, result: &mut i32) -> OcclusionQueryResult {
++    pub fn get_result(&self, result: *mut i32) -> OcclusionQueryResult {
+         unsafe {
+             let _ret = bgfx_sys::bgfx_get_result(self.handle, result);
+             std::mem::transmute(_ret)
+@@ -2919,9 +2962,9 @@ impl Drop for VertexLayout {
+     }
+ }
+ 
+-impl GPU {
+-    pub fn new() -> GPU {
+-        let t = MaybeUninit::<GPU>::zeroed();
++impl CapsGPU {
++    pub fn new() -> CapsGPU {
++        let t = MaybeUninit::<CapsGPU>::zeroed();
+         let t = unsafe { t.assume_init() };
+         t
+     }
+@@ -2967,9 +3010,9 @@ impl Resolution {
+     }
+ }
+ 
+-impl Limits {
+-    pub fn new() -> Limits {
+-        let t = MaybeUninit::<Limits>::zeroed();
++impl InitLimits {
++    pub fn new() -> InitLimits {
++        let t = MaybeUninit::<InitLimits>::zeroed();
+         let t = unsafe { t.assume_init() };
+         t
+     }
+@@ -3102,77 +3145,6 @@ impl Stats {
+     }
+ }
+ 
+-pub struct BuiltVertexLayout(VertexLayoutBuilder);
+-
+-impl VertexLayoutBuilder {
+-    /// * `renderer_type`:
+-    /// Renderer backend type. See: `bgfx::RendererType`
+-    pub fn begin(renderer_type: RendererType) -> VertexLayoutBuilder {
+-        let t = MaybeUninit::<VertexLayoutBuilder>::zeroed();
+-        let t = unsafe { t.assume_init() };
+-        unsafe {
+-            let _t = std::mem::transmute(&t);
+-            let _ret = bgfx_sys::bgfx_vertex_layout_begin(_t, renderer_type as _);
+-        }
+-        t
+-    }
+-
+-    /// * `attrib`:
+-    /// Attribute semantics. See: `bgfx::Attrib`
+-    /// * `num`:
+-    /// Number of elements 1, 2, 3 or 4.
+-    /// * `type_r`:
+-    /// Element type.
+-    /// * `normalized`:
+-    /// When using fixed point AttribType (f.e. Uint8)
+-    /// value will be normalized for vertex shader usage. When normalized
+-    /// is set to true, AttribType::Uint8 value in range 0-255 will be
+-    /// in range 0.0-1.0 in vertex shader.
+-    /// * `as_int`:
+-    /// Packaging rule for vertexPack, vertexUnpack, and
+-    /// vertexConvert for AttribType::Uint8 and AttribType::Int16.
+-    /// Unpacking code must be implemented inside vertex shader.
+-    pub fn add(mut self, attrib: Attrib, num: u8, type_r: AttribType, params: AddArgs) -> Self {
+-        unsafe {
+-            let _self = std::mem::transmute(&mut self);
+-            let _ret = bgfx_sys::bgfx_vertex_layout_add(
+-                _self,
+-                attrib as _,
+-                num,
+-                type_r as _,
+-                params.normalized,
+-                params.as_int,
+-            );
+-            self
+-        }
+-    }
+-    /// * `attrib`:
+-    /// Attribute semantics. See: `bgfx::Attrib`
+-    pub fn has(&self, attrib: Attrib) -> bool {
+-        unsafe {
+-            let _self = std::mem::transmute(self);
+-            let _ret = bgfx_sys::bgfx_vertex_layout_has(_self, attrib as _);
+-            _ret
+-        }
+-    }
+-    /// * `num`:
+-    /// Number of bytes to skip.
+-    pub fn skip(mut self, num: u8) -> Self {
+-        unsafe {
+-            let _self = std::mem::transmute(&mut self);
+-            let _ret = bgfx_sys::bgfx_vertex_layout_skip(_self, num);
+-            self
+-        }
+-    }
+-    pub fn end(mut self) -> BuiltVertexLayout {
+-        unsafe {
+-            let _self = std::mem::transmute(&mut self);
+-            bgfx_sys::bgfx_vertex_layout_end(_self);
+-        }
+-        BuiltVertexLayout(self)
+-    }
+-}
+-
+ impl Encoder {
+     pub fn new() -> Encoder {
+         let t = MaybeUninit::<Encoder>::zeroed();
+@@ -3182,20 +3154,17 @@ impl Encoder {
+ 
+     /// * `marker`:
+     /// Marker string.
+-    pub fn set_marker(&self, marker: &i8) {
++    pub fn set_marker(&self, marker: *const i8) {
+         unsafe {
+             let _self = std::mem::transmute(self);
+-            bgfx_sys::bgfx_encoder_set_marker(
+-                _self,
+-                marker as *const i8 as *const ::std::os::raw::c_char,
+-            );
++            bgfx_sys::bgfx_encoder_set_marker(_self, marker);
+         }
+     }
+     /// * `state`:
+     /// State flags. Default state for primitive type is
+     ///   triangles. See: [StateFlags::DEFAULT].
+     ///   - [StateDepthTestFlags] - Depth test function.
+-    ///   - [StateBlendFlags] - See remark 1 about [state_blend_func].
++    ///   - [StateBlendFlags] - See remark 1 about BGFX_STATE_BLEND_FUNC.
+     ///   - [StateBlendEquationFlags] - See remark 2.
+     ///   - [StateCullFlags] - Backface culling mode.
+     ///   - [StateWriteFlags] - Enable R, G, B, A or Z write.
+@@ -3659,7 +3628,7 @@ impl Encoder {
+     /// * `start`:
+     /// First element in indirect buffer.
+     /// * `num`:
+-    /// Number of dispatches.
++    /// Number of draws.
+     /// * `depth`:
+     /// Depth for sorting.
+     /// * `flags`:
+@@ -3685,6 +3654,50 @@ impl Encoder {
+             );
+         }
+     }
++    /// * `id`:
++    /// View id.
++    /// * `program`:
++    /// Program.
++    /// * `indirect_handle`:
++    /// Indirect buffer.
++    /// * `start`:
++    /// First element in indirect buffer.
++    /// * `num_handle`:
++    /// Buffer for number of draws. Must be
++    ///   created with [BufferFlags::INDEX32] and [BufferFlags::DRAW_INDIRECT].
++    /// * `num_index`:
++    /// Element in number buffer.
++    /// * `num_max`:
++    /// Max number of draws.
++    /// * `depth`:
++    /// Depth for sorting.
++    /// * `flags`:
++    /// Discard or preserve states. See [DiscardFlags].
++    pub fn submit_indirect_count(
++        &self,
++        id: ViewId,
++        program: &Program,
++        indirect_handle: &IndirectBuffer,
++        start: u16,
++        num_handle: &IndexBuffer,
++        params: SubmitIndirectCountArgs,
++    ) {
++        unsafe {
++            let _self = std::mem::transmute(self);
++            bgfx_sys::bgfx_encoder_submit_indirect_count(
++                _self,
++                id,
++                program.handle,
++                indirect_handle.handle,
++                start,
++                num_handle.handle,
++                params.num_index,
++                params.num_max,
++                params.depth,
++                params.flags,
++            );
++        }
++    }
+     /// * `stage`:
+     /// Compute stage.
+     /// * `handle`:
+@@ -3973,7 +3986,7 @@ pub fn shutdown() {
+ ///   - [ResetFlags::FLIP_AFTER_RENDER] - This flag  specifies where flip
+ ///     occurs. Default behaviour is that flip occurs before rendering new
+ ///     frame. This flag only has effect when `BGFX_CONFIG_MULTITHREADED=0`.
+-///   - [ResetFlags::SRGB_BACKBUFFER] - Enable sRGB backbuffer.
++///   - [ResetFlags::SRGB_BACKBUFFER] - Enable sRGB back-buffer.
+ /// * `format`:
+ /// Texture format. See: [TextureFormat].
+ pub fn reset(width: u32, height: u32, params: ResetArgs) {
+@@ -4043,7 +4056,7 @@ pub fn dbg_text_clear(params: DbgTextClearArgs) {
+ /// Raw image data (character/attribute raw encoding).
+ /// * `pitch`:
+ /// Image pitch in bytes.
+-pub fn dbg_text_image(x: u16, y: u16, width: u16, height: u16, data: &c_void, pitch: u16) {
++pub fn dbg_text_image(x: u16, y: u16, width: u16, height: u16, data: *const c_void, pitch: u16) {
+     unsafe {
+         bgfx_sys::bgfx_dbg_text_image(x, y, width, height, data, pitch);
+     }
+@@ -4252,8 +4265,8 @@ pub fn get_avail_instance_data_buffer(num: u32, stride: u16) -> u32 {
+     }
+ }
+ /// * `tib`:
+-/// TransientIndexBuffer structure is filled and is valid
+-/// for the duration of frame, and it can be reused for multiple draw
++/// TransientIndexBuffer structure will be filled, and will be valid
++/// for the duration of frame, and can be reused for multiple draw
+ /// calls.
+ /// * `num`:
+ /// Number of indices to allocate.
+@@ -4266,8 +4279,8 @@ pub fn alloc_transient_index_buffer(tib: &mut TransientIndexBuffer, num: u32, in
+     }
+ }
+ /// * `tvb`:
+-/// TransientVertexBuffer structure is filled and is valid
+-/// for the duration of frame, and it can be reused for multiple draw
++/// TransientVertexBuffer structure will be filled, and will be valid
++/// for the duration of frame, and can be reused for multiple draw
+ /// calls.
+ /// * `num`:
+ /// Number of vertices to allocate.
+@@ -4285,16 +4298,16 @@ pub fn alloc_transient_vertex_buffer(
+     }
+ }
+ /// * `tvb`:
+-/// TransientVertexBuffer structure is filled and is valid
+-/// for the duration of frame, and it can be reused for multiple draw
++/// TransientVertexBuffer structure will be filled, and will be valid
++/// for the duration of frame, and can be reused for multiple draw
+ /// calls.
+ /// * `layout`:
+ /// Vertex layout.
+ /// * `num_vertices`:
+ /// Number of vertices to allocate.
+ /// * `tib`:
+-/// TransientIndexBuffer structure is filled and is valid
+-/// for the duration of frame, and it can be reused for multiple draw
++/// TransientIndexBuffer structure will be filled, and will be valid
++/// for the duration of frame, and can be reused for multiple draw
+ /// calls.
+ /// * `num_indices`:
+ /// Number of indices to allocate.
+@@ -4324,8 +4337,8 @@ pub fn alloc_transient_buffers(
+     }
+ }
+ /// * `idb`:
+-/// InstanceDataBuffer structure is filled and is valid
+-/// for duration of frame, and it can be reused for multiple draw
++/// InstanceDataBuffer structure will be filled, and will be valid
++/// for duration of frame, and can be reused for multiple draw
+ /// calls.
+ /// * `num`:
+ /// Number of instances.
+@@ -4885,7 +4898,7 @@ pub fn create_frame_buffer_from_attachment(
+ /// * `depth_format`:
+ /// Window back buffer depth format.
+ pub fn create_frame_buffer_from_nwh(
+-    nwh: *mut c_void,
++    nwh: *const c_void,
+     width: u16,
+     height: u16,
+     params: CreateFrameBufferFromNwhArgs,
+@@ -4931,7 +4944,7 @@ pub fn create_occlusion_query() -> OcclusionQuery {
+ /// * `result`:
+ /// Number of pixels that passed test. This argument
+ /// can be `NULL` if result of occlusion query is not needed.
+-pub fn get_result(handle: &OcclusionQuery, result: &mut i32) -> OcclusionQueryResult {
++pub fn get_result(handle: &OcclusionQuery, result: *mut i32) -> OcclusionQueryResult {
+     unsafe {
+         let _ret = bgfx_sys::bgfx_get_result(handle.handle, result);
+         std::mem::transmute(_ret)
+@@ -5083,12 +5096,9 @@ pub fn encoder_end(encoder: &Encoder) {
+ /// made for main window back buffer.
+ /// * `file_path`:
+ /// Will be passed to `bgfx::CallbackI::screenShot` callback.
+-pub fn request_screen_shot(handle: &FrameBuffer, file_path: &i8) {
++pub fn request_screen_shot(handle: &FrameBuffer, file_path: *const i8) {
+     unsafe {
+-        bgfx_sys::bgfx_request_screen_shot(
+-            handle.handle,
+-            file_path as *const i8 as *const ::std::os::raw::c_char,
+-        );
++        bgfx_sys::bgfx_request_screen_shot(handle.handle, file_path);
+     }
+ }
+ /// * `msecs`:
+@@ -5115,16 +5125,16 @@ pub fn get_internal_data() -> &'static InternalData {
+ }
+ /// * `marker`:
+ /// Marker string.
+-pub fn set_marker(marker: &i8) {
++pub fn set_marker(marker: *const i8) {
+     unsafe {
+-        bgfx_sys::bgfx_set_marker(marker as *const i8 as *const ::std::os::raw::c_char);
++        bgfx_sys::bgfx_set_marker(marker);
+     }
+ }
+ /// * `state`:
+ /// State flags. Default state for primitive type is
+ ///   triangles. See: [StateFlags::DEFAULT].
+ ///   - [StateDepthTestFlags] - Depth test function.
+-///   - [StateBlendFlags] - See remark 1 about .
++///   - [StateBlendFlags] - See remark 1 about BGFX_STATE_BLEND_FUNC.
+ ///   - [StateBlendEquationFlags] - See remark 2.
+ ///   - [StateCullFlags] - Backface culling mode.
+ ///   - [StateWriteFlags] - Enable R, G, B, A or Z write.
+@@ -5491,7 +5501,7 @@ pub fn submit_occlusion_query(
+ /// * `start`:
+ /// First element in indirect buffer.
+ /// * `num`:
+-/// Number of dispatches.
++/// Number of draws.
+ /// * `depth`:
+ /// Depth for sorting.
+ /// * `flags`:
+@@ -5514,6 +5524,47 @@ pub fn submit_indirect(
+         );
+     }
+ }
++/// * `id`:
++/// View id.
++/// * `program`:
++/// Program.
++/// * `indirect_handle`:
++/// Indirect buffer.
++/// * `start`:
++/// First element in indirect buffer.
++/// * `num_handle`:
++/// Buffer for number of draws. Must be
++///   created with [BufferFlags::INDEX32] and [BufferFlags::DRAW_INDIRECT].
++/// * `num_index`:
++/// Element in number buffer.
++/// * `num_max`:
++/// Max number of draws.
++/// * `depth`:
++/// Depth for sorting.
++/// * `flags`:
++/// Which states to discard for next draw. See [DiscardFlags].
++pub fn submit_indirect_count(
++    id: ViewId,
++    program: &Program,
++    indirect_handle: &IndirectBuffer,
++    start: u16,
++    num_handle: &IndexBuffer,
++    params: SubmitIndirectCountArgs,
++) {
++    unsafe {
++        bgfx_sys::bgfx_submit_indirect_count(
++            id,
++            program.handle,
++            indirect_handle.handle,
++            start,
++            num_handle.handle,
++            params.num_index,
++            params.num_max,
++            params.depth,
++            params.flags,
++        );
++    }
++}
+ /// * `stage`:
+ /// Compute stage.
+ /// * `handle`:
+@@ -5709,6 +5760,77 @@ pub fn blit(
+ 
+ pub type ViewId = u16;
+ 
++pub struct BuiltVertexLayout(VertexLayoutBuilder);
++
++impl VertexLayoutBuilder {
++    /// * `renderer_type`:
++    /// Renderer backend type. See: `bgfx::RendererType`
++    pub fn begin(renderer_type: RendererType) -> VertexLayoutBuilder {
++        let t = MaybeUninit::<VertexLayoutBuilder>::zeroed();
++        let t = unsafe { t.assume_init() };
++        unsafe {
++            let _t = std::mem::transmute(&t);
++            let _ret = bgfx_sys::bgfx_vertex_layout_begin(_t, renderer_type as _);
++        }
++        t
++    }
++
++    /// * `attrib`:
++    /// Attribute semantics. See: `bgfx::Attrib`
++    /// * `num`:
++    /// Number of elements 1, 2, 3 or 4.
++    /// * `type_r`:
++    /// Element type.
++    /// * `normalized`:
++    /// When using fixed point AttribType (f.e. Uint8)
++    /// value will be normalized for vertex shader usage. When normalized
++    /// is set to true, AttribType::Uint8 value in range 0-255 will be
++    /// in range 0.0-1.0 in vertex shader.
++    /// * `as_int`:
++    /// Packaging rule for vertexPack, vertexUnpack, and
++    /// vertexConvert for AttribType::Uint8 and AttribType::Int16.
++    /// Unpacking code must be implemented inside vertex shader.
++    pub fn add(mut self, attrib: Attrib, num: u8, type_r: AttribType, params: AddArgs) -> Self {
++        unsafe {
++            let _self = std::mem::transmute(&mut self);
++            let _ret = bgfx_sys::bgfx_vertex_layout_add(
++                _self,
++                attrib as _,
++                num,
++                type_r as _,
++                params.normalized,
++                params.as_int,
++            );
++            self
++        }
++    }
++    /// * `attrib`:
++    /// Attribute semantics. See: `bgfx::Attrib`
++    pub fn has(&self, attrib: Attrib) -> bool {
++        unsafe {
++            let _self = std::mem::transmute(self);
++            let _ret = bgfx_sys::bgfx_vertex_layout_has(_self, attrib as _);
++            _ret
++        }
++    }
++    /// * `num`:
++    /// Number of bytes to skip.
++    pub fn skip(mut self, num: u8) -> Self {
++        unsafe {
++            let _self = std::mem::transmute(&mut self);
++            let _ret = bgfx_sys::bgfx_vertex_layout_skip(_self, num);
++            self
++        }
++    }
++    pub fn end(mut self) -> BuiltVertexLayout {
++        unsafe {
++            let _self = std::mem::transmute(&mut self);
++            bgfx_sys::bgfx_vertex_layout_end(_self);
++        }
++        BuiltVertexLayout(self)
++    }
++}
++
+ /// Returns the number of uniforms and uniform handles used inside a shader.
+ ///
+ /// Notice that only non-predefined uniforms are returned.
+@@ -5825,21 +5947,35 @@ impl Uniform {
+     pub fn create(name: &str, type_r: UniformType, num: u16) -> Uniform {
+         unsafe {
+             let name_ = CFixedString::from_str(name);
+-            let _ret = bgfx_sys::bgfx_create_uniform(name_.as_ptr() as _, type_r as _, num);
++            let _ret = bgfx_sys::bgfx_create_uniform(name_ as _, type_r as _, num);
+             Uniform { handle: _ret }
+         }
+     }
+ 
+     /// * `handle`: Uniform.
+-    /// * `value`: uniform data.
+-    /// * `num`: Number of elements. Passing `u16::MAX` will use the num passed on uniform creation.
+-    pub fn set(&self, value: &[f32], num: u16) {
++    /// * `value`: Pointer to uniform data.
++    /// * `num`: Number of elements. Passing `u16::MAX` will use the _num passed on uniform creation.
++    pub fn set_uniform(&self, value: &[f32], num: u16) {
+         unsafe {
+             bgfx_sys::bgfx_set_uniform(self.handle, value.as_ptr() as _, num);
+         }
+     }
+ }
+ 
++/// * `name`:
++/// Uniform name in shader.
++/// * `type_r`:
++/// Type of uniform (See: `bgfx::UniformType`).
++/// * `num`:
++/// Number of elements in array.
++pub fn create_uniform(name: &str, type_r: UniformType, num: u16) -> Uniform {
++    unsafe {
++        let name_ = CFixedString::from_str(name);
++        let _ret = bgfx_sys::bgfx_create_uniform(name_ as _, type_r as _, num);
++        Uniform { handle: _ret }
++    }
++}
++
+ /// * `handle`: Uniform.
+ /// * `value`: Pointer to uniform data.
+ /// * `num`: Number of elements. Passing `u16::MAX` will use the _num passed on uniform creation.
