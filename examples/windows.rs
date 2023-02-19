@@ -35,7 +35,7 @@ fn get_platform_data(window: &Window) -> PlatformData {
             pd.nwh = data.ns_window;
         }
         #[cfg(target_os = "windows")]
-        RawWindowHandle::Windows(data) => {
+        RawWindowHandle::Win32(data) => {
             pd.nwh = data.hwnd;
         }
         _ => panic!("Unsupported Window Manager"),
