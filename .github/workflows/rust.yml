@@ -19,7 +19,7 @@ jobs:
     steps:
       - if: matrix.os == 'ubuntu-latest'
         run: sudo apt update && sudo apt-get install mesa-common-dev libx11-dev libxcursor-dev libxinerama-dev libxkbcommon-dev libxrandr-dev libxi-dev libgl1-mesa-dev
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Build
         run: cargo build --verbose
       - name: Build BGFX Release + examples
