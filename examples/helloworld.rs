@@ -32,7 +32,7 @@ fn get_platform_data(window: &Window) -> PlatformData {
         }
 
         #[cfg(target_os = "macos")]
-        RawWindowHandle::MacOS(data) => {
+        RawWindowHandle::AppKit(data) => {
             pd.nwh = data.ns_window;
         }
         #[cfg(target_os = "windows")]
