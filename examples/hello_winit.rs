@@ -1,6 +1,14 @@
 use bgfx::*;
 use bgfx_rs::bgfx;
-use glfw::{Action, Key, Window};
+use winit::{
+    dpi::LogicalSize,
+    event::{ElementState, Event, KeyboardInput, VirtualKeyCode, WindowEvent, DeviceEvent},
+    event_loop::EventLoop,
+    window::WindowBuilder,
+    dpi::PhysicalSize,
+    window::Window,
+};
+
 use raw_window_handle::{HasRawWindowHandle, RawWindowHandle};
 
 const WIDTH: usize = 1280;
@@ -56,19 +64,14 @@ fn get_render_type() -> RendererType {
 }
 
 fn main() {
-    let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
-    glfw.window_hint(glfw::WindowHint::ClientApi(glfw::ClientApiHint::NoApi));
+    let event_loop = EventLoop::new();
 
-    let (mut window, events) = glfw
-        .create_window(
-            WIDTH as _,
-            HEIGHT as _,
-            "helloworld.rs bgfx-rs example - ESC to close",
-            glfw::WindowMode::Windowed,
-        )
-        .expect("Failed to create GLFW window.");
-
-    window.set_key_polling(true);
+    let window = WindowBuilder::new()
+        .with_title("Winit BGFX Example (Esc to exit)")
+        .with_inner_size(LogicalSize::new(WIDTH as f64, HEIGHT as f64))
+        .with_resizable(true)
+        .build(&event_loop)
+        .unwrap();
 
     let mut init = Init::new();
 
@@ -92,24 +95,56 @@ fn main() {
         },
     );
 
-    let mut old_size = (0, 0);
+    let mut old_size = PhysicalSize::new(0, 0);
 
-    while !window.should_close() {
-        glfw.poll_events();
-        for (_, event) in glfw::flush_messages(&events) {
-            if let glfw::WindowEvent::Key(Key::Escape, _, Action::Press, _) = event {
-                window.set_should_close(true)
-            }
+    event_loop.run(move |event, _, control_flow| {
+        control_flow.set_wait();
+
+        match event {
+            Event::DeviceEvent {
+                event:
+                    DeviceEvent::Key(KeyboardInput {
+                        virtual_keycode: Some(key),
+                        state: ElementState::Pressed,
+                        ..
+                    }),
+                ..
+            } => match key {
+                _ => (),
+            },
+            Event::WindowEvent {
+                event:
+                    WindowEvent::KeyboardInput {
+                        input:
+                            KeyboardInput {
+                                virtual_keycode: Some(key),
+                                state: ElementState::Pressed,
+                                ..
+                            },
+                        ..
+                    },
+                ..
+            } => match key {
+                VirtualKeyCode::Escape => {
+                    control_flow.set_exit();
+                }
+                _ => (),
+            },
+            Event::WindowEvent {
+                event: WindowEvent::CloseRequested,
+                window_id,
+            } if window_id == window.id() => control_flow.set_exit(),
+            _ => (),
         }
 
-        let size = window.get_framebuffer_size();
+        let size = window.inner_size();
 
         if old_size != size {
-            bgfx::reset(size.0 as _, size.1 as _, ResetArgs::default());
+            bgfx::reset(size.width as _, size.height as _, ResetArgs::default());
             old_size = size;
         }
 
-        bgfx::set_view_rect(0, 0, 0, size.0 as _, size.1 as _);
+        bgfx::set_view_rect(0, 0, 0, size.width as _, size.height as _);
         bgfx::touch(0);
 
         bgfx::dbg_text_clear(DbgTextClearArgs::default());
@@ -125,7 +160,6 @@ fn main() {
         );
 
         bgfx::frame(false);
-    }
-
-    bgfx::shutdown();
+    });
 }
+

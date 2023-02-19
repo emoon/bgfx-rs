@@ -57,7 +57,6 @@ fn get_platform_data(window: &Window) -> PlatformData {
         ))]
         RawWindowHandle::Xlib(data) => {
             pd.nwh = data.window as *mut _;
-            pd.ndt = data.display as *mut _;
         }
         #[cfg(any(
             target_os = "linux",
@@ -68,7 +67,6 @@ fn get_platform_data(window: &Window) -> PlatformData {
         ))]
         RawWindowHandle::Wayland(data) => {
             pd.ndt = data.surface; // same as window, on wayland there ins't a concept of windows
-            pd.nwh = data.display;
         }
 
         #[cfg(target_os = "macos")]
@@ -121,7 +119,7 @@ fn load_shader_program(vs: &str, ps: &str) -> std::io::Result<Program> {
 
 #[cfg(target_os = "linux")]
 fn get_render_type() -> RendererType {
-    RendererType::Vulkan
+    RendererType::OpenGL
 }
 
 #[cfg(not(target_os = "linux"))]

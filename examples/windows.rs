@@ -17,7 +17,7 @@ fn get_platform_data(window: &Window) -> PlatformData {
         ))]
         RawWindowHandle::Xlib(data) => {
             pd.nwh = data.window as *mut c_void;
-            pd.ndt = data.display as *mut c_void;
+            pd.ndt = data.visual_id as *mut c_void;
         }
         #[cfg(any(
             target_os = "linux",
@@ -28,7 +28,6 @@ fn get_platform_data(window: &Window) -> PlatformData {
         ))]
         RawWindowHandle::Wayland(data) => {
             pd.ndt = data.surface; // same as window, on wayland there ins't a concept of windows
-            pd.nwh = data.display;
         }
 
         #[cfg(target_os = "macos")]
@@ -47,7 +46,7 @@ fn get_platform_data(window: &Window) -> PlatformData {
 
 fn get_render_type() -> RendererType {
     #[cfg(any(target_os = "linux", target_os = "windows"))]
-    return RendererType::Vulkan;
+    return RendererType::OpenGL;
     #[cfg(target_os = "macos")]
     return RendererType::Metal;
 }
