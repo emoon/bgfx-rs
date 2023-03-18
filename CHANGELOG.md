@@ -2,6 +2,10 @@
 
 This project follows semantic versioning.
 
+### v0.18 (2023-03-18)
+
+- [Added] Emscripten support. See `web_example` for an example how this works.
+
 ### v0.9 (2022-04-08)
 
 - [fixed] Fixed a crash when using dynamic vertex buffers
