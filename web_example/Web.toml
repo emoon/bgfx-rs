@@ -1,0 +1,10 @@
+default-target = "wasm32-unknown-emscripten"
+
+[cargo-web]
+minimum-version = "0.6.0"
+
+[target.emscripten]
+link-args = [
+  "-sUSE_GLFW=3",
+]
+

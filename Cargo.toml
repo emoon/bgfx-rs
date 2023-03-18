@@ -16,7 +16,7 @@ exclude = ["resources/"]
 maintenance = { status = "actively-developed" }
 
 [dependencies]
-bgfx-sys = "0.11"
+bgfx-sys = "0.12"
 bitflags = "1.2"
 cfixed-string = "1.0"
 

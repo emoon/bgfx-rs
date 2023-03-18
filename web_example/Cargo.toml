@@ -1,0 +1,12 @@
+[package]
+name = "web_example"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bgfx-rs = { path = ".." }
+glfw = { version = "0.51", package = "glfw-passthrough", default-features = false }
+raw-window-handle = "0.5"
+glam = "0.15"
