@@ -189,6 +189,9 @@ fn main() -> std::io::Result<()> {
 
     let shader_program = create_shader_program()?;
 
+    bgfx::reset(WIDTH as _, HEIGHT as _, ResetArgs::default());
+    bgfx::set_view_rect(0, 0, 0, WIDTH as _, HEIGHT as _);
+
     let state = Box::new(State {
         vbh,
         ibh,
