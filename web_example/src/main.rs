@@ -16,6 +16,7 @@ struct PosColorVertex {
 }
 
 static CANVAS_ID: &[u8; 7] = b"canvas\0";
+
 static VS_CUBES: &[u8] =
     include_bytes!("../../resources/examples/runtime/shaders/essl/vs_cubes.bin");
 static FS_CUBES: &[u8] =
@@ -167,20 +168,6 @@ fn main() -> std::io::Result<()> {
         },
     );
 
-    let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
-    glfw.window_hint(glfw::WindowHint::ClientApi(glfw::ClientApiHint::NoApi));
-
-    let (mut window, _events) = glfw
-        .create_window(
-            WIDTH as _,
-            HEIGHT as _,
-            "cubes.rs bgfx-sys example - ESC to close",
-            glfw::WindowMode::Windowed,
-        )
-        .expect("Failed to create GLFW window.");
-
-    window.set_key_polling(true);
-
     let layout = VertexLayoutBuilder::begin(RendererType::Noop)
         .add(Attrib::Position, 3, AttribType::Float, AddArgs::default())
         .add(
@@ -201,6 +188,9 @@ fn main() -> std::io::Result<()> {
     let ibh = bgfx::create_index_buffer(&index_mem, BufferFlags::NONE.bits());
 
     let shader_program = create_shader_program()?;
+
+    bgfx::reset(WIDTH as _, HEIGHT as _, ResetArgs::default());
+    bgfx::set_view_rect(0, 0, 0, WIDTH as _, HEIGHT as _);
 
     let state = Box::new(State {
         vbh,
