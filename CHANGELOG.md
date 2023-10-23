@@ -2,6 +2,10 @@
 
 This project follows semantic versioning.
 
+### v0.19 (2023-10-23)
+
+- [Added] Depend on latest bgfx-sys with updated BGFX code. 
+
 ### v0.18 (2023-03-18)
 
 - [Added] Emscripten support. See `web_example` for an example how this works.

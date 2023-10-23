@@ -6,7 +6,7 @@ categories = ["rendering::graphics-api"]
 description = "Bindings for bgfx"
 repository = "https://github.com/emoon/bgfx-rs"
 documentation = "https://docs.rs/bgfx-rs/0.1/bgfx-rs"
-version = "0.18.0"
+version = "0.19.0"
 edition = "2018"
 readme = "README.md"
 
@@ -16,7 +16,7 @@ exclude = ["resources/"]
 maintenance = { status = "actively-developed" }
 
 [dependencies]
-bgfx-sys = "0.12"
+bgfx-sys = "0.13"
 bitflags = "1.2"
 cfixed-string = "1.0"
 
