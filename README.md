@@ -3,6 +3,9 @@
 ![Maintenance status](https://img.shields.io/badge/maintenance-looking--for--maintainer-yellow.svg)
 
 Notice that this project is looking for a maintainer. If you are interested in maintaining this project, please open an issue.
+
+## Bindings for BGFX
+
 Rust bindings to [bgfx](https://github.com/bkaradzic/bgfx), a cross-platform, graphics API agnostic, "Bring Your Own Engine/Framework" style rendering library.
 
 ## Why another wrapper?
@@ -12,7 +15,7 @@ In some cases there will be manual implementation where it makes sense to provid
 
 ## Status
 
-Currently being developed and the API is changing. The goal of this library is to cover the majority of the BGFX functionality while providing some Rust style convenience on top of the C API.
+The crate is not being developed actively. 
 
 Usage
 -----
