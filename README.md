@@ -1,5 +1,8 @@
 # bgfx-rs
 
+![Maintenance status](https://img.shields.io/badge/maintenance-looking--for--maintainer-yellow.svg)
+
+Notice that this project is looking for a maintainer. If you are interested in maintaining this project, please open an issue.
 Rust bindings to [bgfx](https://github.com/bkaradzic/bgfx), a cross-platform, graphics API agnostic, "Bring Your Own Engine/Framework" style rendering library.
 
 ## Why another wrapper?
@@ -17,7 +20,7 @@ Usage
 ```toml
 # Cargo.toml
 [dependencies]
-bgfx-rs = "0.19"
+bgfx-rs = "0.20"
 ```
 
 The library doesn't include any window handling and that has to be provided by the user. See [examples](https://github.com/emoon/bgfx-rs/tree/main/examples) an how to use [GLFW](https://crates.io/crates/glfw)

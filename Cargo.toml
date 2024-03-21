@@ -5,7 +5,7 @@ authors = ["Daniel Collin <daniel@collin.com>"]
 categories = ["rendering::graphics-api"]
 description = "Bindings for bgfx"
 repository = "https://github.com/emoon/bgfx-rs"
-documentation = "https://docs.rs/bgfx-rs/0.1/bgfx-rs"
+documentation = "https://docs.rs/bgfx-rs/0.19/bgfx-rs"
 version = "0.19.0"
 edition = "2018"
 readme = "README.md"
@@ -13,10 +13,10 @@ readme = "README.md"
 exclude = ["resources/"]
 
 [badges]
-maintenance = { status = "actively-developed" }
+maintenance = { status = "looking-for-maintainer" }
 
 [dependencies]
-bgfx-sys = "0.13"
+bgfx-sys = "0.15"
 bitflags = "1.2"
 cfixed-string = "1.0"
 
